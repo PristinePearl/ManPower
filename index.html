@@ -1,0 +1,2384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" type="image/png" href="https://www.pristinepearlpharma.in/images/alt-logo.png">
+<title>ManPower — Pristine Pearl Pharma</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#f0f2f8;--surface:#fff;--card:#fff;--card2:#f7f8fc;--border:#e4e8f2;--border2:#d2d9ec;
+  --accent:#3b5bdb;--accent-g:linear-gradient(135deg,#3b5bdb,#5c7cfa);--accent2:#0ca678;
+  --accent3:#f59f00;--accent4:#e03131;--accent5:#7048e8;--sales:#1098ad;--ho:#5f3dc4;
+  --text:#1a1f36;--text2:#4a5272;--muted:#8b93b3;
+  --sh1:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.03);
+  --sh3:0 12px 40px rgba(0,0,0,.12);
+  --radius:14px;--radius-sm:9px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;}
+.font-title{font-family:'Space Grotesk',sans-serif;}
+.mono{font-family:'JetBrains Mono',monospace;}
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* SIDEBAR */
+#sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;overflow-y:auto;box-shadow:var(--sh1);display:flex;flex-direction:column;}
+.sb-logo{padding:20px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.sb-icon{width:40px;height:40px;border-radius:12px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(59,91,219,.35);flex-shrink:0;}
+.sb-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text);}
+.sb-sub{font-size:10px;color:var(--muted);font-weight:600;margin-top:1px;}
+.nav-sect{padding:14px 16px 4px;font-size:9.5px;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:600;margin:1px 8px;transition:all .15s;position:relative;}
+.nav-item:hover{background:var(--bg);color:var(--text);}
+.nav-item.active{background:var(--accent-g);color:#fff;box-shadow:0 4px 12px rgba(59,91,219,.3);}
+.nav-item .ni-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;transition:all .15s;}
+.nav-item.active .ni-icon{background:rgba(255,255,255,.2);}
+.nav-badge{margin-left:auto;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;flex-shrink:0;}
+.sb-footer{padding:12px;border-top:1px solid var(--border);margin-top:auto;}
+.sb-refresh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--accent-g);color:#fff;font-size:13px;font-weight:700;cursor:pointer;border:none;width:100%;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 4px 12px rgba(59,91,219,.3);transition:all .15s;}
+.sb-refresh:hover{box-shadow:0 6px 18px rgba(59,91,219,.4);transform:translateY(-1px);}
+.sb-time{font-size:10px;color:var(--muted);text-align:center;margin-top:6px;font-weight:600;}
+
+/* MAIN */
+main{flex:1;overflow:auto;padding:28px;min-width:0;}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--sh1);}
+.card:hover{box-shadow:var(--sh2);}
+
+/* KPI */
+.kpi-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px;}
+.kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--sh1);position:relative;overflow:hidden;cursor:pointer;transition:all .2s;}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh2);}
+.kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
+.kpi-val{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;line-height:1;}
+.kpi-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:5px;}
+.kpi-bar{height:3px;border-radius:999px;background:var(--border);margin-top:12px;overflow:hidden;}
+.kpi-bar-fill{height:3px;border-radius:999px;transition:width .8s cubic-bezier(.4,0,.2,1);}
+.kpi-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);opacity:.12;font-size:42px;}
+
+/* TABLE */
+.table-wrap{overflow:auto;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--sh1);}
+.emp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.emp-table th{background:var(--card2);color:var(--text2);font-weight:700;padding:11px 14px;text-align:left;position:sticky;top:0;z-index:10;border-bottom:2px solid var(--border);white-space:nowrap;font-family:'Space Grotesk',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;user-select:none;}
+.emp-table th:hover{background:#e8ecfa;color:var(--accent);}
+.emp-table th .sort-icon{margin-left:4px;opacity:.5;font-size:10px;}
+.emp-table th.sort-asc .sort-icon::after{content:'▲';}
+.emp-table th.sort-desc .sort-icon::after{content:'▼';}
+.emp-table th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'⇅';}
+.emp-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap;color:var(--text);}
+.emp-table tr{cursor:pointer;transition:background .1s;}
+.emp-table tr:hover td{background:#eff3ff;}
+.emp-table tbody tr:last-child td{border-bottom:none;}
+.tr-new td{background:#fffde7!important;}
+.tr-new:hover td{background:#fff9c4!important;}
+
+/* BADGE */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap;}
+.b-green{background:#d3f9d8;color:#1b5e20;}.b-red{background:#ffe3e3;color:#c92a2a;}
+.b-blue{background:#dbe4ff;color:#1c3fa8;}.b-amber{background:#fff3bf;color:#854d0e;}
+.b-sky{background:#c5f6fa;color:#0c7a85;}.b-indigo{background:#e5dbff;color:#4c2899;}
+.b-purple{background:#f3d9fa;color:#6a0dad;}.b-gray{background:#e9ecef;color:#495057;}
+.b-new{background:#fff3bf;color:#854d0e;}
+
+/* INPUT */
+.inp{background:var(--card);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,91,219,.12);}
+.inp::placeholder{color:var(--muted);}
+
+/* BUTTON */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;}
+.btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 2px 8px rgba(59,91,219,.25);}
+.btn-primary:hover{box-shadow:0 4px 14px rgba(59,91,219,.35);transform:translateY(-1px);}
+.btn-success{background:linear-gradient(135deg,#0ca678,#12b886);color:#fff;}
+.btn-danger{background:linear-gradient(135deg,#e03131,#f03e3e);color:#fff;}
+.btn-ghost{background:var(--card);border:1.5px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:#eff3ff;}
+.btn-excel{background:linear-gradient(135deg,#1d7a3b,#2e9e4f);color:#fff;box-shadow:0 2px 8px rgba(29,122,59,.25);}
+.btn-excel:hover{box-shadow:0 4px 14px rgba(29,122,59,.35);transform:translateY(-1px);}
+
+/* PAGE */
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* PAGE HEADER */
+.pg-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.pg-title{font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:var(--text);}
+.pg-sub{font-size:13px;color:var(--muted);font-weight:600;margin-top:3px;}
+.pg-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(10,15,40,.5);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);animation:fadeIn .18s ease;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:94%;max-width:800px;max-height:92vh;overflow-y:auto;box-shadow:var(--sh3);animation:scaleIn .2s ease;}
+.modal-header{padding:24px 28px 0;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:0;}
+.modal-content{padding:24px 28px;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.96);}to{opacity:1;transform:none;}}
+
+/* AVATAR */
+.avatar{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;font-family:'Space Grotesk',sans-serif;}
+.av-0{background:#dbe4ff;color:#1c3fa8;}.av-1{background:#d3f9d8;color:#1b5e20;}
+.av-2{background:#fff3bf;color:#854d0e;}.av-3{background:#f3d9fa;color:#6a0dad;}
+.av-4{background:#ffe3e3;color:#c92a2a;}.av-5{background:#c5f6fa;color:#0c7a85;}
+.av-6{background:#e5dbff;color:#4c2899;}.av-7{background:#ffd8a8;color:#8d3b00;}
+
+/* TAB STRIP */
+.tabs{display:flex;gap:3px;background:var(--card2);padding:4px;border-radius:10px;border:1px solid var(--border);}
+.tab-btn{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.tab-btn.active{background:var(--card);color:var(--accent);box-shadow:var(--sh1);}
+
+/* PROGRESS */
+.pbar{background:var(--border);border-radius:999px;overflow:hidden;}
+.pbar-fill{border-radius:999px;transition:width .7s cubic-bezier(.4,0,.2,1);}
+
+/* TOAST */
+#toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;min-width:240px;animation:slideUp .3s ease;box-shadow:var(--sh2);font-weight:600;}
+@keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* HIERARCHY */
+.hier-wrap{padding:4px;}
+.hier-node{position:relative;margin-bottom:2px;}
+.hier-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:11px;margin-bottom:3px;background:var(--card);border:1.5px solid var(--border);cursor:pointer;transition:all .12s;}
+.hier-item:hover{background:#eff3ff;border-color:#bac8ff;box-shadow:var(--sh1);}
+.hier-item.level-0{background:var(--accent-g);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(59,91,219,.3);}
+.hier-item.level-1{background:#eff3ff;border-color:#bac8ff;}
+.hier-item.level-2{background:#f0fdf4;border-color:#bbf7d0;}
+.hier-item.level-3{background:var(--card2);border-color:var(--border);}
+.hier-toggle{width:24px;height:24px;border-radius:7px;background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;transition:all .12s;border:none;color:inherit;}
+.hier-item.level-0 .hier-toggle{background:rgba(255,255,255,.2);}
+.hier-item.level-1 .hier-toggle{background:#dbe4ff;color:#1c3fa8;}
+.hier-item.level-2 .hier-toggle{background:#bbf7d0;color:#166534;}
+.hier-toggle:hover{transform:scale(1.1);}
+.hier-children{padding-left:40px;border-left:2px dashed var(--border2);margin-left:19px;margin-top:3px;margin-bottom:6px;}
+.hier-desig-chip{font-size:10.5px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0;}
+.hier-item.level-0 .hier-desig-chip{background:rgba(255,255,255,.25);color:#fff;}
+.hier-item.level-1 .hier-desig-chip{background:#dbe4ff;color:#1c3fa8;}
+.hier-item.level-2 .hier-desig-chip{background:#bbf7d0;color:#166534;}
+.hier-item.level-3 .hier-desig-chip{background:var(--border);color:var(--text2);}
+.hier-meta{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex-shrink:0;}
+.hier-direct{font-size:10px;font-weight:700;}
+.hier-item.level-0 .hier-direct{color:rgba(255,255,255,.8);}
+.hier-item.level-1 .hier-direct{color:var(--accent);}
+.hier-item.level-2 .hier-direct{color:#16a34a;}
+.hier-item.level-3 .hier-direct{color:var(--muted);}
+.hier-id{font-family:'JetBrains Mono',monospace;font-size:10px;}
+.hier-item.level-0 .hier-id{color:rgba(255,255,255,.65);}
+.hier-hq{font-size:10.5px;font-weight:600;}
+.hier-item.level-0 .hier-hq{color:rgba(255,255,255,.75);}
+
+/* SUMMARY CHIPS */
+.summary-chip{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:var(--radius);background:var(--card);border:2px solid var(--border);cursor:pointer;transition:all .15s;box-shadow:var(--sh1);}
+.summary-chip:hover{border-color:var(--accent);box-shadow:var(--sh2);}
+.summary-chip.active-filter{border-color:var(--accent);background:#eff3ff;box-shadow:0 0 0 3px rgba(59,91,219,.12);}
+
+/* LOADING */
+#loadOv{position:fixed;inset:0;background:rgba(240,242,248,.92);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;backdrop-filter:blur(6px);}
+.spin{width:46px;height:46px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+
+/* PULSE */
+.pulse-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);position:relative;flex-shrink:0;}
+.pulse-dot::after{content:'';position:absolute;inset:-3px;border-radius:50%;border:2px solid var(--accent2);animation:pulseA 1.6s infinite;opacity:0;}
+@keyframes pulseA{0%{opacity:.6;transform:scale(.8);}100%{opacity:0;transform:scale(2);}}
+
+/* HERO */
+.stat-hero{background:var(--accent-g);border-radius:var(--radius);padding:24px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(59,91,219,.28);}
+.stat-hero::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);}
+.stat-hero::after{content:'';position:absolute;right:40px;bottom:-60px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04);}
+
+/* SECTION TITLE */
+.sec-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.sec-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+
+/* MODAL FIELD ROW */
+.field-row{display:flex;align-items:flex-start;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);gap:12px;}
+.field-row:last-child{border-bottom:none;}
+.field-label{font-size:11.5px;color:var(--muted);font-weight:600;flex-shrink:0;min-width:120px;}
+.field-val{font-size:13px;font-weight:600;text-align:right;word-break:break-all;color:var(--text);}
+
+/* REP CARD */
+.rep-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--sh1);transition:all .2s;}
+.rep-card:hover{transform:translateY(-2px);box-shadow:var(--sh2);}
+
+/* DONUT CHART */
+.donut-wrap{display:flex;align-items:center;gap:20px;flex-wrap:wrap;}
+.donut-legend{display:flex;flex-direction:column;gap:6px;flex:1;min-width:120px;}
+.donut-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;}
+.donut-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
+
+/* QUICK STAT ROW */
+.qstat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
+.qstat{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center;}
+.qstat-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
+.qstat-lbl{font-size:10px;color:var(--muted);font-weight:600;margin-top:3px;}
+
+/* TOP LIST */
+.top-list-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+.top-list-item:last-child{border-bottom:none;}
+
+/* CELEBRATION CARD */
+.celeb-card{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);}
+.celeb-card:last-child{border-bottom:none;}
+.celeb-badge{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.celeb-days{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;}
+.today-banner{background:linear-gradient(135deg,#f59f00,#ffd43b);border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 16px rgba(245,159,0,.25);}
+
+/* HIER SEARCH BAR */
+.hier-search-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
+
+@media(max-width:768px){#sidebar{display:none;}}
+</style>
+</head>
+<body>
+
+<div id="gasUrl" data-url="https://script.google.com/macros/s/AKfycbxdOs22qKMLlf-0PCOjb4KHBXW2WtHaWKclaSFW5vRVxfk87d3PltASdbRGcVDi_yabSw/exec" style="display:none"></div>
+
+<div style="display:flex;min-height:100vh;">
+
+<!-- SIDEBAR -->
+<aside id="sidebar">
+  <div class="sb-logo">
+    <div class="sb-icon" style="background:none;box-shadow:none;padding:2px;">
+  <img src="https://www.pristinepearlpharma.in/images/alt-logo.png" style="width:36px;height:36px;object-fit:contain;border-radius:8px;"/>
+</div>
+    <div>
+      <div class="sb-title">ManPower</div>
+      <div class="sb-sub">Pristine Pearl Pharma PVT LTD</div>
+    </div>
+  </div>
+  <nav style="flex:1;padding:6px 0;overflow-y:auto;">
+    <div class="nav-sect">Overview</div>
+    <div class="nav-item active" onclick="navigate('dashboard')">
+      <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg></div>Dashboard
+    </div>
+    <div class="nav-item" onclick="navigate('newjoiners')">
+      <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg></div>New Joiners
+      <span id="nav-new-count" class="nav-badge b-new"></span>
+    </div>
+    <div class="nav-sect">Active Staff</div>
+    <div class="nav-item" onclick="navigate('sales')">
+      <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg></div>Field Staff
+      <span id="nav-sales-count" class="nav-badge b-sky"></span>
+    </div>
+    <div class="nav-item" onclick="navigate('headoffice')">
+      <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1"/></svg></div>HO Staff
+      <span id="nav-ho-count" class="nav-badge b-indigo"></span>
+    </div>
+    <div class="nav-item" onclick="navigate('resigned')">
+      <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></div>Resigned
+      <span id="nav-resigned-count" class="nav-badge b-red"></span>
+    </div>
+    <div class="nav-sect">Reports</div>
+    <div class="nav-item" onclick="navigate('dept')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10"/></svg></div>By Department</div>
+    <div class="nav-item" onclick="navigate('division')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div>By Division</div>
+    <div class="nav-item" onclick="navigate('team')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>By Team</div>
+    <div class="nav-item" onclick="navigate('location')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg></div>By Location</div>
+    <div class="nav-item" onclick="navigate('trend')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>Joining Trends</div>
+    <div class="nav-sect">Tools</div>
+    <div class="nav-item" onclick="navigate('search')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg></div>Search</div>
+    <div class="nav-item" onclick="navigate('export')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></div>Export Data</div>
+  <div class="nav-item" onclick="navigate('contacts')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V7a2 2 0 012-2z"/></svg></div>Contacts</div>
+<div class="nav-item" onclick="navigate('celebrations')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0M9 6l3-3 3 3M12 3v12"/></svg></div>Celebrations <span id="nav-celeb-count" class="nav-badge b-new"></span></div>
+  </nav>
+  <div class="sb-footer">
+    <button class="sb-refresh" onclick="loadData()">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh Data
+    </button>
+    <div id="lastRefresh" class="sb-time">Not loaded</div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main>
+<div id="loadOv">
+  <div class="spin"></div>
+  <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--text2);">Loading employees…</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page active">
+  <div class="pg-header">
+    <div>
+      <div class="pg-title">Workforce Dashboard</div>
+      <div class="pg-sub">Real-time manpower overview · <span id="dash-date"></span></div>
+    </div>
+    <div class="pg-actions">
+      <button class="btn btn-ghost" onclick="navigate('export')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export</button>
+      <button class="btn btn-primary" onclick="loadData()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+    </div>
+  </div>
+
+  <!-- Hero Banner -->
+  <div class="stat-hero" style="margin-bottom:18px;">
+    <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
+      <div>
+        <div style="font-size:11px;font-weight:700;opacity:.7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Total Workforce</div>
+        <div id="hero-total" style="font-family:'Space Grotesk',sans-serif;font-size:56px;font-weight:700;line-height:1;">—</div>
+        <div style="font-size:13px;opacity:.75;font-weight:600;margin-top:4px;">Across all departments & divisions</div>
+      </div>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;" id="hero-active">—</div><div style="font-size:11px;opacity:.7;font-weight:600;display:flex;align-items:center;gap:5px;justify-content:center;"><span class="pulse-dot"></span>Active</div></div>
+        <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;" id="hero-sales">—</div><div style="font-size:11px;opacity:.7;font-weight:600;">Sales Field</div></div>
+        <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;" id="hero-ho">—</div><div style="font-size:11px;opacity:.7;font-weight:600;">Head Office</div></div>
+        <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;color:#ffd43b;" id="hero-new">—</div><div style="font-size:11px;opacity:.7;font-weight:600;">New (10d)</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Row (no resigned) -->
+  <div class="kpi-wrap" id="kpi-wrap"></div>
+
+  <!-- Row 1: Charts -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--sales);"></span>Sales — By Designation</div><div id="dash-sales-chart"></div></div>
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--ho);"></span>Head Office — By Department</div><div id="dash-ho-chart"></div></div>
+  </div>
+
+  <!-- Row 2: Division + HQ -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--accent3);"></span>Division Strength (Sales)</div><div id="div-chart"></div></div>
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--accent5);"></span>HQ Distribution (Active)</div><div id="hq-chart"></div></div>
+  </div>
+
+  <!-- Row 3: Gender + Experience snapshot -->
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent2);"></span>Gender Split</div>
+      <div id="dash-gender"></div>
+    </div>
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent3);"></span>Experience Bands</div>
+      <div id="dash-exp"></div>
+    </div>
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent4);"></span>Attrition Snapshot</div>
+      <div id="dash-attrition"></div>
+    </div>
+  </div>
+
+  <!-- Row 4: Top HQ + Recent Joiners -->
+  <div style="display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px;">
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent);"></span>Top 5 HQs by Strength</div>
+      <div id="dash-top-hq"></div>
+    </div>
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+        <div class="sec-title" style="margin:0;"><span class="sec-dot" style="background:var(--accent3);"></span>Recent Joiners <span class="badge b-new" style="margin-left:6px;">Last 10 days</span></div>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;" onclick="navigate('newjoiners')">View All →</button>
+      </div>
+      <div id="recent-joiners"></div>
+    </div>
+  </div>
+
+  <!-- Row 5: Designation breakdown table -->
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="sec-title" style="margin:0;"><span class="sec-dot" style="background:var(--accent5);"></span>Full Designation Breakdown</div>
+    </div>
+    <div id="dash-desig-breakdown"></div>
+  </div>
+</div>
+
+<!-- NEW JOINERS -->
+<div id="page-newjoiners" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title">🌟 New Joiners</div><div class="pg-sub" id="new-subtitle"></div></div>
+    <div class="pg-actions">
+      <label style="font-size:13px;font-weight:600;color:var(--text2);">Days:</label>
+      <input class="inp" id="new-days" type="number" value="10" min="1" max="365" style="width:70px;" onchange="renderNewJoiners()"/>
+      <select class="inp" id="new-dept-filter" onchange="renderNewJoiners()"><option value="">All Depts</option></select>
+      <select class="inp" id="new-type-filter" onchange="renderNewJoiners()"><option value="">Sales & HO</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option></select>
+      <button class="btn btn-ghost" onclick="clearNewFilters()">Clear Filters</button>
+      <button class="btn btn-excel" onclick="exportNewXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;" id="nj-kpis"></div>
+  <div class="table-wrap">
+    <table class="emp-table">
+      <thead><tr><th>#</th><th>Emp ID</th><th>Name</th><th>Type</th><th>Designation</th><th>Department</th><th>Division</th><th>HQ</th><th>Date of Joining</th><th>Days Ago</th></tr></thead>
+      <tbody id="newjoin-tbody"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- SALES -->
+<div id="page-sales" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title" style="display:flex;align-items:center;gap:10px;"><span style="width:14px;height:14px;border-radius:50%;background:var(--sales);display:inline-block;"></span>Sales Team</div><div class="pg-sub" id="sales-subtitle"></div></div>
+    <div class="pg-actions">
+      <div class="tabs">
+        <button class="tab-btn active" id="sales-tab-list" onclick="switchSalesTab('list')">Employee List</button>
+        <button class="tab-btn" id="sales-tab-hier" onclick="switchSalesTab('hier')">Hierarchy</button>
+      </div>
+      <input class="inp" id="sales-search" placeholder="🔍 Search…" oninput="filterSalesTable()" style="width:175px;"/>
+      <select class="inp" id="sales-desig-filter" onchange="filterSalesTable()"><option value="">All Designations</option></select>
+      <select class="inp" id="sales-div-filter" onchange="filterSalesTable()"><option value="">All Divisions</option></select>
+      <select class="inp" id="sales-hq-filter" onchange="filterSalesTable()"><option value="">All HQ</option></select>
+      <select class="inp" id="sales-team-filter" onchange="filterSalesTable()"><option value="">All Teams</option></select>
+      <button class="btn btn-ghost" onclick="clearSalesFilters()">Clear</button>
+      <button class="btn btn-excel" onclick="exportSalesXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+  <div id="sales-desig-kpis" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <div id="sales-list-panel">
+    <div class="table-wrap">
+      <table class="emp-table" id="sales-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('sales','#',false)">#<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','Emp Id',false)">Emp ID<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','Emp Name',false)">Name<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','Short Designation',false)">Designation<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','Division',false)">Division<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','HQ',false)">HQ<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','Date of Joining',false)">Date of Joining<span class="sort-icon"></span></th>
+            <th onclick="sortTable('sales','Team Wise',false)">Team<span class="sort-icon"></span></th>
+            <th>Reporting Manager<span class="sort-icon"></span></th>
+          </tr>
+        </thead>
+        <tbody id="sales-tbody"></tbody>
+      </table>
+    </div>
+    <div id="sales-pagination" style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px;align-items:center;"></div>
+  </div>
+  <div id="sales-hier-panel" style="display:none;">
+    <div class="card">
+      <div class="hier-search-bar">
+        <div class="sec-title" style="margin:0;flex:1;">Sales Reporting Hierarchy <span class="badge b-sky" id="sales-hier-count" style="margin-left:6px;"></span></div>
+        <input class="inp" id="sales-hier-search" placeholder="🔍 Filter by name / ID…" oninput="filterHierarchy('sales')" style="width:200px;"/>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="expandAllHier('sales-hier-tree')">Expand All</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="collapseAllHier('sales-hier-tree')">Collapse All</button>
+      </div>
+      <div id="sales-hier-tree"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HEAD OFFICE -->
+<div id="page-headoffice" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title" style="display:flex;align-items:center;gap:10px;"><span style="width:14px;height:14px;border-radius:50%;background:var(--ho);display:inline-block;"></span>Head Office</div><div class="pg-sub" id="ho-subtitle"></div></div>
+    <div class="pg-actions">
+      <div class="tabs">
+        <button class="tab-btn active" id="ho-tab-list" onclick="switchHOTab('list')">Employee List</button>
+        <button class="tab-btn" id="ho-tab-hier" onclick="switchHOTab('hier')">Hierarchy</button>
+      </div>
+      <input class="inp" id="ho-search" placeholder="🔍 Search…" oninput="filterHOTable()" style="width:175px;"/>
+      <select class="inp" id="ho-dept-filter" onchange="filterHOTable()"><option value="">All Depts</option></select>
+      <select class="inp" id="ho-desig-filter" onchange="filterHOTable()"><option value="">All Designations</option></select>
+      <button class="btn btn-ghost" onclick="clearHOFilters()">Clear</button>
+      <button class="btn btn-excel" onclick="exportHOXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+  <div id="ho-dept-kpis" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;"></div>
+  <div id="ho-list-panel">
+    <div class="table-wrap">
+      <table class="emp-table" id="ho-table">
+        <thead>
+          <tr>
+            <th onclick="sortTable('ho','#',false)">#<span class="sort-icon"></span></th>
+            <th onclick="sortTable('ho','Emp Id',false)">Emp ID<span class="sort-icon"></span></th>
+            <th onclick="sortTable('ho','Emp Name',false)">Name<span class="sort-icon"></span></th>
+            <th onclick="sortTable('ho','Designation',false)">Designation<span class="sort-icon"></span></th>
+            <th onclick="sortTable('ho','Department',false)">Department<span class="sort-icon"></span></th>
+            <th onclick="sortTable('ho','Date of Joining',false)">Date of Joining<span class="sort-icon"></span></th>
+            <th>Reporting Manager<span class="sort-icon"></span></th>
+          </tr>
+        </thead>
+        <tbody id="ho-tbody"></tbody>
+      </table>
+    </div>
+    <div id="ho-pagination" style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px;align-items:center;"></div>
+  </div>
+  <div id="ho-hier-panel" style="display:none;">
+    <div class="card">
+      <div class="hier-search-bar">
+        <div class="sec-title" style="margin:0;flex:1;">Head Office Reporting Hierarchy <span class="badge b-indigo" id="ho-hier-count" style="margin-left:6px;"></span></div>
+        <input class="inp" id="ho-hier-search" placeholder="🔍 Filter by name / ID…" oninput="filterHierarchy('ho')" style="width:200px;"/>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="expandAllHier('ho-hier-tree')">Expand All</button>
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="collapseAllHier('ho-hier-tree')">Collapse All</button>
+      </div>
+      <div id="ho-hier-tree"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESIGNED -->
+<div id="page-resigned" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title" style="color:var(--accent4);">Resigned Employees</div><div class="pg-sub" id="resigned-subtitle"></div></div>
+    <div class="pg-actions">
+      <input class="inp" id="resigned-search" placeholder="🔍 Search…" oninput="filterResignedTable()" style="width:190px;"/>
+      <select class="inp" id="resigned-dept-filter" onchange="filterResignedTable()"><option value="">All Depts</option></select>
+      <select class="inp" id="resigned-type-filter" onchange="filterResignedTable()"><option value="">Sales & HO</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option></select>
+      <select class="inp" id="resigned-year-filter" onchange="filterResignedTable()"><option value="">All Years</option></select>
+      <button class="btn btn-ghost" onclick="clearResignedFilters()">Clear</button>
+      <button class="btn btn-excel" onclick="exportResignedXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="emp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th onclick="sortTable('resigned','Emp Id',false)">Emp ID<span class="sort-icon"></span></th>
+          <th onclick="sortTable('resigned','Emp Name',false)">Name<span class="sort-icon"></span></th>
+          <th onclick="sortTable('resigned','Short Designation',false)">Designation<span class="sort-icon"></span></th>
+          <th onclick="sortTable('resigned','Department',false)">Department<span class="sort-icon"></span></th>
+          <th onclick="sortTable('resigned','Division',false)">Division<span class="sort-icon"></span></th>
+          <th onclick="sortTable('resigned','Date of Joining',false)">Date of Joining<span class="sort-icon"></span></th>
+          <th onclick="sortTable('resigned','Date Of Resignation',true)" class="sort-desc">Resignation Date<span class="sort-icon"></span></th>
+          <th>Tenure</th>
+          <th>Personal Mail</th>
+        </tr>
+      </thead>
+      <tbody id="resigned-tbody"></tbody>
+    </table>
+  </div>
+  <div id="resigned-pagination" style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px;align-items:center;"></div>
+</div>
+
+<!-- DEPT -->
+<div id="page-dept" class="page">
+  <div class="pg-header"><div class="pg-title">Department Report</div><button class="btn btn-excel" onclick="exportDeptReportXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export Excel</button></div>
+  <div id="dept-report-grid"></div>
+</div>
+
+<!-- DIVISION -->
+<div id="page-division" class="page">
+  <div class="pg-header"><div class="pg-title">Division Report <span class="badge b-sky" style="margin-left:8px;font-size:12px;">Sales Only</span></div><button class="btn btn-excel" onclick="exportDivReportXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export Excel</button></div>
+  <div id="div-report-grid"></div>
+</div>
+
+<!-- TEAM -->
+<div id="page-team" class="page">
+  <div class="pg-header"><div class="pg-title">Team-Wise Report</div><button class="btn btn-excel" onclick="exportTeamReportXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export Excel</button></div>
+  <div id="team-report-grid"></div>
+</div>
+
+<!-- LOCATION -->
+<div id="page-location" class="page">
+  <div class="pg-header"><div class="pg-title">Location Report</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--accent);"></span>By HQ</div><div id="hq-report"></div></div>
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--accent2);"></span>By State</div><div id="state-report"></div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--sales);"></span>Sales — HQ Strength</div><div id="sales-hq-report"></div></div>
+    <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--ho);"></span>Head Office — Location</div><div id="ho-loc-report"></div></div>
+  </div>
+</div>
+
+<!-- TREND -->
+<div id="page-trend" class="page">
+  <div class="pg-header"><div class="pg-title">Joining & Attrition Trends</div></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+    <div class="card"><div class="sec-title">Joining by Year</div><div id="join-trend-chart"></div></div>
+    <div class="card"><div class="sec-title">Resignation by Year</div><div id="resign-trend-chart"></div></div>
+  </div>
+  <div class="card"><div class="sec-title">Year-over-Year Summary</div><div id="yoy-table"></div></div>
+</div>
+
+<!-- SEARCH -->
+<div id="page-search" class="page">
+  <div class="pg-header"><div class="pg-title">Employee Search</div></div>
+  <div class="card" style="margin-bottom:18px;">
+    <div style="display:flex;gap:10px;align-items:center;">
+      <input class="inp" id="global-search" placeholder="Search name, ID, department, city, designation…" style="flex:1;padding:11px 15px;font-size:14px;" oninput="runGlobalSearch()"/>
+      <button class="btn btn-primary" onclick="runGlobalSearch()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>Search</button>
+      <button class="btn btn-ghost" onclick="clearSearchFilters()">Clear</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;">
+      <select class="inp" id="s-dept" onchange="runGlobalSearch()"><option value="">All Departments</option></select>
+      <select class="inp" id="s-div" onchange="runGlobalSearch()"><option value="">All Divisions</option></select>
+      <select class="inp" id="s-hq" onchange="runGlobalSearch()"><option value="">All HQ</option></select>
+      <select class="inp" id="s-desig" onchange="runGlobalSearch()"><option value="">All Designations</option></select>
+      <select class="inp" id="s-status" onchange="runGlobalSearch()"><option value="">All Status</option><option value="active">Active</option><option value="resigned">Resigned</option></select>
+      <select class="inp" id="s-type" onchange="runGlobalSearch()"><option value="">Sales & HO</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option></select>
+    </div>
+  </div>
+  <div id="search-result-count" style="color:var(--muted);font-size:13px;margin-bottom:10px;font-weight:600;"></div>
+  <div class="table-wrap">
+    <table class="emp-table">
+      <thead><tr><th>#</th><th>Emp ID</th><th>Name</th><th>Type</th><th>Status</th><th>Designation</th><th>Department</th><th>Division</th><th>HQ</th><th>Joined</th></tr></thead>
+      <tbody id="search-tbody"></tbody>
+    </table>
+  </div>
+  <div id="search-pagination" style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px;align-items:center;"></div>
+</div>
+
+<!-- EXPORT -->
+<div id="page-export" class="page">
+  <div class="pg-header"><div class="pg-title">Export Data</div></div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:16px;">
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">📊</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Sales Team</div><div id="export-sales-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportSalesXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">🏢</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Head Office</div><div id="export-ho-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportHOXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">👋</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Resigned</div><div id="export-resigned-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportResignedXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">👥</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">All Employees</div><div id="export-all-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportAllXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">🌟</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">New Joiners (10d)</div><div id="export-new-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportNewXLSX()">Download XLSX</button></div>
+  </div>
+  <div class="card"><div class="sec-title">Export by Department</div><div id="dept-export-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div></div>
+</div>
+<!-- CONTACTS -->
+<div id="page-contacts" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title">📋 Bulk Contacts</div><div class="pg-sub" id="contacts-subtitle"></div></div>
+    <div class="pg-actions">
+      <input class="inp" id="contacts-search" placeholder="🔍 Search name / ID…" oninput="renderContacts()" style="width:180px;"/>
+      <select class="inp" id="contacts-type" onchange="renderContacts()"><option value="active">Active Employees</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option><option value="all">All Employees</option></select>
+      <select class="inp" id="contacts-team" onchange="renderContacts()">
+  <option value="">All Teams</option>
+</select>
+
+<select class="inp" id="contacts-desig" onchange="renderContacts()">
+  <option value="">All Designations</option>
+</select>
+      <select class="inp" id="contacts-dept" onchange="renderContacts()"><option value="">All Departments</option></select>
+      <select class="inp" id="contacts-field" onchange="renderContacts()"><option value="email">Official Emails</option><option value="phone">Phone Numbers</option><option value="personal">Personal Emails</option></select>
+      <button class="btn btn-primary" onclick="copyContacts()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copy All</button>
+      <button class="btn btn-excel" onclick="exportContactsXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;" id="contacts-kpis"></div>
+
+  <!-- Contact list -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent);"></span>Contact List <span id="contacts-count" class="badge b-blue" style="margin-left:6px;"></span></div>
+      <div id="contacts-textarea-wrap">
+        <textarea id="contacts-textarea" readonly style="width:100%;height:320px;background:var(--card2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);resize:vertical;outline:none;line-height:1.6;"></textarea>
+      </div>
+      <div style="margin-top:10px;display:flex;gap:8px;">
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="copyContacts()">📋 Copy to Clipboard</button>
+        <button class="btn btn-ghost" id="whatsapp-btn" onclick="copyContactsFormatted('whatsapp')">💬 WhatsApp Format</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent2);"></span>Employee Details</div>
+      <div class="table-wrap" style="max-height:380px;overflow-y:auto;">
+        <table class="emp-table">
+          <thead><tr><th>#</th><th>Name</th><th>Dept</th><th>Contact</th><th>Type</th></tr></thead>
+          <tbody id="contacts-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CELEBRATIONS -->
+<div id="page-celebrations" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title">🎉 Celebrations</div><div class="pg-sub">Upcoming birthdays & work anniversaries</div></div>
+    <div class="pg-actions">
+      <select class="inp" id="celeb-window" onchange="renderCelebrations()">
+        <option value="7">Next 7 days</option>
+        <option value="14">Next 14 days</option>
+        <option value="30">Next 30 days</option>
+      </select>
+      <button class="btn btn-excel" onclick="exportCelebXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+
+  <!-- KPI strip -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px;" id="celeb-kpis"></div>
+
+  <!-- Today's celebrations banner -->
+  <div id="celeb-today-banner"></div>
+
+  <!-- Two panels -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:#e64980;"></span>🎂 Upcoming Birthdays</div>
+      <div id="birthday-list"></div>
+    </div>
+    <div class="card">
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent3);"></span>🏆 Work Anniversaries</div>
+      <div id="anniversary-list"></div>
+    </div>
+  </div>
+</div>
+
+</main>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-ov" style="display:none;" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div id="modal-avatar" class="avatar" style="width:64px;height:64px;font-size:22px;flex-shrink:0;"></div>
+        <div>
+          <div id="modal-name" style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;line-height:1.2;"></div>
+          <div id="modal-desig" style="color:var(--muted);font-size:13px;margin-top:4px;font-weight:600;"></div>
+          <div id="modal-status" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+        </div>
+      </div>
+      <button onclick="document.getElementById('modal').style.display='none'" style="background:var(--bg);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">✕</button>
+    </div>
+    <div class="modal-content">
+      <div id="modal-mgr-banner" style="display:none;background:linear-gradient(135deg,#eff3ff,#e5dbff);border:1.5px solid #bac8ff;border-radius:10px;padding:12px 16px;margin-bottom:18px;align-items:center;gap:12px;">
+        <svg width="18" height="18" fill="none" stroke="#5f3dc4" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#5f3dc4;text-transform:uppercase;letter-spacing:.07em;margin-bottom:2px;">Reporting Manager</div>
+          <div id="modal-mgr-name" style="font-weight:700;font-size:14px;color:#1a1f36;"></div>
+          <div id="modal-mgr-id" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#5f3dc4;margin-top:1px;"></div>
+        </div>
+      </div>
+      <div id="modal-body" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;"></div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const GAS_URL = document.getElementById('gasUrl').dataset.url;
+const DEMO_MODE = (GAS_URL === 'YOUR_WEB_APP_URL_HERE');
+const SALES_DEPT = 'Sales';
+
+let allEmployees=[], activeEmps=[], resignedEmps=[];
+let salesEmps=[], hoEmps=[];
+let salesFiltered=[], hoFiltered=[], resignedFiltered=[], searchFiltered=[];
+let salesPage=1, hoPage=1, resignedPage=1, searchPage=1;
+const PAGE_SIZE=50;
+const TODAY=new Date(); TODAY.setHours(0,0,0,0);
+const COLORS=['#3b5bdb','#0ca678','#f59f00','#e03131','#7048e8','#1098ad','#5f3dc4','#e64980','#2f9e44','#0077b6'];
+const AV_CLS=['av-0','av-1','av-2','av-3','av-4','av-5','av-6','av-7'];
+
+let sortState={sales:{col:'',dir:'asc'},ho:{col:'',dir:'asc'},resigned:{col:'Date Of Resignation',dir:'desc'}};
+
+// Active chip filters — track separately from dropdown so they stay in sync
+let salesDesigFilter='';
+
+let empIdMap={};
+
+// ──────────────────────────────────────────────
+// NAVIGATION
+// ──────────────────────────────────────────────
+function navigate(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const el=document.getElementById('page-'+page);
+  if(el) el.classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>{
+    if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+page+"'")) n.classList.add('active');
+  });
+  if(page==='dept')       renderDeptReport();
+  if(page==='division')   renderDivReport();
+  if(page==='team')       renderTeamReport();
+  if(page==='location')   renderLocationReport();
+  if(page==='trend')      renderTrendReport();
+  if(page==='export')     renderExportPage();
+  if(page==='contacts')     {renderContacts();populateSelect('contacts-dept',[...new Set(activeEmps.map(e=>e['Department']).filter(Boolean))].sort());}
+if(page==='celebrations') renderCelebrations();
+  if(page==='search')     {populateSearchFilters();runGlobalSearch();}
+  if(page==='newjoiners') renderNewJoiners();
+  if(page==='sales')      {renderSalesTable();renderSalesDesigKPIs();}
+  if(page==='headoffice') {renderHOTable();renderHODeptKPIs();}
+  if(page==='resigned')   renderResignedTable();
+}
+
+// ──────────────────────────────────────────────
+// LOAD
+// ──────────────────────────────────────────────
+async function loadData(){
+  showLoading(true);
+  try{
+    if(DEMO_MODE){allEmployees=generateDemoData();}
+    else{
+      const data=await fetchGAS();
+      if(!data.success) throw new Error(data.error||'Failed');
+      allEmployees=data.employees;
+    }
+    empIdMap={};
+    allEmployees.forEach(e=>{empIdMap[String(e['Emp Id']).trim()]=e;});
+
+    activeEmps   = allEmployees.filter(isActive);
+    resignedEmps = allEmployees.filter(e=>!isActive(e));
+    salesEmps    = activeEmps.filter(isSales);
+    hoEmps       = activeEmps.filter(e=>!isSales(e));
+    salesFiltered=[...salesEmps]; hoFiltered=[...hoEmps];
+    resignedFiltered=sortByResignedDate([...resignedEmps]);
+    searchFiltered=[...allEmployees];
+
+    renderDashboard();
+    renderSalesTable(); renderSalesDesigKPIs();
+    renderHOTable();    renderHODeptKPIs();
+    renderResignedTable();
+    populateFilters(); populateSearchFilters();
+    populateSelect('contacts-team',[...new Set(allEmployees.map(e=>e['Team Wise']).filter(Boolean))].sort());
+
+populateSelect('contacts-desig',[...new Set(allEmployees.map(e=>e['Short Designation']).filter(Boolean))].sort());
+
+    const nc=getNewJoiners(10).length;
+    document.getElementById('nav-sales-count').textContent=salesEmps.length;
+    document.getElementById('nav-ho-count').textContent=hoEmps.length;
+    document.getElementById('nav-resigned-count').textContent=resignedEmps.length;
+    document.getElementById('nav-new-count').textContent=nc;
+    // Celebrations badge (7 day window)
+const celebCount=[...activeEmps].filter(e=>{
+  const bdDays=getDaysUntilAnniversary(getDOB(e),7);
+  const annDays=getDaysUntilAnniversary(e['Date of Joining'],7);
+  const milestones=[1,2,3,5,7,10,15,20,25];
+  const validAnniv=annDays!==null&&milestones.includes(getYearsCompleted(e['Date of Joining'])+(annDays===0?0:1));
+  return bdDays!==null||validAnniv;
+}).length;
+document.getElementById('nav-celeb-count').textContent=celebCount||'';
+    document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString();
+    showToast('Loaded '+allEmployees.length+' employees','success');
+  }catch(e){showToast('Error: '+e.message,'error');console.error(e);}
+  showLoading(false);
+}
+
+async function fetchGAS(){
+  const url=GAS_URL+'?action=getAllEmployees&t='+Date.now();
+  try{
+    const res=await fetch(url,{method:'GET',mode:'cors'});
+    const txt=await res.text();
+    try{return JSON.parse(txt);}catch(_){}
+    return JSON.parse(txt.replace(/^\)\]\}'\n/,''));
+  }catch(e){
+    const res2=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=getAllEmployees'});
+    return await res2.json();
+  }
+}
+
+// ──────────────────────────────────────────────
+// HELPERS
+// ──────────────────────────────────────────────
+const isSales=e=>(e['Department']||'').toLowerCase().trim()===SALES_DEPT.toLowerCase();
+const isActive=e=>!e['Date Of Resignation']||e['Date Of Resignation'].toString().trim()==='';
+
+function parseDateStr(s){
+  if(!s) return null;
+  s=String(s).trim();
+  const p=s.split(/[-\/]/);
+  if(p.length!==3) return null;
+  if(p[0].length===4) return new Date(+p[0],+p[1]-1,+p[2]);
+  return new Date(+p[2],+p[1]-1,+p[0]);
+}
+function daysSince(ds){const d=parseDateStr(ds);if(!d)return null;d.setHours(0,0,0,0);return Math.floor((TODAY-d)/86400000);}
+function extractYear(s){if(!s)return null;const p=String(s).split(/[-\/]/);if(p[0].length===4)return p[0];if(p[2]&&p[2].length===4)return p[2];return null;}
+function calcTenure(doj,dor){const a=parseDateStr(doj),b=parseDateStr(dor);if(!a||!b)return '—';const m=Math.round((b-a)/2592000000);return m<12?m+'m':Math.floor(m/12)+'y '+(m%12)+'m';}
+function groupBy(arr,key){return arr.reduce((acc,e)=>{const k=e[key]||'Unknown';if(!acc[k])acc[k]=[];acc[k].push(e);return acc;},{});}
+function hashStr(s){let h=0;for(let c of s||'')h=(h*31+c.charCodeAt(0))|0;return h;}
+function buildAvatar(e,size='28px',fs='11px'){
+  const init=(e['Emp Name']||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const cls=AV_CLS[Math.abs(hashStr(e['Emp Id']))%AV_CLS.length];
+  return `<span class="avatar ${cls}" style="width:${size};height:${size};font-size:${fs};">${init}</span>`;
+}
+function getNewJoiners(days){
+  return activeEmps.filter(e=>{const d=daysSince(e['Date of Joining']);return d!==null&&d>=0&&d<=days;})
+    .sort((a,b)=>(parseDateStr(b['Date of Joining'])||0)-(parseDateStr(a['Date of Joining'])||0));
+}
+function safeJson(e){return JSON.stringify(e).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+function showLoading(v){document.getElementById('loadOv').style.display=v?'flex':'none';}
+
+function populateSelect(id,opts){
+  const el=document.getElementById(id);if(!el)return;
+  const first=el.options[0];el.innerHTML='';el.appendChild(first);
+  opts.forEach(o=>{const op=document.createElement('option');op.value=o;op.textContent=o;el.appendChild(op);});
+}
+
+function sortByResignedDate(arr){
+  return arr.sort((a,b)=>{
+    const da=parseDateStr(a['Date Of Resignation']),db=parseDateStr(b['Date Of Resignation']);
+    if(!da&&!db)return 0;if(!da)return 1;if(!db)return-1;
+    return db-da;
+  });
+}
+
+function getMgrInfo(mgrId){
+  if(!mgrId||!mgrId.toString().trim()) return null;
+  const key=mgrId.toString().trim();
+  const mgr=empIdMap[key];
+  if(!mgr) return {name:'External/Unknown',id:mgrId,desig:''};
+  const desig=isSales(mgr)?(mgr['Short Designation']||mgr['Designation']||''):(mgr['Designation']||'');
+  return {name:mgr['Emp Name'],id:mgrId,desig};
+}
+
+// ──────────────────────────────────────────────
+// CLEAR FILTER HELPERS
+// ──────────────────────────────────────────────
+function clearSalesFilters(){
+  document.getElementById('sales-search').value='';
+  document.getElementById('sales-desig-filter').value='';
+  document.getElementById('sales-div-filter').value='';
+  document.getElementById('sales-hq-filter').value='';
+  document.getElementById('sales-team-filter').value='';
+  salesDesigFilter='';
+  salesFiltered=[...salesEmps];
+  salesPage=1;
+  renderSalesTable();
+  renderSalesDesigKPIs();
+}
+
+function clearHOFilters(){
+  document.getElementById('ho-search').value='';
+  document.getElementById('ho-dept-filter').value='';
+  document.getElementById('ho-desig-filter').value='';
+  hoFiltered=[...hoEmps];
+  hoPage=1;
+  renderHOTable();
+  renderHODeptKPIs();
+}
+
+function clearResignedFilters(){
+  document.getElementById('resigned-search').value='';
+  document.getElementById('resigned-dept-filter').value='';
+  document.getElementById('resigned-type-filter').value='';
+  document.getElementById('resigned-year-filter').value='';
+  resignedFiltered=sortByResignedDate([...resignedEmps]);
+  resignedPage=1;
+  renderResignedTable();
+}
+
+function clearNewFilters(){
+  document.getElementById('new-dept-filter').value='';
+  document.getElementById('new-type-filter').value='';
+  renderNewJoiners();
+}
+
+function clearSearchFilters(){
+  document.getElementById('global-search').value='';
+  document.getElementById('s-dept').value='';
+  document.getElementById('s-div').value='';
+  document.getElementById('s-hq').value='';
+  document.getElementById('s-desig').value='';
+  document.getElementById('s-status').value='';
+  document.getElementById('s-type').value='';
+  runGlobalSearch();
+}
+
+// ──────────────────────────────────────────────
+// SORTING
+// ──────────────────────────────────────────────
+function sortTable(table,col,defaultDesc){
+  const state=sortState[table];
+  if(state.col===col){
+    state.dir=state.dir==='asc'?'desc':'asc';
+  } else {
+    state.col=col;
+    state.dir=defaultDesc?'desc':'asc';
+  }
+  updateSortHeaders(table,col,state.dir);
+  applySortAndRender(table);
+}
+
+function updateSortHeaders(table,col,dir){
+  const tblId=table==='sales'?'sales-table':table==='ho'?'ho-table':null;
+  if(!tblId)return;
+  const tbl=document.getElementById(tblId);
+  if(!tbl)return;
+  tbl.querySelectorAll('th').forEach(th=>{
+    th.classList.remove('sort-asc','sort-desc');
+    if(th.getAttribute('onclick')&&th.getAttribute('onclick').includes("'"+col+"'")){
+      th.classList.add(dir==='asc'?'sort-asc':'sort-desc');
+    }
+  });
+}
+
+function applySortAndRender(table){
+  const state=sortState[table];
+  const col=state.col;
+  const dir=state.dir;
+  function cmp(a,b){
+    let va=a[col]||'',vb=b[col]||'';
+    const da=parseDateStr(va),db=parseDateStr(vb);
+    if(da&&db){const diff=da-db;return dir==='asc'?diff:-diff;}
+    va=va.toString().toLowerCase();vb=vb.toString().toLowerCase();
+    if(va<vb)return dir==='asc'?-1:1;
+    if(va>vb)return dir==='asc'?1:-1;
+    return 0;
+  }
+  if(table==='sales'){salesFiltered.sort(cmp);salesPage=1;renderSalesTable();}
+  else if(table==='ho'){hoFiltered.sort(cmp);hoPage=1;renderHOTable();}
+  else if(table==='resigned'){resignedFiltered.sort(cmp);resignedPage=1;renderResignedTable();}
+}
+
+// ──────────────────────────────────────────────
+// DASHBOARD
+// ──────────────────────────────────────────────
+function renderDashboard(){
+  const total=allEmployees.length,active=activeEmps.length;
+  const newJ=getNewJoiners(10);
+  document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('hero-total').textContent=total;
+  document.getElementById('hero-active').textContent=active;
+  document.getElementById('hero-sales').textContent=salesEmps.length;
+  document.getElementById('hero-ho').textContent=hoEmps.length;
+  document.getElementById('hero-new').textContent=newJ.length;
+
+  // KPIs — no resigned card
+  const kpis=[
+    {label:'Active',val:active,sub:total?Math.round(active/total*100)+'% of total':'',color:'#0ca678',icon:'✅',pct:total?active/total:0,page:'dashboard'},
+    {label:'Sales Field',val:salesEmps.length,sub:'Active field staff',color:'#1098ad',icon:'📈',pct:active?salesEmps.length/active:0,page:'sales'},
+    {label:'Head Office',val:hoEmps.length,sub:'Support functions',color:'#5f3dc4',icon:'🏢',pct:active?hoEmps.length/active:0,page:'headoffice'},
+    {label:'New (10 days)',val:newJ.length,sub:'Recent joiners',color:'#f59f00',icon:'🌟',pct:active?newJ.length/active:0,page:'newjoiners'},
+  ];
+  document.getElementById('kpi-wrap').innerHTML=kpis.map(k=>`
+    <div class="kpi" onclick="navigate('${k.page}')">
+      <div class="kpi-icon">${k.icon}</div>
+      <div class="kpi-label">${k.label}</div>
+      <div class="kpi-val" style="color:${k.color};">${k.val}</div>
+      <div class="kpi-sub">${k.sub}</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:${Math.round(k.pct*100)}%;background:${k.color};"></div></div>
+    </div>`).join('');
+
+  // Charts
+  renderBarChart('dash-sales-chart',groupBy(salesEmps,'Short Designation'),10,true,'#1098ad');
+  renderBarChart('dash-ho-chart',groupBy(hoEmps,'Department'),10,true,'#5f3dc4');
+  renderBarChart('div-chart',groupBy(salesEmps,'Division'),8,false,null);
+  renderBarChart('hq-chart',groupBy(activeEmps,'HQ'),10,false,null);
+
+  // Gender split
+  const gMap=groupBy(activeEmps,'Gender');
+  const gEntries=Object.entries(gMap).sort((a,b)=>b[1].length-a[1].length);
+  const gColors=['#3b5bdb','#e64980','#0ca678','#f59f00'];
+  document.getElementById('dash-gender').innerHTML=`
+    <div class="donut-wrap">
+      ${buildMiniDonut(gEntries,gColors,80)}
+      <div class="donut-legend">${gEntries.map(([g,arr],i)=>`
+        <div class="donut-legend-item">
+          <span class="donut-dot" style="background:${gColors[i%gColors.length]};"></span>
+          <span>${g}</span>
+          <span style="margin-left:auto;font-weight:700;">${arr.length}</span>
+          <span style="color:var(--muted);font-size:11px;">${active?Math.round(arr.length/active*100):0}%</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+  // Experience bands
+  const expBands={'0-2y':0,'3-5y':0,'6-10y':0,'10+y':0,'Unknown':0};
+  activeEmps.forEach(e=>{
+    const y=parseFloat(e['Years of Experience']);
+    if(isNaN(y)){expBands['Unknown']++;return;}
+    if(y<=2)expBands['0-2y']++;
+    else if(y<=5)expBands['3-5y']++;
+    else if(y<=10)expBands['6-10y']++;
+    else expBands['10+y']++;
+  });
+  const expEntries=Object.entries(expBands).filter(([,v])=>v>0);
+  const expColors=['#c5f6fa','#74c0fc','#4c6ef5','#364fc7','#adb5bd'];
+  document.getElementById('dash-exp').innerHTML=`
+    <div class="donut-wrap">
+      ${buildMiniDonut(expEntries,expColors,80)}
+      <div class="donut-legend">${expEntries.map(([b,v],i)=>`
+        <div class="donut-legend-item">
+          <span class="donut-dot" style="background:${expColors[i%expColors.length]};"></span>
+          <span>${b}</span>
+          <span style="margin-left:auto;font-weight:700;">${v}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+
+  // Attrition snapshot
+  const res=resignedEmps.length;
+  const thisYear=new Date().getFullYear();
+  const resThisYear=resignedEmps.filter(e=>extractYear(e['Date Of Resignation'])===String(thisYear)).length;
+  const resLastYear=resignedEmps.filter(e=>extractYear(e['Date Of Resignation'])===String(thisYear-1)).length;
+  const attrRate=total?((res/total)*100).toFixed(1):0;
+  document.getElementById('dash-attrition').innerHTML=`
+    <div class="qstat-row">
+      <div class="qstat"><div class="qstat-val" style="color:var(--accent4);">${res}</div><div class="qstat-lbl">Total Resigned</div></div>
+      <div class="qstat"><div class="qstat-val" style="color:var(--accent3);">${attrRate}%</div><div class="qstat-lbl">Attrition Rate</div></div>
+      <div class="qstat"><div class="qstat-val" style="color:var(--accent4);">${resThisYear}</div><div class="qstat-lbl">${thisYear} Exits</div></div>
+      <div class="qstat"><div class="qstat-val" style="color:var(--muted);">${resLastYear}</div><div class="qstat-lbl">${thisYear-1} Exits</div></div>
+    </div>
+    <div style="margin-top:12px;"><button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="navigate('resigned')">View Resigned →</button></div>`;
+
+  // Top 5 HQs
+  const hqMap=groupBy(activeEmps,'HQ');
+  const top5hq=Object.entries(hqMap).sort((a,b)=>b[1].length-a[1].length).slice(0,5);
+  const maxHq=top5hq[0]?.[1].length||1;
+  document.getElementById('dash-top-hq').innerHTML=top5hq.map(([hq,arr],i)=>`
+    <div class="top-list-item">
+      <div style="width:28px;height:28px;border-radius:8px;background:${COLORS[i%COLORS.length]}22;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:${COLORS[i%COLORS.length]};flex-shrink:0;">${i+1}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:700;font-size:13px;">${hq}</div>
+        <div class="pbar" style="height:5px;margin-top:5px;"><div class="pbar-fill" style="width:${arr.length/maxHq*100}%;height:5px;background:${COLORS[i%COLORS.length]};"></div></div>
+      </div>
+      <div class="mono" style="font-size:14px;font-weight:700;color:${COLORS[i%COLORS.length]};">${arr.length}</div>
+    </div>`).join('');
+
+  // Recent joiners
+  const top=newJ.slice(0,6);
+  document.getElementById('recent-joiners').innerHTML=top.length
+    ?`<div class="table-wrap"><table class="emp-table"><thead><tr><th>Emp ID</th><th>Name</th><th>Type</th><th>Designation</th><th>Dept</th><th>Joined</th><th>Days Ago</th></tr></thead><tbody>
+      ${top.map(e=>{
+        const ds=daysSince(e['Date of Joining']);
+        return `<tr class="${ds===0?'tr-new':''}" onclick='openModal(${safeJson(e)})'>
+          <td class="mono" style="color:var(--accent);font-size:12px;">${e['Emp Id']}</td>
+          <td>${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+          <td>${isSales(e)?'<span class="badge b-sky">Sales</span>':'<span class="badge b-indigo">HO</span>'}</td>
+          <td><span class="badge b-gray">${(isSales(e)?e['Short Designation']:e['Designation'])||'—'}</span></td>
+          <td>${e['Department']||'—'}</td>
+          <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
+          <td>${ds===0?'<span class="badge b-new">🎉 Today</span>':ds+'d ago'}</td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`
+    :'<div style="color:var(--muted);font-size:13px;font-weight:600;padding:16px 0;">No recent joiners in the last 10 days.</div>';
+
+  // Full designation breakdown
+  const allDesigMap={};
+  [...salesEmps,...hoEmps].forEach(e=>{
+    const d=(isSales(e)?e['Short Designation']:e['Designation'])||'Unknown';
+    const type=isSales(e)?'Sales':'HO';
+    const key=d+'||'+type;
+    if(!allDesigMap[key]) allDesigMap[key]={desig:d,type,count:0};
+    allDesigMap[key].count++;
+  });
+  const desigRows=Object.values(allDesigMap).sort((a,b)=>b.count-a.count);
+  document.getElementById('dash-desig-breakdown').innerHTML=`
+    <div class="table-wrap"><table class="emp-table">
+      <thead><tr><th>Designation</th><th>Type</th><th>Count</th><th>Share of Type</th></tr></thead>
+      <tbody>${desigRows.map(r=>`<tr>
+        <td style="font-weight:700;">${r.desig}</td>
+        <td>${r.type==='Sales'?'<span class="badge b-sky">Sales</span>':'<span class="badge b-indigo">HO</span>'}</td>
+        <td class="mono" style="font-weight:700;color:${r.type==='Sales'?'var(--sales)':'var(--ho)'};">${r.count}</td>
+        <td><div class="pbar" style="height:7px;width:180px;"><div class="pbar-fill" style="width:${r.type==='Sales'?Math.round(r.count/salesEmps.length*100):Math.round(r.count/hoEmps.length*100)}%;height:7px;background:${r.type==='Sales'?'var(--sales)':'var(--ho)'};"></div></div></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+}
+
+// Mini SVG donut
+function buildMiniDonut(entries,colors,size){
+  const total=entries.reduce((s,[,v])=>s+(Array.isArray(v)?v.length:v),0);
+  if(!total) return '';
+  let html=`<svg width="${size}" height="${size}" viewBox="0 0 36 36" style="flex-shrink:0;">`;
+  const r=15.9155,cx=18,cy=18,stroke=4;
+  let offset=25;
+  entries.forEach(([,v],i)=>{
+    const cnt=Array.isArray(v)?v.length:v;
+    const pct=(cnt/total)*100;
+    const dash=`${pct} ${100-pct}`;
+    html+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${colors[i%colors.length]}" stroke-width="${stroke}" stroke-dasharray="${dash}" stroke-dashoffset="${offset}" stroke-linecap="round"/>`;
+    offset-=pct;
+  });
+  html+=`<text x="${cx}" y="${cy}" text-anchor="middle" dominant-baseline="central" font-size="7" font-weight="bold" fill="var(--text)" font-family="Space Grotesk,sans-serif">${total}</text>`;
+  html+=`</svg>`;
+  return html;
+}
+
+// ──────────────────────────────────────────────
+// NEW JOINERS
+// ──────────────────────────────────────────────
+function renderNewJoiners(){
+  const days=parseInt(document.getElementById('new-days').value)||10;
+  const deptF=document.getElementById('new-dept-filter').value;
+  const typeF=document.getElementById('new-type-filter').value;
+  let joiners=getNewJoiners(days);
+  if(deptF) joiners=joiners.filter(e=>e['Department']===deptF);
+  if(typeF==='sales') joiners=joiners.filter(isSales);
+  if(typeF==='ho') joiners=joiners.filter(e=>!isSales(e));
+
+  const salesJ=joiners.filter(isSales),hoJ=joiners.filter(e=>!isSales(e));
+  const todayJ=joiners.filter(e=>daysSince(e['Date of Joining'])===0);
+  document.getElementById('new-subtitle').textContent=`Employees who joined in the last ${days} days`;
+  document.getElementById('nj-kpis').innerHTML=[
+    {val:joiners.length,label:'Total New',color:'#f59f00',icon:'🌟'},
+    {val:salesJ.length,label:'Sales',color:'#1098ad',icon:'📈'},
+    {val:hoJ.length,label:'Head Office',color:'#5f3dc4',icon:'🏢'},
+    {val:todayJ.length,label:'Joined Today',color:'#0ca678',icon:'🎉'},
+  ].map(k=>`<div class="card" style="text-align:center;padding:16px;">
+    <div style="font-size:20px;margin-bottom:4px;">${k.icon}</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:${k.color};">${k.val}</div>
+    <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:3px;">${k.label}</div>
+  </div>`).join('');
+  document.getElementById('nav-new-count').textContent=getNewJoiners(10).length;
+  document.getElementById('newjoin-tbody').innerHTML=joiners.length
+    ?joiners.map((e,i)=>{
+        const ds=daysSince(e['Date of Joining']);
+        return `<tr class="${ds<=1?'tr-new':''}" onclick='openModal(${safeJson(e)})'>
+          <td class="mono" style="color:var(--muted);font-size:12px;">${i+1}</td>
+          <td class="mono" style="color:var(--accent);font-size:12px;">${e['Emp Id']}</td>
+          <td>${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+          <td>${isSales(e)?'<span class="badge b-sky">Sales</span>':'<span class="badge b-indigo">HO</span>'}</td>
+          <td><span class="badge b-gray">${(isSales(e)?e['Short Designation']:e['Designation'])||'—'}</span></td>
+          <td>${e['Department']||'—'}</td>
+          <td>${e['Division']||'—'}</td>
+          <td>${e['HQ']||'—'}</td>
+          <td style="font-size:12px;">${e['Date of Joining']||'—'}</td>
+          <td>${ds===0?'<span class="badge b-new">🎉 Today</span>':ds===1?'Yesterday':ds+'d ago'}</td>
+        </tr>`;
+      }).join('')
+    :`<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:32px;font-weight:600;">No joiners in the last ${days} days.</td></tr>`;
+}
+
+// ──────────────────────────────────────────────
+// SALES DESIGNATION KPIs (filterable chips)
+// ──────────────────────────────────────────────
+function renderSalesDesigKPIs(){
+  const dm=groupBy(salesEmps,'Short Designation');
+  const sorted=Object.entries(dm).sort((a,b)=>a[0].localeCompare(b[0]));
+  document.getElementById('sales-desig-kpis').innerHTML=`
+    <div class="summary-chip ${salesDesigFilter===''?'active-filter':''}" onclick="setSalesDesigFilter('')">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#3b5bdb;">${salesEmps.length}</div>
+      <div><div style="font-size:12px;font-weight:700;">All Staff</div><div style="font-size:10px;color:var(--muted);font-weight:600;">Sales</div></div>
+    </div>
+    ${sorted.map(([d,arr],i)=>`
+    <div class="summary-chip ${salesDesigFilter===d?'active-filter':''}" onclick="setSalesDesigFilter('${d.replace(/'/g,"\\'")}')">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:${COLORS[i%COLORS.length]};">${arr.length}</div>
+      <div><div style="font-size:12px;font-weight:700;">${d}</div><div style="font-size:10px;color:var(--muted);font-weight:600;">Sales</div></div>
+    </div>`).join('')}`;
+  // Populate dropdowns (preserve current selections)
+  const curDesig=document.getElementById('sales-desig-filter').value;
+  const curDiv=document.getElementById('sales-div-filter').value;
+  const curHq=document.getElementById('sales-hq-filter').value;
+  const curTeam=document.getElementById('sales-team-filter').value;
+  populateSelect('sales-desig-filter',Object.keys(dm).sort());
+  populateSelect('sales-div-filter',[...new Set(salesEmps.map(e=>e['Division']).filter(Boolean))].sort());
+  populateSelect('sales-hq-filter',[...new Set(salesEmps.map(e=>e['HQ']).filter(Boolean))].sort());
+  populateSelect('sales-team-filter',[...new Set(salesEmps.map(e=>e['Team Wise']).filter(Boolean))].sort());
+  // Restore selections
+  if(curDesig) document.getElementById('sales-desig-filter').value=curDesig;
+  if(curDiv)   document.getElementById('sales-div-filter').value=curDiv;
+  if(curHq)    document.getElementById('sales-hq-filter').value=curHq;
+  if(curTeam)  document.getElementById('sales-team-filter').value=curTeam;
+}
+
+function setSalesDesigFilter(val){
+  salesDesigFilter=val;
+  // Sync dropdown to chip selection
+  const el=document.getElementById('sales-desig-filter');
+  if(el) el.value=val;
+  filterSalesTable();
+  renderSalesDesigKPIs();
+}
+
+function renderSalesTable(data){
+  if(data!==undefined) salesFiltered=data;
+  document.getElementById('sales-subtitle').textContent=salesFiltered.length+' of '+salesEmps.length+' sales employees shown';
+  renderPaginatedTable('sales-tbody','sales-pagination',salesFiltered,salesPage,(e,i,off)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return `<tr onclick='openModal(${safeJson(e)})'>
+      <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
+      <td class="mono" style="color:var(--sales);font-size:12px;">${e['Emp Id']}</td>
+      <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+      <td><span class="badge b-sky">${e['Short Designation']||e['Designation']||'—'}</span></td>
+      <td>${e['Division']||'—'}</td>
+      <td>${e['HQ']||'—'}</td>
+      <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
+      <td>${e['Team Wise']||'—'}</td>
+      <td>${mgr?`<div style="font-weight:600;font-size:12px;">${mgr.name}</div><div class="mono" style="font-size:10px;color:var(--muted);">${mgr.id}${mgr.desig?' · '+mgr.desig:''}</div>`:'<span style="color:var(--muted);font-size:12px;">—</span>'}</td>
+    </tr>`;
+  });
+}
+
+function filterSalesTable(){
+  const q=(document.getElementById('sales-search').value||'').toLowerCase();
+  // Use dropdown value as primary; if chip also set, they're kept in sync
+  const desig=document.getElementById('sales-desig-filter').value||salesDesigFilter;
+  const div=document.getElementById('sales-div-filter').value;
+  const hq=document.getElementById('sales-hq-filter').value;
+  const team=document.getElementById('sales-team-filter').value;
+
+  // Keep chip in sync if dropdown changed independently
+  const ddDesig=document.getElementById('sales-desig-filter').value;
+  if(ddDesig!==salesDesigFilter){
+    salesDesigFilter=ddDesig;
+    renderSalesDesigKPIs();
+  }
+
+  salesFiltered=salesEmps.filter(e=>
+    (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
+    (!desig||e['Short Designation']===desig)&&
+    (!div||e['Division']===div)&&
+    (!hq||e['HQ']===hq)&&
+    (!team||e['Team Wise']===team));
+  salesPage=1;
+  if(sortState.sales.col) applySortAndRender('sales');
+  else renderSalesTable();
+}
+
+function switchSalesTab(tab){
+  document.getElementById('sales-list-panel').style.display=tab==='list'?'block':'none';
+  document.getElementById('sales-hier-panel').style.display=tab==='hier'?'block':'none';
+  document.getElementById('sales-tab-list').classList.toggle('active',tab==='list');
+  document.getElementById('sales-tab-hier').classList.toggle('active',tab==='hier');
+  if(tab==='hier'){
+    // Sales hierarchy: ONLY sales employees
+    renderHierarchy('sales-hier-tree', salesEmps, 'Short Designation', 'sales');
+    document.getElementById('sales-hier-count').textContent=salesEmps.length+' employees';
+  }
+}
+
+// ──────────────────────────────────────────────
+// HEAD OFFICE DEPT KPIs (filterable chips)
+// ──────────────────────────────────────────────
+function renderHODeptKPIs(){
+  const dm=groupBy(hoEmps,'Department');
+  const sorted=Object.entries(dm).sort((a,b)=>a[0].localeCompare(b[0]));
+  const curDept=document.getElementById('ho-dept-filter').value||'';
+  document.getElementById('ho-dept-kpis').innerHTML=`
+    <div class="summary-chip ${curDept===''?'active-filter':''}" onclick="setHODeptFilter('')">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#5f3dc4;">${hoEmps.length}</div>
+      <div><div style="font-size:12px;font-weight:700;">All Depts</div><div style="font-size:10px;color:var(--muted);font-weight:600;">Head Office</div></div>
+    </div>
+    ${sorted.map(([d,arr],i)=>`
+    <div class="summary-chip ${curDept===d?'active-filter':''}" onclick="setHODeptFilter('${d.replace(/'/g,"\\'")}')">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:${COLORS[i%COLORS.length]};">${arr.length}</div>
+      <div><div style="font-size:12px;font-weight:700;">${d}</div><div style="font-size:10px;color:var(--muted);font-weight:600;">Head Office</div></div>
+    </div>`).join('')}`;
+
+  const curDesig=document.getElementById('ho-desig-filter').value;
+  populateSelect('ho-dept-filter',Object.keys(dm).sort());
+  populateSelect('ho-desig-filter',[...new Set(hoEmps.map(e=>e['Designation']).filter(Boolean))].sort());
+  if(curDept)  document.getElementById('ho-dept-filter').value=curDept;
+  if(curDesig) document.getElementById('ho-desig-filter').value=curDesig;
+}
+
+function setHODeptFilter(val){
+  document.getElementById('ho-dept-filter').value=val;
+  filterHOTable();
+  renderHODeptKPIs();
+}
+
+function renderHOTable(data){
+  if(data!==undefined) hoFiltered=data;
+  document.getElementById('ho-subtitle').textContent=hoFiltered.length+' of '+hoEmps.length+' head office employees shown';
+  renderPaginatedTable('ho-tbody','ho-pagination',hoFiltered,hoPage,(e,i,off)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return `<tr onclick='openModal(${safeJson(e)})'>
+      <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
+      <td class="mono" style="color:var(--ho);font-size:12px;">${e['Emp Id']}</td>
+      <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+      <td><span class="badge b-indigo">${e['Designation']||'—'}</span></td>
+      <td>${e['Department']||'—'}</td>
+      <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
+      <td>${mgr?`<div style="font-weight:600;font-size:12px;">${mgr.name}</div><div class="mono" style="font-size:10px;color:var(--muted);">${mgr.id}${mgr.desig?' · '+mgr.desig:''}</div>`:'<span style="color:var(--muted);font-size:12px;">—</span>'}</td>
+    </tr>`;
+  });
+}
+
+function filterHOTable(){
+  const q=(document.getElementById('ho-search').value||'').toLowerCase();
+  const dept=document.getElementById('ho-dept-filter').value;
+  const desig=document.getElementById('ho-desig-filter').value;
+  hoFiltered=hoEmps.filter(e=>
+    (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
+    (!dept||e['Department']===dept)&&
+    (!desig||e['Designation']===desig));
+  hoPage=1;
+  if(sortState.ho.col) applySortAndRender('ho');
+  else renderHOTable();
+  renderHODeptKPIs();
+}
+
+function switchHOTab(tab){
+  document.getElementById('ho-list-panel').style.display=tab==='list'?'block':'none';
+  document.getElementById('ho-hier-panel').style.display=tab==='hier'?'block':'none';
+  document.getElementById('ho-tab-list').classList.toggle('active',tab==='list');
+  document.getElementById('ho-tab-hier').classList.toggle('active',tab==='hier');
+  if(tab==='hier'){
+    // Find Sales managers that HO staff report to
+    const salesMgrIds=new Set(
+      hoEmps
+        .map(e=>e['Reporting Manager ID']&&String(e['Reporting Manager ID']).trim())
+        .filter(id=>id&&salesEmps.find(s=>String(s['Emp Id']).trim()===id))
+    );
+    const salesMgrs=salesEmps.filter(e=>salesMgrIds.has(String(e['Emp Id']).trim()));
+
+    // Also include Sales staff who report to HO employees
+    const hoIds=new Set(hoEmps.map(e=>String(e['Emp Id']).trim()));
+    const connectedSales=salesEmps.filter(e=>{
+      const mgId=e['Reporting Manager ID']&&String(e['Reporting Manager ID']).trim();
+      return mgId && hoIds.has(mgId);
+    });
+
+    const hierEmps=[...salesMgrs, ...hoEmps, ...connectedSales];
+    renderHierarchy('ho-hier-tree', hierEmps, 'Designation', 'ho');
+    const note=connectedSales.length>0
+      ? ``
+      : '';
+    const treeEl=document.getElementById('ho-hier-tree');
+    treeEl.insertAdjacentHTML('afterbegin',note);
+    document.getElementById('ho-hier-count').textContent=hierEmps.length+' employees';
+  }
+}
+
+// ──────────────────────────────────────────────
+// RESIGNED TABLE
+// ──────────────────────────────────────────────
+function renderResignedTable(data){
+  if(data!==undefined) resignedFiltered=data;
+  document.getElementById('resigned-subtitle').textContent=resignedFiltered.length+' of '+resignedEmps.length+' resigned employees';
+  renderPaginatedTable('resigned-tbody','resigned-pagination',resignedFiltered,resignedPage,(e,i,off)=>`<tr onclick='openModal(${safeJson(e)})'>
+    <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
+    <td class="mono" style="color:var(--accent4);font-size:12px;">${e['Emp Id']}</td>
+    <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+    <td><span class="badge b-amber">${e['Short Designation']||e['Designation']||'—'}</span></td>
+    <td>${e['Department']||'—'}</td>
+    <td>${e['Division']||'—'}</td>
+    <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
+    <td style="color:var(--accent4);font-size:12px;font-weight:600;">${e['Date Of Resignation']||'—'}</td>
+    <td><span class="badge b-red">${calcTenure(e['Date of Joining'],e['Date Of Resignation'])}</span></td>
+    <td style="color:var(--muted);font-size:12px;">${e['Personal Mail ID']||'—'}</td>
+  </tr>`);
+}
+
+function filterResignedTable(){
+  const q=(document.getElementById('resigned-search').value||'').toLowerCase();
+  const dept=document.getElementById('resigned-dept-filter').value;
+  const typeF=document.getElementById('resigned-type-filter').value;
+  const year=document.getElementById('resigned-year-filter').value;
+  resignedFiltered=resignedEmps.filter(e=>
+    (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
+    (!dept||e['Department']===dept)&&
+    (!typeF||(typeF==='sales'?isSales(e):!isSales(e)))&&
+    (!year||extractYear(e['Date Of Resignation'])===year));
+  if(sortState.resigned.col){
+    applySortAndRender('resigned');
+  } else {
+    resignedFiltered=sortByResignedDate(resignedFiltered);
+    resignedPage=1;
+    renderResignedTable();
+  }
+}
+
+// ──────────────────────────────────────────────
+// PAGINATION
+// ──────────────────────────────────────────────
+function renderPaginatedTable(tbodyId,paginId,data,page,rowFn){
+  const total=data.length,pages=Math.ceil(total/PAGE_SIZE)||1;
+  page=Math.min(page,pages);
+  const offset=(page-1)*PAGE_SIZE,slice=data.slice(offset,offset+PAGE_SIZE);
+  document.getElementById(tbodyId).innerHTML=slice.length
+    ?slice.map((e,i)=>rowFn(e,i,offset)).join('')
+    :`<tr><td colspan="20" style="text-align:center;color:var(--muted);padding:32px;font-weight:600;">No records found.</td></tr>`;
+  const pg=document.getElementById(paginId);
+  if(!pg) return;
+  if(pages<=1){pg.innerHTML='';return;}
+  let html=`<span style="color:var(--muted);font-size:12px;font-weight:600;">${total} records · Page ${page} of ${pages}</span>`;
+  if(page>2) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',1)">« First</button>`;
+  if(page>1) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${page-1})">← Prev</button>`;
+  // Show up to 5 page numbers
+  const start=Math.max(1,page-2),end=Math.min(pages,start+4);
+  for(let p2=start;p2<=end;p2++) html+=`<button class="btn ${p2===page?'btn-primary':'btn-ghost'}" style="padding:5px 10px;font-size:12px;min-width:34px;" onclick="pgChange('${tbodyId}',${p2})">${p2}</button>`;
+  if(page<pages) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${page+1})">Next →</button>`;
+  if(page<pages-1) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${pages})">Last »</button>`;
+  pg.innerHTML=html;
+}
+
+function pgChange(tbodyId,pg){
+  if(tbodyId==='sales-tbody'){salesPage=pg;renderSalesTable();}
+  if(tbodyId==='ho-tbody'){hoPage=pg;renderHOTable();}
+  if(tbodyId==='resigned-tbody'){resignedPage=pg;renderResignedTable();}
+  if(tbodyId==='search-tbody'){searchPage=pg;renderSearchTable();}
+}
+
+// ──────────────────────────────────────────────
+// HIERARCHY — fixed scoping
+// ──────────────────────────────────────────────
+function renderHierarchy(containerId, emps, desigField, context){
+  const container=document.getElementById(containerId);
+  if(!emps.length){container.innerHTML='<div style="color:var(--muted);padding:20px;">No data.</div>';return;}
+
+  // Build local ID set from only the employees in this hierarchy
+  const localIds=new Set(emps.map(e=>String(e['Emp Id']).trim()));
+
+  // Children map: only within this set
+  const childrenMap={};
+  emps.forEach(e=>{
+    const mgId=e['Reporting Manager ID']&&String(e['Reporting Manager ID']).trim();
+    if(mgId && mgId!==String(e['Emp Id']).trim() && localIds.has(mgId)){
+      if(!childrenMap[mgId]) childrenMap[mgId]=[];
+      childrenMap[mgId].push(e);
+    }
+  });
+
+  // Roots: employees whose manager is NOT in this set (or no manager)
+  const roots=emps.filter(e=>{
+    const mgId=e['Reporting Manager ID']&&String(e['Reporting Manager ID']).trim();
+    return !mgId || !localIds.has(mgId) || mgId===String(e['Emp Id']).trim();
+  });
+
+  roots.sort((a,b)=>(childrenMap[String(b['Emp Id'])]||[]).length-(childrenMap[String(a['Emp Id'])]||[]).length);
+
+  let uid=0;
+
+  function buildNode(emp,depth){
+    const id='hn'+(uid++);
+    const empId=String(emp['Emp Id']).trim();
+    const children=(childrenMap[empId]||[]);
+    children.sort((a,b)=>(childrenMap[String(b['Emp Id'])]||[]).length-(childrenMap[String(a['Emp Id'])]||[]).length);
+    const hasC=children.length>0;
+    const level=Math.min(depth,3);
+    const desig=emp[desigField]||emp['Short Designation']||emp['Designation']||'Staff';
+    const avCls=AV_CLS[Math.abs(hashStr(emp['Emp Id']))%AV_CLS.length];
+    const init=(emp['Emp Name']||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const isSalesEmp=isSales(emp);
+    const empTypeBadge=isSalesEmp
+      ?'<span class="badge b-sky" style="font-size:9px;padding:2px 6px;">Sales</span>'
+      :'<span class="badge b-indigo" style="font-size:9px;padding:2px 6px;">HO</span>';
+    const hqText=emp['HQ']?emp['HQ']:'';
+
+    return `<div class="hier-node" id="${id}-node">
+      <div class="hier-item level-${level}" onclick='openModal(${safeJson(emp)})'>
+        ${hasC?`<button class="hier-toggle" id="${id}-tog" onclick="event.stopPropagation();toggleHier('${id}')">+</button>`:'<span style="width:24px;height:24px;flex-shrink:0;display:inline-flex;"></span>'}
+        <span class="avatar ${avCls}" style="width:32px;height:32px;font-size:11px;">${init}</span>
+        <div style="flex:1;min-width:0;">
+          <div style="display:flex;align-items:center;gap:6px;margin-bottom:2px;">
+            <span class="hier-desig-chip">${desig}</span>
+            ${empTypeBadge}
+          </div>
+          <div style="font-size:13px;font-weight:700;${level===0?'color:#fff;':''}">${emp['Emp Name']}</div>
+          ${hqText?`<div class="hier-hq" style="margin-top:1px;">${hqText}${emp['Division']&&emp['Division']!=='HO'?' · '+emp['Division']:''}</div>`:''}
+        </div>
+        <div class="hier-meta">
+          <span class="hier-id ${level===0?'':'mono'}">${emp['Emp Id']}</span>
+          ${hasC?`<span class="hier-direct">${children.length} direct${children.length>1?'s':''}</span>`:''}
+        </div>
+      </div>
+      ${hasC?`<div class="hier-children" id="${id}-children" style="display:none;">
+        ${children.map(c=>buildNode(c,depth+1)).join('')}
+      </div>`:''}
+    </div>`;
+  }
+
+  const totalCount=`<div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;">
+    <div style="background:#eff3ff;border:1px solid #bac8ff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;color:#1c3fa8;">👥 ${emps.length} total in this view</div>
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;color:#166534;">🌿 ${roots.length} root node${roots.length!==1?'s':''}</div>
+    <div style="background:#fff3bf;border:1px solid #ffd43b;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:700;color:#854d0e;">💼 Click any card to view details</div>
+  </div>`;
+  container.innerHTML=totalCount+`<div class="hier-wrap" id="${containerId}-inner">${roots.map(r=>buildNode(r,0)).join('')}</div>`;
+}
+
+function toggleHier(id){
+  const ch=document.getElementById(id+'-children');
+  const tog=document.getElementById(id+'-tog');
+  if(!ch||!tog) return;
+  const open=ch.style.display==='block';
+  ch.style.display=open?'none':'block';
+  tog.textContent=open?'+':'−';
+}
+
+function expandAllHier(containerId){
+  const container=document.getElementById(containerId);
+  if(!container) return;
+  container.querySelectorAll('.hier-children').forEach(c=>c.style.display='block');
+  container.querySelectorAll('.hier-toggle').forEach(t=>t.textContent='−');
+}
+
+function collapseAllHier(containerId){
+  const container=document.getElementById(containerId);
+  if(!container) return;
+  container.querySelectorAll('.hier-children').forEach(c=>c.style.display='none');
+  container.querySelectorAll('.hier-toggle').forEach(t=>t.textContent='+');
+}
+
+function filterHierarchy(context){
+  const searchId=context==='sales'?'sales-hier-search':'ho-hier-search';
+  const treeId=context==='sales'?'sales-hier-tree':'ho-hier-tree';
+  const q=(document.getElementById(searchId).value||'').toLowerCase().trim();
+  const container=document.getElementById(treeId);
+  if(!container) return;
+  if(!q){
+    container.querySelectorAll('.hier-node').forEach(n=>n.style.display='');
+    return;
+  }
+  // Show/hide nodes based on text match
+  container.querySelectorAll('.hier-node').forEach(node=>{
+    const text=(node.textContent||'').toLowerCase();
+    node.style.display=text.includes(q)?'':'none';
+  });
+  // Expand all when searching
+  container.querySelectorAll('.hier-children').forEach(c=>c.style.display='block');
+  container.querySelectorAll('.hier-toggle').forEach(t=>t.textContent='−');
+}
+
+// ──────────────────────────────────────────────
+// REPORTS
+// ──────────────────────────────────────────────
+function renderDeptReport(){
+  const depts=groupBy(activeEmps,'Department');
+  const sorted=Object.entries(depts).sort((a,b)=>b[1].length-a[1].length);
+  const max=sorted[0]?.[1].length||1;
+  document.getElementById('dept-report-grid').innerHTML=
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;">
+    ${sorted.map(([dept,emps],ci)=>{
+      const sal=emps.filter(isSales).length,ho=emps.filter(e=>!isSales(e)).length;
+      return `<div class="rep-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;">${dept}</div>
+          <span class="mono" style="font-size:24px;font-weight:700;color:${COLORS[ci%COLORS.length]};">${emps.length}</span>
+        </div>
+        <div class="pbar" style="height:7px;margin-bottom:12px;"><div class="pbar-fill" style="width:${emps.length/max*100}%;height:7px;background:${COLORS[ci%COLORS.length]};"></div></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">${sal?`<span class="badge b-sky">📈 ${sal} Sales</span>`:''}${ho?`<span class="badge b-indigo">🏢 ${ho} HO</span>`:''}</div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+function renderDivReport(){
+  const divs=groupBy(salesEmps,'Division');
+  const sorted=Object.entries(divs).sort((a,b)=>b[1].length-a[1].length);
+  const max=sorted[0]?.[1].length||1;
+  document.getElementById('div-report-grid').innerHTML=
+    `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:14px;">
+    ${sorted.map(([div,emps],ci)=>{
+      const byDesig=groupBy(emps,'Short Designation');
+      return `<div class="rep-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+          <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;">${div}</div>
+          <span class="mono" style="font-size:24px;font-weight:700;color:${COLORS[ci%COLORS.length]};">${emps.length}</span>
+        </div>
+        <div class="pbar" style="height:7px;margin-bottom:12px;"><div class="pbar-fill" style="width:${emps.length/max*100}%;height:7px;background:${COLORS[ci%COLORS.length]};"></div></div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">${Object.entries(byDesig).map(([d,a])=>`<span class="badge b-sky">${d}: ${a.length}</span>`).join('')}</div>
+      </div>`;
+    }).join('')}</div>`;
+}
+
+function renderTeamReport(){
+  const teams=groupBy(salesEmps,'Team Wise');
+  const sorted=Object.entries(teams).sort((a,b)=>b[1].length-a[1].length);
+  document.getElementById('team-report-grid').innerHTML=
+    `<div class="table-wrap"><table class="emp-table">
+      <thead><tr><th>#</th><th>Team</th><th>Total</th><th>Designations</th><th>HQ Coverage</th></tr></thead>
+      <tbody>${sorted.map(([team,emps],i)=>{
+        const byDesig=groupBy(emps,'Short Designation');
+        const hqs=[...new Set(emps.map(e=>e['HQ']))].filter(Boolean).slice(0,3);
+        return `<tr><td class="mono" style="color:var(--muted);font-size:12px;">${i+1}</td>
+          <td style="font-weight:700;">${team}</td>
+          <td class="mono" style="font-weight:700;color:${COLORS[i%COLORS.length]};font-size:16px;">${emps.length}</td>
+          <td style="padding:10px 14px;">${Object.entries(byDesig).map(([d,a])=>`<span class="badge b-sky">${d} ${a.length}</span>`).join(' ')}</td>
+          <td>${hqs.map(h=>`<span class="badge b-gray">${h}</span>`).join(' ')}</td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
+}
+
+function renderLocationReport(){
+  renderBarChart('hq-report',groupBy(activeEmps,'HQ'),20,true,null);
+  renderBarChart('state-report',groupBy(activeEmps,'Current State'),20,true,null);
+  renderBarChart('sales-hq-report',groupBy(salesEmps,'HQ'),15,true,'#1098ad');
+  renderBarChart('ho-loc-report',groupBy(hoEmps,'HQ')||groupBy(hoEmps,'Current City'),15,true,'#5f3dc4');
+}
+
+function renderTrendReport(){
+  const jMap={},rMap={};
+  allEmployees.forEach(e=>{const y=extractYear(e['Date of Joining']);if(y)jMap[y]=(jMap[y]||0)+1;});
+  resignedEmps.forEach(e=>{const y=extractYear(e['Date Of Resignation']);if(y)rMap[y]=(rMap[y]||0)+1;});
+  renderBarChart('join-trend-chart',mapToGroup(jMap),20,true,null);
+  renderBarChart('resign-trend-chart',mapToGroup(rMap),20,true,'#e03131');
+  const years=[...new Set([...Object.keys(jMap),...Object.keys(rMap)])].sort();
+  document.getElementById('yoy-table').innerHTML=
+    `<div class="table-wrap"><table class="emp-table">
+      <thead><tr><th>Year</th><th>New Joiners</th><th>Resignations</th><th>Net Change</th></tr></thead>
+      <tbody>${years.map(y=>{const j=jMap[y]||0,r=rMap[y]||0,net=j-r;
+        return `<tr><td class="mono" style="font-weight:700;">${y}</td><td><span class="badge b-green">+${j}</span></td><td><span class="badge b-red">-${r}</span></td><td><span class="badge ${net>=0?'b-blue':'b-red'}">${net>=0?'+':''}${net}</span></td></tr>`;
+      }).join('')}</tbody></table></div>`;
+}
+
+function mapToGroup(m){const g={};Object.entries(m).forEach(([k,v])=>{g[k]=new Array(v).fill(null);});return g;}
+
+function renderExportPage(){
+  document.getElementById('export-sales-count').textContent=salesEmps.length+' employees';
+  document.getElementById('export-ho-count').textContent=hoEmps.length+' employees';
+  document.getElementById('export-resigned-count').textContent=resignedEmps.length+' employees';
+  document.getElementById('export-all-count').textContent=allEmployees.length+' employees';
+  document.getElementById('export-new-count').textContent=getNewJoiners(10).length+' employees';
+  const depts=groupBy(activeEmps,'Department');
+  document.getElementById('dept-export-list').innerHTML=Object.entries(depts).sort((a,b)=>b[1].length-a[1].length).map(([dept,emps])=>
+    `<button class="btn btn-ghost" onclick="exportDeptXLSX('${dept.replace(/'/g,"\\'")}')">${dept} (${emps.length})</button>`
+  ).join('');
+}
+
+// ──────────────────────────────────────────────
+// GLOBAL SEARCH
+// ──────────────────────────────────────────────
+function populateSearchFilters(){
+  populateSelect('s-dept',[...new Set(allEmployees.map(e=>e['Department']).filter(Boolean))].sort());
+  populateSelect('s-div',[...new Set(allEmployees.map(e=>e['Division']).filter(Boolean))].sort());
+  populateSelect('s-hq',[...new Set(allEmployees.map(e=>e['HQ']).filter(Boolean))].sort());
+  // Combine sales short desig + HO desig
+  const desigs=[...new Set([
+    ...salesEmps.map(e=>e['Short Designation']),
+    ...hoEmps.map(e=>e['Designation'])
+  ].filter(Boolean))].sort();
+  populateSelect('s-desig',desigs);
+}
+
+let _searchResultData=[];
+function runGlobalSearch(){
+  const q=(document.getElementById('global-search').value||'').toLowerCase();
+  const dept=document.getElementById('s-dept').value;
+  const div=document.getElementById('s-div').value;
+  const hq=document.getElementById('s-hq').value;
+  const desig=document.getElementById('s-desig').value;
+  const status=document.getElementById('s-status').value;
+  const type=document.getElementById('s-type').value;
+  _searchResultData=allEmployees.filter(e=>
+    (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
+    (!dept||e['Department']===dept)&&
+    (!div||e['Division']===div)&&
+    (!hq||e['HQ']===hq)&&
+    (!desig||(isSales(e)?e['Short Designation']:e['Designation'])===desig)&&
+    (!status||(status==='active'?isActive(e):!isActive(e)))&&
+    (!type||(type==='sales'?isSales(e):!isSales(e))));
+  searchPage=1;
+  document.getElementById('search-result-count').textContent=_searchResultData.length+' result(s) found';
+  renderSearchTable();
+}
+
+function renderSearchTable(){
+  renderPaginatedTable('search-tbody','search-pagination',_searchResultData,searchPage,(e,i,off)=>{
+    const act=isActive(e),sal=isSales(e);
+    return `<tr onclick='openModal(${safeJson(e)})'>
+      <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
+      <td class="mono" style="color:var(--accent);font-size:12px;">${e['Emp Id']}</td>
+      <td>${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+      <td>${sal?'<span class="badge b-sky">Sales</span>':'<span class="badge b-indigo">HO</span>'}</td>
+      <td><span class="badge ${act?'b-green':'b-red'}">${act?'Active':'Resigned'}</span></td>
+      <td><span class="badge b-gray">${(sal?e['Short Designation']:e['Designation'])||'—'}</span></td>
+      <td>${e['Department']||'—'}</td>
+      <td>${e['Division']||'—'}</td>
+      <td>${e['HQ']||'—'}</td>
+      <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
+    </tr>`;
+  });
+}
+
+// ──────────────────────────────────────────────
+// BAR CHART
+// ──────────────────────────────────────────────
+function renderBarChart(id,map,limit,showPct,singleColor){
+  const el=document.getElementById(id);if(!el)return;
+  const sorted=Object.entries(map).sort((a,b)=>b[1].length-a[1].length).slice(0,limit);
+  const max=sorted[0]?.[1].length||1;
+  const total=Object.values(map).reduce((a,b)=>a+b.length,0);
+  el.innerHTML=sorted.map(([label,arr],i)=>{
+    const cnt=arr.length,pct=Math.round(cnt/max*100),share=total?Math.round(cnt/total*100):0;
+    const col=singleColor||COLORS[i%COLORS.length];
+    return `<div style="margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+        <span style="font-size:12px;font-weight:600;">${label}</span>
+        <span class="mono" style="font-size:12px;color:var(--muted);">${cnt}${showPct?` · ${share}%`:''}</span>
+      </div>
+      <div class="pbar" style="height:8px;"><div class="pbar-fill" style="width:${pct}%;height:8px;background:${col};"></div></div>
+    </div>`;
+  }).join('');
+}
+
+// ──────────────────────────────────────────────
+// MODAL
+// ──────────────────────────────────────────────
+function openModal(emp){
+  if(typeof emp==='string') emp=JSON.parse(emp);
+  const act=isActive(emp),sal=isSales(emp);
+  const init=(emp['Emp Name']||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const cls=AV_CLS[Math.abs(hashStr(emp['Emp Id']))%AV_CLS.length];
+
+  document.getElementById('modal-avatar').className=`avatar ${cls}`;
+  document.getElementById('modal-avatar').style.cssText='width:64px;height:64px;font-size:22px;flex-shrink:0;';
+  document.getElementById('modal-avatar').textContent=init;
+  document.getElementById('modal-name').textContent=emp['Emp Name']||'—';
+  document.getElementById('modal-desig').textContent=(sal?emp['Short Designation']:emp['Designation']||'')+(emp['Department']?' · '+emp['Department']:'');
+  document.getElementById('modal-status').innerHTML=
+    `${sal?'<span class="badge b-sky">📈 Sales</span>':'<span class="badge b-indigo">🏢 Head Office</span>'}
+     ${act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red">👋 Resigned '+emp['Date Of Resignation']+'</span>'}
+     ${emp['HQ']?`<span class="badge b-gray">📍 ${emp['HQ']}</span>`:''}
+     ${emp['Division']?`<span class="badge b-purple">🗂 ${emp['Division']}</span>`:''}`;
+
+  const mgrId=emp['Reporting Manager ID']&&String(emp['Reporting Manager ID']).trim();
+  const mgrBanner=document.getElementById('modal-mgr-banner');
+  if(mgrId){
+    const mgrEmp=empIdMap[mgrId];
+    if(mgrEmp){
+      const mgrDesig=isSales(mgrEmp)?(mgrEmp['Short Designation']||mgrEmp['Designation']||''):(mgrEmp['Designation']||'');
+      const mgrDept=mgrEmp['Department']||'';
+      document.getElementById('modal-mgr-name').innerHTML=`${mgrEmp['Emp Name']} <span style="font-size:11px;font-weight:500;color:#5f3dc4;">${mgrDesig}${mgrDept?' · '+mgrDept:''}</span>`;
+      document.getElementById('modal-mgr-id').textContent=mgrId;
+      mgrBanner.style.display='flex';
+    } else {
+      document.getElementById('modal-mgr-name').textContent='Unknown ('+mgrId+')';
+      document.getElementById('modal-mgr-id').textContent='ID: '+mgrId;
+      mgrBanner.style.display='flex';
+    }
+  } else {
+    mgrBanner.style.display='none';
+  }
+
+  const fields=[
+    {title:'💼 Employment',items:[
+      {l:'Employee ID',v:emp['Emp Id']},
+      {l:'Designation',v:emp['Short Designation']||emp['Designation']},
+      {l:'Department',v:emp['Department']},
+      {l:'Division',v:emp['Division']},
+      {l:'HQ / Location',v:emp['HQ']},
+      {l:'Team',v:emp['Team Wise']},
+      {l:'Date of Joining',v:emp['Date of Joining']},
+      {l:'Experience',v:emp['Years of Experience']?emp['Years of Experience']+' years':''},
+      {l:'Official Email',v:emp['Official E-Mail Id']},
+      {l:'Resignation Date',v:emp['Date Of Resignation']},
+    ]},
+    {title:'👤 Personal',items:[
+      {l:'Age',v:emp['Age']},
+      {l:'Gender',v:emp['Gender']},
+      {l:'Blood Group',v:emp['Blood Group']},
+      {l:'Personal Email',v:emp['Personal Mail ID']},
+      {l:'Phone',v:emp['Current Phone']},
+      {l:'Emergency Contact',v:emp['EmergencyContact']},
+    ]},
+    {title:'📍 Current Address',items:[
+      {l:'Address',v:emp['Current Address']},
+      {l:'City',v:emp['Current City']},
+      {l:'State',v:emp['Current State']},
+      {l:'Pincode',v:emp['Current Pincode']},
+    ]},
+    {title:'🏠 Permanent Address',items:[
+      {l:'Address',v:emp['Permanent Address']},
+      {l:'City',v:emp['Permanent City']},
+      {l:'State',v:emp['Permanent State']},
+      {l:'Pincode',v:emp['Permanent Pincode']},
+    ]},
+  ];
+
+  document.getElementById('modal-body').innerHTML=fields.map(section=>`
+    <div style="background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:18px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border);">${section.title}</div>
+      ${section.items.filter(f=>f.v&&f.v.toString().trim()).map(f=>`
+        <div class="field-row">
+          <span class="field-label">${f.l}</span>
+          <span class="field-val">${f.v}</span>
+        </div>`).join('')}
+      ${!section.items.filter(f=>f.v&&f.v.toString().trim()).length?'<div style="color:var(--muted);font-size:12px;padding:8px 0;">No data available</div>':''}
+    </div>`).join('');
+
+  document.getElementById('modal').style.display='flex';
+}
+
+function closeModal(e){if(e.target===document.getElementById('modal'))document.getElementById('modal').style.display='none';}
+
+// ──────────────────────────────────────────────
+// POPULATE FILTERS
+// ──────────────────────────────────────────────
+function populateFilters(){
+  const depts=[...new Set(allEmployees.map(e=>e['Department']).filter(Boolean))].sort();
+  populateSelect('resigned-dept-filter',depts);
+  populateSelect('new-dept-filter',depts);
+  // Resigned year filter
+  const years=[...new Set(resignedEmps.map(e=>extractYear(e['Date Of Resignation'])).filter(Boolean))].sort((a,b)=>b-a);
+  populateSelect('resigned-year-filter',years);
+}
+
+// ──────────────────────────────────────────────
+// XLSX EXPORTS
+// ──────────────────────────────────────────────
+function styleWS(ws){
+  if(!ws['!ref'])return;
+  const range=XLSX.utils.decode_range(ws['!ref']);
+  const cols=[];
+  for(let c=range.s.c;c<=range.e.c;c++) cols.push({wch:22});
+  ws['!cols']=cols;
+}
+function downloadXLSX(wb,filename){XLSX.writeFile(wb,filename+'.xlsx');showToast('Downloaded '+filename+'.xlsx','success');}
+function today(){return new Date().toISOString().slice(0,10);}
+
+function exportSalesXLSX(){
+  const data=salesFiltered.length&&salesFiltered.length!==salesEmps.length?salesFiltered:salesEmps;
+  if(!data.length){showToast('No data','error');return;}
+  const rows=data.map((e,i)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return {'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      'Designation':e['Short Designation']||e['Designation']||'','Division':e['Division']||'','HQ':e['HQ']||'',
+      'Date of Joining':e['Date of Joining']||'','Team':e['Team Wise']||'',
+      'Reporting Manager ID':e['Reporting Manager ID']||'','Reporting Manager Name':mgr?mgr.name:'',
+      'Phone':e['Current Phone']||''};
+  });
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Sales Team');downloadXLSX(wb,'Sales_Team_'+today());
+}
+
+function exportHOXLSX(){
+  const data=hoFiltered.length&&hoFiltered.length!==hoEmps.length?hoFiltered:hoEmps;
+  if(!data.length){showToast('No data','error');return;}
+  const rows=data.map((e,i)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return {'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      'Designation':e['Designation']||'','Department':e['Department']||'',
+      'Date of Joining':e['Date of Joining']||'','Phone':e['Current Phone']||'',
+      'Email':e['Official E-Mail Id']||'','HQ':e['HQ']||'',
+      'Reporting Manager ID':e['Reporting Manager ID']||'','Reporting Manager Name':mgr?mgr.name:''};
+  });
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Head Office');downloadXLSX(wb,'HeadOffice_'+today());
+}
+
+function exportResignedXLSX(){
+  const data=resignedFiltered.length?resignedFiltered:resignedEmps;
+  if(!data.length){showToast('No data','error');return;}
+  const rows=data.map((e,i)=>({'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+    'Designation':e['Short Designation']||e['Designation']||'','Department':e['Department']||'',
+    'Division':e['Division']||'','Date of Joining':e['Date of Joining']||'',
+    'Resignation Date':e['Date Of Resignation']||'','Tenure':calcTenure(e['Date of Joining'],e['Date Of Resignation']),
+    'Personal Mail':e['Personal Mail ID']||''}));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Resigned');downloadXLSX(wb,'Resigned_Employees_'+today());
+}
+
+function exportAllXLSX(){
+  if(!allEmployees.length){showToast('No data','error');return;}
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.json_to_sheet(allEmployees);styleWS(ws);XLSX.utils.book_append_sheet(wb,ws,'All Employees');
+  const ws2=XLSX.utils.json_to_sheet(salesEmps);styleWS(ws2);XLSX.utils.book_append_sheet(wb,ws2,'Sales');
+  const ws3=XLSX.utils.json_to_sheet(hoEmps);styleWS(ws3);XLSX.utils.book_append_sheet(wb,ws3,'Head Office');
+  downloadXLSX(wb,'All_Employees_'+today());
+}
+
+function exportNewXLSX(){
+  const data=getNewJoiners(parseInt(document.getElementById('new-days')&&document.getElementById('new-days').value)||10);
+  if(!data.length){showToast('No data','error');return;}
+  const rows=data.map((e,i)=>({'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+    'Type':isSales(e)?'Sales':'HO','Designation':(isSales(e)?e['Short Designation']:e['Designation'])||'',
+    'Department':e['Department']||'','Division':e['Division']||'','HQ':e['HQ']||'',
+    'Date of Joining':e['Date of Joining']||'','Days Ago':daysSince(e['Date of Joining'])}));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'New Joiners');downloadXLSX(wb,'New_Joiners_'+today());
+}
+
+function exportDeptXLSX(dept){
+  const data=activeEmps.filter(e=>e['Department']===dept);
+  if(!data.length){showToast('No data','error');return;}
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(data);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,dept.slice(0,31));downloadXLSX(wb,'Dept_'+dept.replace(/\s+/g,'_')+'_'+today());
+}
+
+function exportDeptReportXLSX(){
+  const depts=groupBy(activeEmps,'Department');
+  const rows=Object.entries(depts).sort((a,b)=>b[1].length-a[1].length).map(([d,e])=>({'Department':d,'Total':e.length,'Sales':e.filter(isSales).length,'Head Office':e.filter(x=>!isSales(x)).length}));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Dept Report');downloadXLSX(wb,'Department_Report_'+today());
+}
+
+function exportDivReportXLSX(){
+  const divs=groupBy(salesEmps,'Division');
+  const rows=Object.entries(divs).sort((a,b)=>b[1].length-a[1].length).map(([d,e])=>({'Division':d,'Total Sales':e.length}));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Division Report');downloadXLSX(wb,'Division_Report_'+today());
+}
+
+function exportTeamReportXLSX(){
+  const teams=groupBy(salesEmps,'Team Wise');
+  const rows=Object.entries(teams).sort((a,b)=>b[1].length-a[1].length).map(([t,e])=>({'Team':t,'Total':e.length}));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Team Report');downloadXLSX(wb,'Team_Report_'+today());
+}
+
+// ──────────────────────────────────────────────
+// TOAST
+// ──────────────────────────────────────────────
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  const el=document.createElement('div');el.className='toast-item';
+  const col=type==='success'?'var(--accent2)':type==='error'?'var(--accent4)':'var(--accent)';
+  el.style.borderLeft=`3px solid ${col}`;
+  const icon=type==='success'?'✅':'❌';
+  el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">${icon} <span>${msg}</span></div>`;
+  t.appendChild(el);setTimeout(()=>el.remove(),3500);
+}
+
+// ──────────────────────────────────────────────
+// DEMO DATA
+// ──────────────────────────────────────────────
+function generateDemoData(){
+  const salesDesig=[['RSM','Regional Sales Manager'],['ASM','Area Sales Manager'],['TSE','Territory Sales Executive'],['SR','Sales Representative'],['SE','Sales Executive']];
+  const hoDepts=['Finance','HR','IT','Operations','Marketing','Legal','Admin','Supply Chain','R&D','Quality'];
+  const hoDesig=['Manager','Deputy Manager','Executive','Senior Executive','Lead','Analyst','Senior Analyst','Officer','Coordinator','Head'];
+  const divs=['North','South','East','West','Central'];
+  const hqs=['Mumbai','Delhi','Chennai','Bangalore','Hyderabad','Pune','Kolkata','Ahmedabad'];
+  const teams=['Team Alpha','Team Beta','Team Gamma','Team Delta','Team Sigma'];
+  const bgs=['A+','A-','B+','B-','O+','O-','AB+','AB-'];
+  const cities=['Mumbai','Delhi','Chennai','Bangalore','Hyderabad','Pune','Kolkata','Ahmedabad','Jaipur','Surat'];
+  const states=['Maharashtra','Delhi','Tamil Nadu','Karnataka','Telangana','Rajasthan','West Bengal','Gujarat'];
+  const names=['Arjun Sharma','Priya Patel','Rahul Kumar','Sneha Singh','Vikram Nair','Ananya Iyer','Rohit Gupta','Deepa Menon','Amit Joshi','Kavya Reddy','Suresh Pillai','Meera Krishnan','Rajesh Verma','Pooja Shah','Kiran Rao','Lakshmi Devi','Sanjay Mehta','Divya Nair','Arun Mishra','Ritu Agarwal','Nikhil Bose','Shreya Kapoor','Manoj Sinha','Gayatri Bhatt','Vishal Dubey','Nisha Tiwari','Abhishek Roy','Sunita Yadav','Siddharth Das','Pallavi Jain'];
+
+  const emps=[];
+  const now=new Date();
+
+  const rsmIds=['EMP0001','EMP0002','EMP0003'];
+  const rsmNames=['Arjun Sharma','Vikram Nair','Rajesh Verma'];
+  rsmIds.forEach((id,idx)=>{
+    emps.push({'Emp Id':id,'Emp Name':rsmNames[idx],'Date Of Resignation':'',
+      'Designation':'Regional Sales Manager','Short Designation':'RSM',
+      'Department':'Sales','Division':divs[idx],'HQ':hqs[idx*2],
+      'Date of Joining':fmtDate(new Date(2015+idx,3,10+idx)),
+      'Reporting Manager ID':'','Team Wise':teams[idx],
+      'Current Phone':'9'+String(1000000000+idx),'Official E-Mail Id':id.toLowerCase()+'@company.com',
+      'Gender':idx%2===0?'Male':'Female','Blood Group':bgs[idx],'Age':String(35+idx),
+      'Years of Experience':String(10+idx),'Personal Mail ID':id.toLowerCase()+'@gmail.com',
+      'Current Address':'Head Office, '+hqs[idx*2],'Current City':hqs[idx*2],'Current State':states[idx*2],'Current Pincode':'400001',
+      'Permanent Address':'Home','Permanent City':hqs[idx*2],'Permanent State':states[idx*2],'Permanent Pincode':'400001'});
+  });
+
+  let empIdx=4;
+  rsmIds.forEach((rsmId,ri)=>{
+    for(let a=0;a<3;a++){
+      const id='EMP'+String(empIdx).padStart(4,'0');
+      emps.push({'Emp Id':id,'Emp Name':names[empIdx%names.length]+' '+(empIdx),'Date Of Resignation':'',
+        'Designation':'Area Sales Manager','Short Designation':'ASM',
+        'Department':'Sales','Division':divs[ri],'HQ':hqs[(ri+a)%hqs.length],
+        'Date of Joining':fmtDate(new Date(2017+ri,a*2,5)),
+        'Reporting Manager ID':rsmId,'Team Wise':teams[ri],
+        'Current Phone':'9'+String(1000000000+empIdx),'Official E-Mail Id':id.toLowerCase()+'@company.com',
+        'Gender':empIdx%2===0?'Male':'Female','Blood Group':bgs[empIdx%bgs.length],'Age':String(28+empIdx%8),
+        'Years of Experience':String(5+empIdx%6),'Personal Mail ID':id.toLowerCase()+'@gmail.com',
+        'Current Address':String(empIdx)+', MG Road, '+hqs[(ri+a)%hqs.length],'Current City':hqs[(ri+a)%hqs.length],'Current State':states[(ri+a)%states.length],'Current Pincode':'560001',
+        'Permanent Address':String(empIdx)+', Park Street','Permanent City':hqs[(ri+a)%hqs.length],'Permanent State':states[(ri+a)%states.length],'Permanent Pincode':'560001'});
+      empIdx++;
+    }
+  });
+
+  const asmList=emps.filter(e=>e['Short Designation']==='ASM');
+  asmList.forEach((asm,ai)=>{
+    const desigOpts=[['TSE','Territory Sales Executive'],['SR','Sales Representative'],['SE','Sales Executive']];
+    for(let s=0;s<5;s++){
+      const id='EMP'+String(empIdx).padStart(4,'0');
+      const [dCode,dLabel]=desigOpts[s%desigOpts.length];
+      let doj;
+      if(ai===0&&s<3){const d=new Date(now);d.setDate(now.getDate()-s);doj=fmtDate(d);}
+      else doj=fmtDate(new Date(2018+s,ai%12,s+1));
+      const isRes=empIdx%9===0;
+      const dor=isRes?fmtDate(new Date(2022,empIdx%12,empIdx%28+1)):'';
+      emps.push({'Emp Id':id,'Emp Name':names[empIdx%names.length]+' '+(empIdx),'Date Of Resignation':dor,
+        'Designation':dLabel,'Short Designation':dCode,
+        'Department':'Sales','Division':asm['Division'],'HQ':asm['HQ'],
+        'Date of Joining':doj,'Reporting Manager ID':asm['Emp Id'],'Team Wise':asm['Team Wise'],
+        'Current Phone':'9'+String(1000000000+empIdx),'Official E-Mail Id':id.toLowerCase()+'@company.com',
+        'Gender':empIdx%2===0?'Male':'Female','Blood Group':bgs[empIdx%bgs.length],'Age':String(23+empIdx%10),
+        'Years of Experience':String(1+empIdx%8),'Personal Mail ID':id.toLowerCase()+'@gmail.com',
+        'Current Address':String(empIdx)+', Lake View, '+asm['HQ'],'Current City':asm['HQ'],'Current State':states[empIdx%states.length],'Current Pincode':'600001',
+        'Permanent Address':String(empIdx)+', River Road','Permanent City':cities[empIdx%cities.length],'Permanent State':states[empIdx%states.length],'Permanent Pincode':'600002'});
+      empIdx++;
+    }
+  });
+
+  // HO employees — HO Head at top, others report to HO Head or each other
+  // NO cross-dept reporting in demo (Sales RSMs don't appear in HO hierarchy)
+  const hoHeadId='EMP'+String(empIdx).padStart(4,'0');
+  emps.push({'Emp Id':hoHeadId,'Emp Name':'Meera Krishnan (HO)','Date Of Resignation':'',
+    'Designation':'Head','Short Designation':'Head',
+    'Department':'Operations','Division':'HO','HQ':'Mumbai',
+    'Date of Joining':fmtDate(new Date(2012,2,15)),
+    'Reporting Manager ID':'','Team Wise':'HO Team',
+    'Current Phone':'9100000099','Official E-Mail Id':hoHeadId.toLowerCase()+'@company.com',
+    'Gender':'Female','Blood Group':'A+','Age':'45',
+    'Years of Experience':'18','Personal Mail ID':hoHeadId.toLowerCase()+'@gmail.com',
+    'Current Address':'HO, Mumbai','Current City':'Mumbai','Current State':'Maharashtra','Current Pincode':'400001',
+    'Permanent Address':'HO, Mumbai','Permanent City':'Mumbai','Permanent State':'Maharashtra','Permanent Pincode':'400001'});
+  empIdx++;
+
+  for(let h=0;h<40;h++){
+    const id='EMP'+String(empIdx).padStart(4,'0');
+    const dept=hoDepts[h%hoDepts.length];
+    const desig=hoDesig[h%hoDesig.length];
+    const hq=hqs[h%hqs.length];
+    // HO staff report to HO Head (first few) or within-dept staff
+    const prevHO=emps.filter(e=>e['Department']===dept&&!isSales(e)&&String(e['Emp Id'])!==id);
+    const mgr=h<8?hoHeadId:(prevHO.slice(-1)[0]?.['Emp Id']||hoHeadId);
+    const isRes=h%11===0;
+    const doj=fmtDate(new Date(2016+h%6,h%12,h%28+1));
+    const dor=isRes?fmtDate(new Date(2023,h%12,h%28+1)):'';
+    emps.push({'Emp Id':id,'Emp Name':names[empIdx%names.length]+' '+(empIdx),'Date Of Resignation':dor,
+      'Designation':desig,'Short Designation':desig.split(' ').map(w=>w[0]).join(''),
+      'Department':dept,'Division':'HO','HQ':hq,
+      'Date of Joining':doj,'Reporting Manager ID':mgr,'Team Wise':'HO Team',
+      'Current Phone':'9'+String(1000000000+empIdx),'Official E-Mail Id':id.toLowerCase()+'@company.com',
+      'Gender':empIdx%2===0?'Male':'Female','Blood Group':bgs[empIdx%bgs.length],'Age':String(25+empIdx%15),
+      'Years of Experience':String(2+empIdx%12),'Personal Mail ID':id.toLowerCase()+'@gmail.com',
+      'Current Address':String(empIdx)+', Commercial St, '+hq,'Current City':hq,'Current State':states[empIdx%states.length],'Current Pincode':'110001',
+      'Permanent Address':String(empIdx)+', Suburb Lane','Permanent City':cities[empIdx%cities.length],'Permanent State':states[empIdx%states.length],'Permanent Pincode':'110002'});
+    empIdx++;
+  }
+  return emps;
+}
+
+function fmtDate(d){return String(d.getDate()).padStart(2,'0')+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+d.getFullYear();}
+
+// ──────────────────────────────────────────────
+// CONTACTS PAGE
+// ──────────────────────────────────────────────
+function renderContacts(){
+  const type=document.getElementById('contacts-type').value;
+  const dept=document.getElementById('contacts-dept').value;
+  const field=document.getElementById('contacts-field').value;
+
+  let pool=[];
+  if(type==='active') pool=[...activeEmps];
+  else if(type==='sales') pool=[...salesEmps];
+  else if(type==='ho') pool=[...hoEmps];
+  else pool=[...allEmployees];
+
+   if(dept) pool=pool.filter(e=>e['Department']===dept);
+
+  const team=document.getElementById('contacts-team').value;
+  const desig=document.getElementById('contacts-desig').value;
+  const searchQ=(document.getElementById('contacts-search').value||'').toLowerCase();
+  if(team) pool=pool.filter(e=>(e['Team Wise']||'').toString().trim()===team.toString().trim());
+  if(desig) pool=pool.filter(e=>(e['Short Designation']||'').toString().trim()===desig.toString().trim());
+  if(searchQ) pool=pool.filter(e=>Object.values(e).some(v=>String(v).toLowerCase().includes(searchQ)));
+
+  const fieldKey=field==='phone'?'Current Phone':field==='email'?'Official E-Mail Id':'Personal Mail ID';
+  const fieldLabel=field==='phone'?'Phone':field==='email'?'Official Email':'Personal Email';
+
+  const withContact=pool.filter(e=>e[fieldKey]&&e[fieldKey].toString().trim());
+  const noContact=pool.filter(e=>!e[fieldKey]||!e[fieldKey].toString().trim());
+
+  document.getElementById('contacts-subtitle').textContent=
+    `${withContact.length} contacts found · ${noContact.length} missing ${fieldLabel.toLowerCase()}`;
+
+  // KPIs
+  document.getElementById('contacts-kpis').innerHTML=[
+    {val:pool.length,label:'Total Selected',color:'#3b5bdb',icon:'👥'},
+    {val:withContact.length,label:'Have '+fieldLabel,color:'#0ca678',icon:'✅'},
+    {val:noContact.length,label:'Missing',color:'#e03131',icon:'❌'},
+    {val:Math.round(withContact.length/Math.max(pool.length,1)*100)+'%',label:'Coverage',color:'#f59f00',icon:'📊'},
+  ].map(k=>`<div class="card" style="text-align:center;padding:14px;">
+    <div style="font-size:18px;margin-bottom:3px;">${k.icon}</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:${k.color};">${k.val}</div>
+    <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;">${k.label}</div>
+  </div>`).join('');
+
+  // Textarea
+  const contacts=withContact.map(e=>e[fieldKey].toString().trim()).join('\n');
+  document.getElementById('contacts-textarea').value=contacts;
+  document.getElementById('whatsapp-btn').style.display=field==='phone'?'inline-flex':'none';
+  document.getElementById('contacts-count').textContent=withContact.length+' contacts';
+
+  // Table
+  document.getElementById('contacts-tbody').innerHTML=withContact.length
+    ?withContact.map((e,i)=>`<tr onclick='openModal(${safeJson(e)})'>
+        <td class="mono" style="color:var(--muted);font-size:11px;">${i+1}</td>
+        <td style="font-weight:600;">${buildAvatar(e)} <span style="margin-left:6px;">${e['Emp Name']}</span></td>
+        <td style="font-size:12px;">${e['Department']||'—'}</td>
+        <td class="mono" style="font-size:11px;color:var(--accent);">${e[fieldKey]}</td>
+        <td>${isSales(e)?'<span class="badge b-sky" style="font-size:9px;">Sales</span>':'<span class="badge b-indigo" style="font-size:9px;">HO</span>'}</td>
+      </tr>`)
+    .join('')
+    :`<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:24px;">No contacts found.</td></tr>`;
+
+  // Populate dept filter
+  const curDept=document.getElementById('contacts-dept').value;
+  populateSelect('contacts-dept',[...new Set(pool.map(e=>e['Department']).filter(Boolean))].sort());
+  if(curDept) document.getElementById('contacts-dept').value=curDept;
+}
+
+function copyContacts(){
+  const txt=document.getElementById('contacts-textarea').value;
+  if(!txt){showToast('No contacts to copy','error');return;}
+  navigator.clipboard.writeText(txt).then(()=>showToast('Copied '+txt.split('\n').length+' contacts!','success'))
+    .catch(()=>{document.getElementById('contacts-textarea').select();document.execCommand('copy');showToast('Copied!','success');});
+}
+
+function copyContactsFormatted(format){
+  const type=document.getElementById('contacts-type').value;
+  const dept=document.getElementById('contacts-dept').value;
+  const field=document.getElementById('contacts-field').value;
+  const fieldKey=field==='phone'?'Current Phone':field==='email'?'Official E-Mail Id':'Personal Mail ID';
+
+  let pool=[];
+  if(type==='active') pool=[...activeEmps];
+  else if(type==='sales') pool=[...salesEmps];
+  else if(type==='ho') pool=[...hoEmps];
+  else pool=[...allEmployees];
+  if(dept) pool=pool.filter(e=>e['Department']===dept);
+  
+
+  const withContact=pool.filter(e=>e[fieldKey]&&e[fieldKey].toString().trim());
+
+  if(format==='whatsapp'){
+    const txt=withContact.map(e=>`${e['Emp Name']}: ${e[fieldKey]}`).join('\n');
+    navigator.clipboard.writeText(txt).then(()=>showToast('Copied in WhatsApp format!','success'));
+  }
+}
+
+function exportContactsXLSX(){
+  const type=document.getElementById('contacts-type').value;
+  const dept=document.getElementById('contacts-dept').value;
+
+  let pool=[];
+  if(type==='active') pool=[...activeEmps];
+  else if(type==='sales') pool=[...salesEmps];
+  else if(type==='ho') pool=[...hoEmps];
+  else pool=[...allEmployees];
+  if(dept) pool=pool.filter(e=>e['Department']===dept);
+
+  if(!pool.length){showToast('No data','error');return;}
+  const rows=pool.map((e,i)=>({
+    '#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+    'Department':e['Department']||'','Designation':e['Short Designation']||e['Designation']||'',
+    'Type':isSales(e)?'Sales':'HO','Phone':e['Current Phone']||'',
+    'Official Email':e['Official E-Mail Id']||'','Personal Email':e['Personal Mail ID']||''
+  }));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Contacts');downloadXLSX(wb,'Contacts_'+today());
+}
+
+// ──────────────────────────────────────────────
+// CELEBRATIONS PAGE
+// ──────────────────────────────────────────────
+function getDOB(emp){
+  // Try 'Date of Birth' field first, fallback to 'DOB'
+  return emp['Date of Birth']||emp['DOB']||emp['Birth Date']||null;
+}
+
+function getDaysUntilAnniversary(dateStr, windowDays){
+  if(!dateStr) return null;
+  const d=parseDateStr(dateStr);
+  if(!d) return null;
+  const now=new Date(); now.setHours(0,0,0,0);
+  // This year's occurrence
+  let thisYear=new Date(now.getFullYear(), d.getMonth(), d.getDate());
+  if(thisYear<now) thisYear=new Date(now.getFullYear()+1, d.getMonth(), d.getDate());
+  const diff=Math.floor((thisYear-now)/86400000);
+  return diff<=windowDays ? diff : null;
+}
+
+function getYearsCompleted(dateStr){
+  const d=parseDateStr(dateStr);
+  if(!d) return 0;
+  const now=new Date();
+  let years=now.getFullYear()-d.getFullYear();
+  const m=now.getMonth()-d.getMonth();
+  if(m<0||(m===0&&now.getDate()<d.getDate())) years--;
+  return years;
+}
+
+function renderCelebrations(){
+  const window=parseInt(document.getElementById('celeb-window').value)||7;
+
+  // Birthdays
+  const birthdays=activeEmps.map(e=>{
+    const dob=getDOB(e);
+    const days=getDaysUntilAnniversary(dob, window);
+    if(days===null) return null;
+    return {...e, _days:days, _type:'birthday', _date:dob};
+  }).filter(Boolean).sort((a,b)=>a._days-b._days);
+
+  // Work anniversaries — only milestone years (1,2,3,5,7,10,15,20,25)
+  const milestones=[1,2,3,5,7,10,15,20,25];
+  const anniversaries=activeEmps.map(e=>{
+    const doj=e['Date of Joining'];
+    const days=getDaysUntilAnniversary(doj, window);
+    if(days===null) return null;
+    const yearsNext=getYearsCompleted(doj)+(days===0?0:1);
+    // Only show milestone anniversaries
+    if(!milestones.includes(yearsNext)) return null;
+    return {...e, _days:days, _type:'anniversary', _date:doj, _years:yearsNext};
+  }).filter(Boolean).sort((a,b)=>a._days-b._days);
+
+  const todayBdays=birthdays.filter(e=>e._days===0);
+  const todayAnnivs=anniversaries.filter(e=>e._days===0);
+  const totalToday=todayBdays.length+todayAnnivs.length;
+
+  // Update nav badge
+  const totalUpcoming=birthdays.length+anniversaries.length;
+  document.getElementById('nav-celeb-count').textContent=totalUpcoming||'';
+
+  // KPIs
+  document.getElementById('celeb-kpis').innerHTML=[
+    {val:birthdays.length,label:'Birthdays',color:'#e64980',icon:'🎂'},
+    {val:anniversaries.length,label:'Anniversaries',color:'#f59f00',icon:'🏆'},
+    {val:totalToday,label:'Today',color:'#0ca678',icon:'🎉'},
+    {val:window,label:'Day Window',color:'#3b5bdb',icon:'📅'},
+  ].map(k=>`<div class="card" style="text-align:center;padding:14px;">
+    <div style="font-size:20px;margin-bottom:4px;">${k.icon}</div>
+    <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:${k.color};">${k.val}</div>
+    <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;">${k.label}</div>
+  </div>`).join('');
+
+  // Today banner
+  const banner=document.getElementById('celeb-today-banner');
+  if(totalToday>0){
+    const names=[...todayBdays,...todayAnnivs].map(e=>e['Emp Name'].split(' ')[0]).join(', ');
+    banner.innerHTML=`<div class="today-banner">
+      <div style="font-size:36px;">🎉</div>
+      <div>
+        <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#1a1f36;">Today's Celebrations!</div>
+        <div style="font-size:13px;color:#4a5272;margin-top:3px;">
+          ${todayBdays.length?`🎂 ${todayBdays.map(e=>e['Emp Name']).join(', ')} — Birthday`:''}
+          ${todayBdays.length&&todayAnnivs.length?'<br>':''}
+          ${todayAnnivs.length?`🏆 ${todayAnnivs.map(e=>e['Emp Name']+' ('+e._years+'y)').join(', ')} — Work Anniversary`:''}
+        </div>
+      </div>
+    </div>`;
+  } else {
+    banner.innerHTML='';
+  }
+
+  // Birthday list
+  document.getElementById('birthday-list').innerHTML=birthdays.length
+    ?birthdays.map(e=>celebCard(e,'birthday')).join('')
+    :`<div style="color:var(--muted);font-size:13px;padding:16px 0;text-align:center;">No birthdays in the next ${window} days.</div>`;
+
+  // Anniversary list
+  document.getElementById('anniversary-list').innerHTML=anniversaries.length
+    ?anniversaries.map(e=>celebCard(e,'anniversary')).join('')
+    :`<div style="color:var(--muted);font-size:13px;padding:16px 0;text-align:center;">No milestone anniversaries in the next ${window} days.</div>`;
+}
+
+function celebCard(emp, type){
+  const isBday=type==='birthday';
+  const daysText=emp._days===0?'Today':emp._days===1?'Tomorrow':`In ${emp._days} days`;
+  const badgeColor=emp._days===0?'#0ca678':emp._days<=2?'#f59f00':'#3b5bdb';
+  const bgColor=isBday?'#fce7f3':'#fef3c7';
+  const emoji=isBday?'🎂':'🏆';
+  const detail=isBday
+    ? (emp._date?`Born ${emp._date}`:'')
+    : `${emp._years} year${emp._years>1?'s':''} anniversary · Joined ${emp['Date of Joining']}`;
+
+  return `<div class="celeb-card" onclick='openModal(${safeJson(emp)})' style="cursor:pointer;">
+    <div class="celeb-badge" style="background:${bgColor};">${emoji}</div>
+    <div style="flex:1;min-width:0;">
+      <div style="font-weight:700;font-size:13px;">${emp['Emp Name']}</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:2px;">${emp['Short Designation']||emp['Designation']||''} · ${emp['Department']||''}</div>
+      ${detail?`<div style="font-size:11px;color:var(--muted);margin-top:1px;">${detail}</div>`:''}
+    </div>
+    <div style="text-align:right;flex-shrink:0;">
+      <span class="celeb-days" style="background:${badgeColor}22;color:${badgeColor};">${daysText}</span>
+      ${isSales(emp)?'<div style="margin-top:4px;"><span class="badge b-sky" style="font-size:9px;">Sales</span></div>':'<div style="margin-top:4px;"><span class="badge b-indigo" style="font-size:9px;">HO</span></div>'}
+    </div>
+  </div>`;
+}
+
+function exportCelebXLSX(){
+  const window=parseInt(document.getElementById('celeb-window').value)||7;
+  const birthdays=activeEmps.map(e=>{
+    const dob=getDOB(e);
+    const days=getDaysUntilAnniversary(dob,window);
+    if(days===null) return null;
+    return {Type:'Birthday','Emp ID':e['Emp Id'],Name:e['Emp Name'],Department:e['Department']||'',
+      Designation:e['Short Designation']||e['Designation']||'','Days Until':days,'Date':dob||''};
+  }).filter(Boolean);
+
+  const milestones=[1,2,3,5,7,10,15,20,25];
+  const anniversaries=activeEmps.map(e=>{
+    const days=getDaysUntilAnniversary(e['Date of Joining'],window);
+    if(days===null) return null;
+    const yearsNext=getYearsCompleted(e['Date of Joining'])+(days===0?0:1);
+    if(!milestones.includes(yearsNext)) return null;
+    return {Type:'Anniversary ('+yearsNext+'y)','Emp ID':e['Emp Id'],Name:e['Emp Name'],
+      Department:e['Department']||'',Designation:e['Short Designation']||e['Designation']||'',
+      'Days Until':days,'Date':e['Date of Joining']||''};
+  }).filter(Boolean);
+
+  const rows=[...birthdays,...anniversaries].sort((a,b)=>a['Days Until']-b['Days Until']);
+  if(!rows.length){showToast('No celebrations found','error');return;}
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Celebrations');downloadXLSX(wb,'Celebrations_'+today());
+}
+
+
+
+window.addEventListener('DOMContentLoaded',loadData);
+</script>
+</body>
+</html>
