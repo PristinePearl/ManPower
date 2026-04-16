@@ -423,6 +423,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <select class="inp" id="sales-div-filter" onchange="filterSalesTable()"><option value="">All Divisions</option></select>
       <select class="inp" id="sales-hq-filter" onchange="filterSalesTable()"><option value="">All HQ</option></select>
       <select class="inp" id="sales-team-filter" onchange="filterSalesTable()"><option value="">All Teams</option></select>
+      <select class="inp" id="sales-gender-filter" onchange="filterSalesTable()"><option value="">All Genders</option></select>
       <button class="btn btn-ghost" onclick="clearSalesFilters()">Clear</button>
       <button class="btn btn-excel" onclick="exportSalesXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
     </div>
@@ -474,6 +475,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <input class="inp" id="ho-search" placeholder="🔍 Search…" oninput="filterHOTable()" style="width:175px;"/>
       <select class="inp" id="ho-dept-filter" onchange="filterHOTable()"><option value="">All Depts</option></select>
       <select class="inp" id="ho-desig-filter" onchange="filterHOTable()"><option value="">All Designations</option></select>
+      <select class="inp" id="ho-gender-filter" onchange="filterHOTable()"><option value="">All Genders</option></select>
       <button class="btn btn-ghost" onclick="clearHOFilters()">Clear</button>
       <button class="btn btn-excel" onclick="exportHOXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
     </div>
@@ -916,6 +918,7 @@ function clearSalesFilters(){
   document.getElementById('sales-div-filter').value='';
   document.getElementById('sales-hq-filter').value='';
   document.getElementById('sales-team-filter').value='';
+  document.getElementById('sales-gender-filter').value='';
   salesDesigFilter='';
   salesFiltered=[...salesEmps];
   salesPage=1;
@@ -927,6 +930,7 @@ function clearHOFilters(){
   document.getElementById('ho-search').value='';
   document.getElementById('ho-dept-filter').value='';
   document.getElementById('ho-desig-filter').value='';
+  document.getElementById('ho-gender-filter').value='';
   hoFiltered=[...hoEmps];
   hoPage=1;
   renderHOTable();
@@ -1236,15 +1240,19 @@ function renderSalesDesigKPIs(){
   const curDiv=document.getElementById('sales-div-filter').value;
   const curHq=document.getElementById('sales-hq-filter').value;
   const curTeam=document.getElementById('sales-team-filter').value;
+  const curGender=document.getElementById('sales-gender-filter').value;
   populateSelect('sales-desig-filter',Object.keys(dm).sort());
   populateSelect('sales-div-filter',[...new Set(salesEmps.map(e=>e['Division']).filter(Boolean))].sort());
   populateSelect('sales-hq-filter',[...new Set(salesEmps.map(e=>e['HQ']).filter(Boolean))].sort());
   populateSelect('sales-team-filter',[...new Set(salesEmps.map(e=>e['Team Wise']).filter(Boolean))].sort());
+  populateSelect('sales-gender-filter',[...new Set(salesEmps.map(e=>e['Gender']).filter(Boolean))].sort());
+
   // Restore selections
   if(curDesig) document.getElementById('sales-desig-filter').value=curDesig;
   if(curDiv)   document.getElementById('sales-div-filter').value=curDiv;
   if(curHq)    document.getElementById('sales-hq-filter').value=curHq;
   if(curTeam)  document.getElementById('sales-team-filter').value=curTeam;
+  if(curGender) document.getElementById('sales-gender-filter').value=curGender;
 }
 
 function setSalesDesigFilter(val){
@@ -1282,6 +1290,7 @@ function filterSalesTable(){
   const div=document.getElementById('sales-div-filter').value;
   const hq=document.getElementById('sales-hq-filter').value;
   const team=document.getElementById('sales-team-filter').value;
+  const gender=document.getElementById('sales-gender-filter').value;
 
   // Keep chip in sync if dropdown changed independently
   const ddDesig=document.getElementById('sales-desig-filter').value;
@@ -1295,6 +1304,7 @@ function filterSalesTable(){
     (!desig||e['Short Designation']===desig)&&
     (!div||e['Division']===div)&&
     (!hq||e['HQ']===hq)&&
+    (!gender||e['Gender']===gender)&&
     (!team||e['Team Wise']===team));
   salesPage=1;
   if(sortState.sales.col) applySortAndRender('sales');
@@ -1332,10 +1342,13 @@ function renderHODeptKPIs(){
     </div>`).join('')}`;
 
   const curDesig=document.getElementById('ho-desig-filter').value;
+  const curGenderHO=document.getElementById('ho-gender-filter').value;
   populateSelect('ho-dept-filter',Object.keys(dm).sort());
   populateSelect('ho-desig-filter',[...new Set(hoEmps.map(e=>e['Designation']).filter(Boolean))].sort());
+  populateSelect('ho-gender-filter',[...new Set(hoEmps.map(e=>e['Gender']).filter(Boolean))].sort());
   if(curDept)  document.getElementById('ho-dept-filter').value=curDept;
   if(curDesig) document.getElementById('ho-desig-filter').value=curDesig;
+  if(curGenderHO) document.getElementById('ho-gender-filter').value=curGenderHO;
 }
 
 function setHODeptFilter(val){
@@ -1365,9 +1378,11 @@ function filterHOTable(){
   const q=(document.getElementById('ho-search').value||'').toLowerCase();
   const dept=document.getElementById('ho-dept-filter').value;
   const desig=document.getElementById('ho-desig-filter').value;
+  const gender=document.getElementById('ho-gender-filter').value;
   hoFiltered=hoEmps.filter(e=>
     (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
     (!dept||e['Department']===dept)&&
+    (!gender||e['Gender']===gender)&&
     (!desig||e['Designation']===desig));
   hoPage=1;
   if(sortState.ho.col) applySortAndRender('ho');
