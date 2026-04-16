@@ -324,7 +324,6 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
         <div style="font-size:13px;opacity:.75;font-weight:600;margin-top:4px;">Across all departments & divisions</div>
       </div>
       <div style="display:flex;gap:28px;flex-wrap:wrap;">
-        <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;" id="hero-active">—</div><div style="font-size:11px;opacity:.7;font-weight:600;display:flex;align-items:center;gap:5px;justify-content:center;"><span class="pulse-dot"></span>Active</div></div>
         <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;" id="hero-sales">—</div><div style="font-size:11px;opacity:.7;font-weight:600;">Sales Field</div></div>
         <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;" id="hero-ho">—</div><div style="font-size:11px;opacity:.7;font-weight:600;">Head Office</div></div>
         <div style="text-align:center;"><div style="font-size:30px;font-family:'Space Grotesk',sans-serif;font-weight:700;color:#ffd43b;" id="hero-new">—</div><div style="font-size:11px;opacity:.7;font-weight:600;">New (10d)</div></div>
@@ -1017,8 +1016,7 @@ function renderDashboard(){
   const total=allEmployees.length,active=activeEmps.length;
   const newJ=getNewJoiners(10);
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('hero-total').textContent=total;
-  document.getElementById('hero-active').textContent=active;
+  document.getElementById('hero-total').textContent = active;
   document.getElementById('hero-sales').textContent=salesEmps.length;
   document.getElementById('hero-ho').textContent=hoEmps.length;
   document.getElementById('hero-new').textContent=newJ.length;
