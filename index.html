@@ -1026,7 +1026,7 @@ function renderDashboard(){
     {label:'Active',val:active,sub:total?Math.round(active/total*100)+'% of total':'',color:'#0ca678',icon:'✅',pct:total?active/total:0,page:'dashboard'},
     {label:'Sales Field',val:salesEmps.length,sub:'Active field staff',color:'#1098ad',icon:'📈',pct:active?salesEmps.length/active:0,page:'sales'},
     {label:'Head Office',val:hoEmps.length,sub:'Support functions',color:'#5f3dc4',icon:'🏢',pct:active?hoEmps.length/active:0,page:'headoffice'},
-    {label:'New (10 days)',val:newJ.length,sub:'Recent joiners',color:'#f59f00',icon:'🌟',pct:active?newJ.length/active:0,page:'newjoiners'},
+    {label:'New Joiners (10 days)',val:newJ.length,sub:'Recent joiners',color:'#f59f00',icon:'🌟',pct:active?newJ.length/active:0,page:'newjoiners'},
   ];
   document.getElementById('kpi-wrap').innerHTML=kpis.map(k=>`
     <div class="kpi" onclick="navigate('${k.page}')">
