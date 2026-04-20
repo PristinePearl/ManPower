@@ -233,7 +233,62 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 /* HIER SEARCH BAR */
 .hier-search-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
 
-@media(max-width:768px){#sidebar{display:none;}}
+@media(max-width:768px){
+  #sidebar{display:none;}
+  main{padding:14px;}
+  .pg-header{flex-direction:column;gap:8px;}
+  .pg-actions{flex-wrap:wrap;gap:6px;width:100%;}
+  .pg-actions .inp{width:100%!important;max-width:100%;}
+  .pg-actions .btn{flex:1;justify-content:center;min-width:80px;}
+  .pg-title{font-size:20px;}
+  .kpi-wrap{grid-template-columns:repeat(2,1fr);}
+  .kpi-val{font-size:28px;}
+  #hero-total{font-size:38px;}
+  .stat-hero>div{flex-direction:column;gap:12px;}
+  div[style*="grid-template-columns:1fr 1fr"],
+  div[style*="grid-template-columns:1fr 2fr"],
+  div[style*="grid-template-columns:1fr 1fr 1fr"]{
+    display:flex!important;flex-direction:column!important;
+  }
+  .table-wrap{font-size:11px;}
+  .emp-table td,.emp-table th{padding:7px 8px;}
+  .modal-box{width:98%;max-height:95vh;border-radius:14px;}
+  .modal-header{padding:16px 16px 14px;}
+  .modal-content{padding:14px 16px;}
+  #modal-body{grid-template-columns:1fr!important;}
+  .tabs{flex-wrap:wrap;}
+  .tab-btn{font-size:11px;padding:5px 10px;}
+  .qstat-row{grid-template-columns:repeat(2,1fr);}
+  .donut-wrap{flex-direction:column;align-items:flex-start;}
+  .hier-children{padding-left:20px;}
+  div[style*="grid-template-columns:repeat(auto-fit,minmax(220px"]{
+    grid-template-columns:1fr 1fr!important;
+  }
+  .summary-chip{padding:8px 12px;}
+  #sales-desig-kpis,#ho-dept-kpis{flex-wrap:wrap;}
+  .contacts-grid{flex-direction:column;}
+  div[style*="display:grid;grid-template-columns:1fr 1fr"]{
+    display:flex!important;flex-direction:column!important;
+  }
+}
+
+@media(max-width:480px){
+  .kpi-wrap{grid-template-columns:1fr 1fr;}
+  .kpi-val{font-size:24px;}
+  .pg-actions{flex-direction:column;}
+  .pg-actions .btn{width:100%;}
+  main{padding:10px;}
+  .emp-table th{font-size:9px;}
+  .emp-table td{font-size:11px;}
+  .badge{font-size:9.5px;padding:2px 6px;}
+  div[style*="grid-template-columns:repeat(auto-fit,minmax(220px"]{
+    grid-template-columns:1fr!important;
+  }
+  #nj-kpis,#celeb-kpis,#contacts-kpis{
+    grid-template-columns:repeat(2,1fr)!important;
+  }
+  .modal-header>div{flex-direction:column;align-items:flex-start;}
+}
 </style>
 </head>
 <body>
@@ -297,6 +352,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 <!-- MAIN -->
 <main>
+  <button id="mob-menu-btn" onclick="toggleMobileSidebar()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:900;width:52px;height:52px;border-radius:50%;background:var(--accent-g);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(59,91,219,.4);font-size:22px;color:#fff;align-items:center;justify-content:center;">☰</button>
 <div id="loadOv">
   <div class="spin"></div>
   <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--text2);">Loading employees…</div>
@@ -711,6 +767,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 </main>
 </div>
+<div id="mob-overlay" onclick="toggleMobileSidebar()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:799;backdrop-filter:blur(3px);"></div>
 
 <!-- MODAL -->
 <div id="modal" class="modal-ov" style="display:none;" onclick="closeModal(event)">
@@ -2389,7 +2446,22 @@ function exportCelebXLSX(){
   XLSX.utils.book_append_sheet(wb,ws,'Celebrations');downloadXLSX(wb,'Celebrations_'+today());
 }
 
+// Mobile sidebar
+function toggleMobileSidebar(){
+  const sb=document.getElementById('sidebar');
+  const open=sb.style.display==='flex';
+  sb.style.cssText=open?'':'display:flex;position:fixed;inset:0;z-index:800;width:240px;box-shadow:var(--sh3);';
+  document.getElementById('mob-overlay').style.display=open?'none':'block';
+}
 
+// Show hamburger on mobile
+if(window.innerWidth<=768){
+  document.getElementById('mob-menu-btn').style.display='flex';
+}
+window.addEventListener('resize',()=>{
+  const btn=document.getElementById('mob-menu-btn');
+  if(btn) btn.style.display=window.innerWidth<=768?'flex':'none';
+});
 
 window.addEventListener('DOMContentLoaded',loadData);
 </script>
