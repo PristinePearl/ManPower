@@ -335,6 +335,9 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="nav-item" onclick="navigate('division')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div>By Division</div>
     <div class="nav-item" onclick="navigate('team')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>By Team</div>
     <div class="nav-item" onclick="navigate('location')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg></div>By Location</div>
+    <div class="nav-item" onclick="navigate('indiamap')">
+  <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20.586L3.707 15.293A8 8 0 1120.586 9H21a1 1 0 010 2h-1a8.001 8.001 0 01-7 7.938V20.586z"/></svg></div> Map Distribution
+</div>
     <div class="nav-item" onclick="navigate('trend')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg></div>Joining Trends</div>
     <div class="nav-sect">Tools</div>
     <div class="nav-item" onclick="navigate('search')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg></div>Search</div>
@@ -342,9 +345,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <div class="nav-item" onclick="navigate('contacts')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V7a2 2 0 012-2z"/></svg></div>Contacts</div>
 
 <div class="nav-item" onclick="navigate('celebrations')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0M9 6l3-3 3 3M12 3v12"/></svg></div>Celebrations <span id="nav-celeb-count" class="nav-badge b-new"></span></div>
- <div class="nav-item" onclick="navigate('indiamap')">
-  <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20.586L3.707 15.293A8 8 0 1120.586 9H21a1 1 0 010 2h-1a8.001 8.001 0 01-7 7.938V20.586z"/></svg></div>India Map
-</div>
+ 
   </nav>
   <div class="sb-footer">
     <button class="sb-refresh" onclick="loadData()">
@@ -691,7 +692,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 <div id="page-indiamap" class="page">
   <div class="pg-header">
     <div>
-      <div class="pg-title">🗺️ India — Employee Distribution Map</div>
+      <div class="pg-title">🗺 — Employee Distribution Map</div>
       <div class="pg-sub">State-wise employee density · Click any state to explore</div>
     </div>
     <div class="pg-actions">
@@ -705,7 +706,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     </div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:18px;" id="imap-kpis"></div>
-  <div style="display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap;">
+  <div style="display:flex;gap:16px;align-items:stretch;flex-wrap:wrap;">
     <div class="card" style="flex:1;min-width:320px;padding:18px;">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
         <span style="font-size:11px;color:var(--muted);font-weight:600;">Fewer</span>
@@ -715,7 +716,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
         <span style="font-size:11px;color:var(--muted);font-weight:600;">employees</span>
       </div>
       <div style="position:relative;overflow:hidden;border-radius:10px;background:var(--card2);border:1px solid var(--border);" id="imap-wrap">
-        <svg id="imap-svg" viewBox="0 0 640 720" width="100%" style="display:block;transition:transform .15s;cursor:grab;user-select:none;"></svg>
+        <svg id="imap-svg" viewBox="0 0 640 760" width="100%" style="display:block;transition:transform .15s;cursor:grab;user-select:none;"></svg>
         <div style="position:absolute;top:10px;right:10px;display:flex;flex-direction:column;gap:4px;">
           <button class="btn btn-ghost" onclick="imapZoom(1.3)" style="width:30px;height:30px;padding:0;font-size:18px;justify-content:center;">+</button>
           <button class="btn btn-ghost" onclick="imapZoom(0.77)" style="width:30px;height:30px;padding:0;font-size:18px;justify-content:center;">−</button>
@@ -725,7 +726,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       </div>
       <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px;font-weight:600;">Scroll to zoom · Drag to pan · Click state for details</div>
     </div>
-    <div style="width:260px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
+    <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
       <div class="card" style="padding:18px;" id="imap-side">
         <div class="sec-title" style="margin-bottom:12px;"><span class="sec-dot" style="background:var(--accent);"></span>State Details</div>
         <div style="color:var(--muted);font-size:12px;text-align:center;padding:28px 0;font-weight:600;line-height:1.8;">🗺️<br>Click any state<br>to view details</div>
@@ -2743,7 +2744,7 @@ function imapSelectState(state,counts,pool){
   const sales=emps.filter(isSales);
   const ho=emps.filter(e=>!isSales(e));
   const desigMap={};
-  emps.forEach(e=>{const d=isSales(e)?(e["Short Designation"]||"—"):(e["Designation"]||"—");desigMap[d]=(desigMap[d]||0)+1;});
+ emps.forEach(e=>{const d=isSales(e)?(e["Short Designation"]||"—"):"HO Staff";desigMap[d]=(desigMap[d]||0)+1;});
   const side=document.getElementById("imap-side");
   if(!side) return;
   side.innerHTML=`
@@ -2761,7 +2762,7 @@ function imapSelectState(state,counts,pool){
         <span style="font-weight:700;color:var(--text);">${c}</span>
       </div>`).join("")}`:"" }
     <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px;">Employees</div>
-    <div style="max-height:200px;overflow-y:auto;">
+    <div style="max-height:320px;overflow-y:auto;">
       ${emps.map(e=>`<div onclick='openModal(${safeJson(e)})' style="padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;">
         <div style="font-weight:700;font-size:12px;color:var(--text);">${e["Emp Name"]}</div>
         <div style="font-size:10px;color:var(--muted);">${isSales(e)?(e["Short Designation"]||""):e["Designation"]||""} · ${e["HQ"]||""}</div>
@@ -2774,6 +2775,7 @@ function imapZoom(f){
   imapApplyTransform();
 }
 function imapReset(){imapSc=1;imapTx=0;imapTy=0;imapSel="";imapApplyTransform();}
+
 function imapApplyTransform(){
   const svg=document.getElementById("imap-svg");
   if(svg) svg.style.transform=`scale(${imapSc}) translate(${imapTx}px,${imapTy}px)`;
