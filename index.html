@@ -628,7 +628,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 <!-- LOCATION -->
 <div id="page-location" class="page">
-  <div class="pg-header"><div class="pg-title">Location Report</div></div>
+  <div class="pg-header"><div class="pg-title">Location Report</div><button class="btn btn-excel" onclick="exportLocationXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export Excel</button></div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
     <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--accent);"></span>By HQ</div><div id="hq-report"></div></div>
     <div class="card"><div class="sec-title"><span class="sec-dot" style="background:var(--accent2);"></span>By State</div><div id="state-report"></div></div>
@@ -755,6 +755,9 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <select class="inp" id="contacts-dept" onchange="renderContacts()"><option value="">All Departments</option></select>
       <select class="inp" id="contacts-field" onchange="renderContacts()"><option value="email">Official Emails</option><option value="phone">Phone Numbers</option><option value="personal">Personal Emails</option></select>
       <button class="btn btn-primary" onclick="copyContacts()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>Copy All</button>
+      <button class="btn btn-primary" onclick="exportGroupedContactsXLSX()">
+  <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0"/></svg>Grouped Export
+</button>
       <button class="btn btn-excel" onclick="exportContactsXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
     </div>
   </div>
@@ -2078,25 +2081,209 @@ function exportDeptXLSX(dept){
   XLSX.utils.book_append_sheet(wb,ws,dept.slice(0,31));downloadXLSX(wb,'Dept_'+dept.replace(/\s+/g,'_')+'_'+today());
 }
 
+function exportLocationXLSX(){
+  const wb=XLSX.utils.book_new();
+
+  // Sheet 1: HQ Summary
+  const hqMap=groupBy(activeEmps,'HQ');
+  const hqSummary=Object.entries(hqMap).sort((a,b)=>b[1].length-a[1].length).map(([hq,emps])=>({
+    'HQ':hq,'Total':emps.length,
+    'Sales':emps.filter(isSales).length,
+    'HO':emps.filter(e=>!isSales(e)).length
+  }));
+  const ws1=XLSX.utils.json_to_sheet(hqSummary);styleWS(ws1);
+  XLSX.utils.book_append_sheet(wb,ws1,'HQ Summary');
+
+  // Sheet 2: State Summary
+  const stateMap=groupBy(activeEmps,'Current State');
+  const stateSummary=Object.entries(stateMap).sort((a,b)=>b[1].length-a[1].length).map(([state,emps])=>({
+    'State':state,'Total':emps.length,
+    'Sales':emps.filter(isSales).length,
+    'HO':emps.filter(e=>!isSales(e)).length,
+    'HQs':[...new Set(emps.map(e=>e['HQ']).filter(Boolean))].join(', ')
+  }));
+  const ws2=XLSX.utils.json_to_sheet(stateSummary);styleWS(ws2);
+  XLSX.utils.book_append_sheet(wb,ws2,'State Summary');
+
+  // Sheet 3: Full HQ Breakdown — every employee
+  const hqBreakdown=activeEmps.slice().sort((a,b)=>(a['HQ']||'').localeCompare(b['HQ']||'')).map((e,i)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return {
+      '#':i+1,'HQ':e['HQ']||'','State':e['Current State']||'','City':e['Current City']||'',
+      'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      'Type':isSales(e)?'Sales':'HO',
+      'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
+      'Department':e['Department']||'','Division':e['Division']||'','Team':e['Team Wise']||'',
+      'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
+      'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+    };
+  });
+  const ws3=XLSX.utils.json_to_sheet(hqBreakdown);styleWS(ws3);
+  XLSX.utils.book_append_sheet(wb,ws3,'All by HQ');
+
+  // Sheet 4: One sheet per state (top 10 states only to avoid Excel sheet limit)
+  Object.entries(stateMap).sort((a,b)=>b[1].length-a[1].length).slice(0,10).forEach(([state,emps])=>{
+    const rows=emps.map((e,i)=>{
+      const mgr=getMgrInfo(e['Reporting Manager ID']);
+      return {
+        '#':i+1,'HQ':e['HQ']||'','Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+        'Type':isSales(e)?'Sales':'HO',
+        'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
+        'Department':e['Department']||'','Phone':e['Current Phone']||'',
+        'Email':e['Official E-Mail Id']||'',
+        'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+      };
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+    XLSX.utils.book_append_sheet(wb,ws,state.slice(0,31));
+  });
+
+  downloadXLSX(wb,'Location_Report_'+today());
+}
+
 function exportDeptReportXLSX(){
+  const wb=XLSX.utils.book_new();
+
+  // Sheet 1: Summary
   const depts=groupBy(activeEmps,'Department');
-  const rows=Object.entries(depts).sort((a,b)=>b[1].length-a[1].length).map(([d,e])=>({'Department':d,'Total':e.length,'Sales':e.filter(isSales).length,'Head Office':e.filter(x=>!isSales(x)).length}));
-  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
-  XLSX.utils.book_append_sheet(wb,ws,'Dept Report');downloadXLSX(wb,'Department_Report_'+today());
+  const summary=Object.entries(depts).sort((a,b)=>b[1].length-a[1].length).map(([d,emps])=>({
+    'Department':d,'Total':emps.length,
+    'Sales':emps.filter(isSales).length,
+    'Head Office':emps.filter(x=>!isSales(x)).length
+  }));
+  const ws1=XLSX.utils.json_to_sheet(summary);styleWS(ws1);
+  XLSX.utils.book_append_sheet(wb,ws1,'Summary');
+
+  // Sheet 2: Full Breakdown — one row per employee
+  const breakdown=activeEmps.slice().sort((a,b)=>(a['Department']||'').localeCompare(b['Department']||'')).map((e,i)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return {
+      '#':i+1,'Department':e['Department']||'','Type':isSales(e)?'Sales':'HO',
+      'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
+      'Division':e['Division']||'','HQ':e['HQ']||'','Team':e['Team Wise']||'',
+      'Date of Joining':e['Date of Joining']||'','Phone':e['Current Phone']||'',
+      'Email':e['Official E-Mail Id']||'',
+      'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+    };
+  });
+  const ws2=XLSX.utils.json_to_sheet(breakdown);styleWS(ws2);
+  XLSX.utils.book_append_sheet(wb,ws2,'All Employees');
+
+  // One sheet per department
+  Object.entries(depts).sort((a,b)=>b[1].length-a[1].length).forEach(([dept,emps])=>{
+    const rows=emps.map((e,i)=>{
+      const mgr=getMgrInfo(e['Reporting Manager ID']);
+      return {
+        '#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+        'Type':isSales(e)?'Sales':'HO',
+        'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
+        'Division':e['Division']||'','HQ':e['HQ']||'','Team':e['Team Wise']||'',
+        'Date of Joining':e['Date of Joining']||'','Phone':e['Current Phone']||'',
+        'Email':e['Official E-Mail Id']||'',
+        'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+      };
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+    XLSX.utils.book_append_sheet(wb,ws,dept.slice(0,31));
+  });
+
+  downloadXLSX(wb,'Department_Report_'+today());
 }
 
 function exportDivReportXLSX(){
+  const wb=XLSX.utils.book_new();
+
+  // Sheet 1: Summary
   const divs=groupBy(salesEmps,'Division');
-  const rows=Object.entries(divs).sort((a,b)=>b[1].length-a[1].length).map(([d,e])=>({'Division':d,'Total Sales':e.length}));
-  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
-  XLSX.utils.book_append_sheet(wb,ws,'Division Report');downloadXLSX(wb,'Division_Report_'+today());
+  const summary=Object.entries(divs).sort((a,b)=>b[1].length-a[1].length).map(([d,emps])=>{
+    const byDesig=groupBy(emps,'Short Designation');
+    const row={'Division':d,'Total':emps.length};
+    Object.entries(byDesig).forEach(([desig,arr])=>{row[desig]=arr.length;});
+    return row;
+  });
+  const ws1=XLSX.utils.json_to_sheet(summary);styleWS(ws1);
+  XLSX.utils.book_append_sheet(wb,ws1,'Summary');
+
+  // Sheet 2: Full Breakdown
+  const breakdown=salesEmps.slice().sort((a,b)=>(a['Division']||'').localeCompare(b['Division']||'')).map((e,i)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return {
+      '#':i+1,'Division':e['Division']||'','Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      'Designation':e['Short Designation']||e['Designation']||'',
+      'HQ':e['HQ']||'','Team':e['Team Wise']||'','Date of Joining':e['Date of Joining']||'',
+      'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
+      'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+    };
+  });
+  const ws2=XLSX.utils.json_to_sheet(breakdown);styleWS(ws2);
+  XLSX.utils.book_append_sheet(wb,ws2,'All Sales Employees');
+
+  // One sheet per division
+  Object.entries(divs).sort((a,b)=>b[1].length-a[1].length).forEach(([div,emps])=>{
+    const rows=emps.map((e,i)=>{
+      const mgr=getMgrInfo(e['Reporting Manager ID']);
+      return {
+        '#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+        'Designation':e['Short Designation']||e['Designation']||'',
+        'HQ':e['HQ']||'','Team':e['Team Wise']||'','Date of Joining':e['Date of Joining']||'',
+        'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
+        'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+      };
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+    XLSX.utils.book_append_sheet(wb,ws,div.slice(0,31));
+  });
+
+  downloadXLSX(wb,'Division_Report_'+today());
 }
 
 function exportTeamReportXLSX(){
+  const wb=XLSX.utils.book_new();
+
+  // Sheet 1: Summary
   const teams=groupBy(salesEmps,'Team Wise');
-  const rows=Object.entries(teams).sort((a,b)=>b[1].length-a[1].length).map(([t,e])=>({'Team':t,'Total':e.length}));
-  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
-  XLSX.utils.book_append_sheet(wb,ws,'Team Report');downloadXLSX(wb,'Team_Report_'+today());
+  const summary=Object.entries(teams).sort((a,b)=>b[1].length-a[1].length).map(([t,emps])=>{
+    const byDesig=groupBy(emps,'Short Designation');
+    const hqs=[...new Set(emps.map(e=>e['HQ']).filter(Boolean))].join(', ');
+    const row={'Team':t,'Total':emps.length,'HQs Covered':hqs};
+    Object.entries(byDesig).forEach(([desig,arr])=>{row[desig]=arr.length;});
+    return row;
+  });
+  const ws1=XLSX.utils.json_to_sheet(summary);styleWS(ws1);
+  XLSX.utils.book_append_sheet(wb,ws1,'Summary');
+
+  // Sheet 2: Full Breakdown
+  const breakdown=salesEmps.slice().sort((a,b)=>(a['Team Wise']||'').localeCompare(b['Team Wise']||'')).map((e,i)=>{
+    const mgr=getMgrInfo(e['Reporting Manager ID']);
+    return {
+      '#':i+1,'Team':e['Team Wise']||'','Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      'Designation':e['Short Designation']||e['Designation']||'',
+      'Division':e['Division']||'','HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
+      'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
+      'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+    };
+  });
+  const ws2=XLSX.utils.json_to_sheet(breakdown);styleWS(ws2);
+  XLSX.utils.book_append_sheet(wb,ws2,'All Team Employees');
+
+  // One sheet per team
+  Object.entries(teams).sort((a,b)=>b[1].length-a[1].length).forEach(([team,emps])=>{
+    const rows=emps.map((e,i)=>{
+      const mgr=getMgrInfo(e['Reporting Manager ID']);
+      return {
+        '#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+        'Designation':e['Short Designation']||e['Designation']||'',
+        'Division':e['Division']||'','HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
+        'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
+        'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
+      };
+    });
+    const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+    XLSX.utils.book_append_sheet(wb,ws,team.slice(0,31));
+  });
+
+  downloadXLSX(wb,'Team_Report_'+today());
 }
 
 // ──────────────────────────────────────────────
@@ -2324,6 +2511,88 @@ function copyContactsFormatted(format){
     const txt=withContact.map(e=>`${e['Emp Name']}: ${e[fieldKey]}`).join('\n');
     navigator.clipboard.writeText(txt).then(()=>showToast('Copied in WhatsApp format!','success'));
   }
+}
+
+function exportGroupedContactsXLSX(){
+  const type=document.getElementById('contacts-type').value;
+  const dept=document.getElementById('contacts-dept').value;
+  const team=document.getElementById('contacts-team').value;
+  const desig=document.getElementById('contacts-desig').value;
+  const searchQ=(document.getElementById('contacts-search').value||'').toLowerCase();
+
+  let pool=[];
+  if(type==='active') pool=[...activeEmps];
+  else if(type==='sales') pool=[...salesEmps];
+  else if(type==='ho') pool=[...hoEmps];
+  else pool=[...allEmployees];
+  if(dept) pool=pool.filter(e=>e['Department']===dept);
+  if(team) pool=pool.filter(e=>(e['Team Wise']||'').toString().trim()===team.toString().trim());
+  if(desig) pool=pool.filter(e=>(e['Short Designation']||'').toString().trim()===desig.toString().trim());
+  if(searchQ) pool=pool.filter(e=>Object.values(e).some(v=>String(v).toLowerCase().includes(searchQ)));
+
+  if(!pool.length){showToast('No data','error');return;}
+
+  // For each employee, trace all managers up the chain
+  function getManagerChain(emp, depth=1, visited=new Set()){
+    const chain=[];
+    let current=emp;
+    let d=depth;
+    while(d<=5){
+      const mgrId=current['Reporting Manager ID']&&String(current['Reporting Manager ID']).trim();
+      if(!mgrId||visited.has(mgrId)) break;
+      visited.add(mgrId);
+      const mgr=empIdMap[mgrId];
+      if(!mgr) break;
+      chain.push({level:d, mgr});
+      current=mgr;
+      d++;
+    }
+    return chain;
+  }
+
+  const rows=pool.map(e=>{
+    const chain=getManagerChain(e);
+    const row={
+      'Team':e['Team Wise']||'',
+      'HQ':e['HQ']||'',
+      'Staff Name':e['Emp Name']||'',
+      'Staff ID':e['Emp Id']||'',
+      'Staff Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
+      'Staff Department':e['Department']||'',
+      'Staff Phone':e['Current Phone']||'',
+      'Staff Email':e['Official E-Mail Id']||'',
+    };
+    // Add up to 5 manager levels
+    for(let i=1;i<=5;i++){
+      const found=chain.find(c=>c.level===i);
+      if(found){
+        const m=found.mgr;
+        const mDesig=isSales(m)?(m['Short Designation']||m['Designation']||''):(m['Designation']||'');
+        row[`MGR ${i} Name`]=m['Emp Name']||'';
+        row[`MGR ${i} ID`]=m['Emp Id']||'';
+        row[`MGR ${i} Designation`]=mDesig;
+        row[`MGR ${i} Phone`]=m['Current Phone']||'';
+        row[`MGR ${i} Email`]=m['Official E-Mail Id']||'';
+      } else {
+        row[`MGR ${i} Name`]='';
+        row[`MGR ${i} ID`]='';
+        row[`MGR ${i} Designation`]='';
+        row[`MGR ${i} Phone`]='';
+        row[`MGR ${i} Email`]='';
+      }
+    }
+    return row;
+  });
+
+  // Sort by Team then HQ
+  rows.sort((a,b)=>(a['Team']||'').localeCompare(b['Team']||'')||(a['HQ']||'').localeCompare(b['HQ']||''));
+
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.json_to_sheet(rows);
+  // Wider columns
+  ws['!cols']=Array(Object.keys(rows[0]||{}).length).fill({wch:22});
+  XLSX.utils.book_append_sheet(wb,ws,'Grouped Contacts');
+  downloadXLSX(wb,'Grouped_Contacts_'+today());
 }
 
 function exportContactsXLSX(){
