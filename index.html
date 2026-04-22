@@ -2537,7 +2537,7 @@ function exportGroupedContactsXLSX(){
     const chain=[];
     let current=emp;
     let d=depth;
-    while(d<=5){
+    while(d<=10){
       const mgrId=current['Reporting Manager ID']&&String(current['Reporting Manager ID']).trim();
       if(!mgrId||visited.has(mgrId)) break;
       visited.add(mgrId);
@@ -2563,7 +2563,7 @@ function exportGroupedContactsXLSX(){
       'Staff Email':e['Official E-Mail Id']||'',
     };
     // Add up to 5 manager levels
-    for(let i=1;i<=5;i++){
+    for(let i=1;i<=10;i++){
       const found=chain.find(c=>c.level===i);
       if(found){
         const m=found.mgr;
