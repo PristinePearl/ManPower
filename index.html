@@ -726,11 +726,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       </div>
       <div style="font-size:10px;color:var(--muted);text-align:center;margin-top:8px;font-weight:600;">Scroll to zoom · Drag to pan · Click state for details</div>
     </div>
-    <div style="width:300px;flex-shrink:0;display:flex;flex-direction:column;gap:14px;">
-      <div class="card" style="padding:18px;" id="imap-side">
-        <div class="sec-title" style="margin-bottom:12px;"><span class="sec-dot" style="background:var(--accent);"></span>State Details</div>
-        <div style="color:var(--muted);font-size:12px;text-align:center;padding:28px 0;font-weight:600;line-height:1.8;">🗺️<br>Click any state<br>to view details</div>
-      </div>
+    <div style="width:260px;flex-shrink:0;">
       <div class="card" style="padding:18px;">
         <div class="sec-title" style="margin-bottom:10px;"><span class="sec-dot" style="background:var(--accent2);"></span>Top States</div>
         <div id="imap-top-states"></div>
@@ -3232,29 +3228,28 @@ function imapSelectState(state,counts,pool){
   const ho=emps.filter(e=>!isSales(e));
   const desigMap={};
  emps.forEach(e=>{const d=isSales(e)?(e["Short Designation"]||"—"):"HO Staff";desigMap[d]=(desigMap[d]||0)+1;});
-  const side=document.getElementById("imap-side");
-  if(!side) return;
-  side.innerHTML=`
-    <div class="sec-title" style="margin-bottom:10px;"><span class="sec-dot" style="background:var(--accent);"></span>${state}</div>
-    <div style="font-family:'Space Grotesk',sans-serif;font-size:38px;font-weight:700;color:#3b5bdb;line-height:1;">${emps.length}</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">total employees</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
-      <div class="qstat"><div class="qstat-val" style="color:var(--sales);">${sales.length}</div><div class="qstat-lbl">Sales</div></div>
-      <div class="qstat"><div class="qstat-val" style="color:var(--ho);">${ho.length}</div><div class="qstat-lbl">HO</div></div>
-    </div>
-    ${Object.keys(desigMap).length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">By Designation</div>
-    ${Object.entries(desigMap).sort((a,b)=>b[1]-a[1]).map(([d,c])=>`
-      <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;">
-        <span style="color:var(--text2);font-weight:600;">${d}</span>
-        <span style="font-weight:700;color:var(--text);">${c}</span>
-      </div>`).join("")}`:"" }
+  const modalHtml=`<div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#3b5bdb;line-height:1;margin-bottom:4px;">${emps.length} Employees</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">${sales.length} Sales · ${ho.length} HO</div>
+    ${Object.keys(desigMap).length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">By Designation</div>${Object.entries(desigMap).sort((a,b)=>b[1]-a[1]).map(([d,c])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--text2);font-weight:600;">${d}</span><span style="font-weight:700;">${c}</span></div>`).join("")}`:""}
     <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px;">Employees</div>
-    <div style="max-height:320px;overflow-y:auto;">
-      ${emps.map(e=>`<div onclick='openModal(${safeJson(e)})' style="padding:5px 0;border-bottom:1px solid var(--border);cursor:pointer;">
-        <div style="font-weight:700;font-size:12px;color:var(--text);">${e["Emp Name"]}</div>
-        <div style="font-size:10px;color:var(--muted);">${isSales(e)?(e["Short Designation"]||""):e["Designation"]||""} · ${e["HQ"]||""}</div>
-      </div>`).join("") || "<div style=\"color:var(--muted);font-size:12px;padding:10px 0;\">No employees in this state</div>"}
-    </div>`;
+    <div style="max-height:320px;overflow-y:auto;">${emps.map(e=>`<div onclick='document.getElementById("imap-popup").style.display="none";openModal(${safeJson(e)})' style="padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;"><div style="font-weight:700;font-size:12px;">${e["Emp Name"]}</div><div style="font-size:10px;color:var(--muted);">${isSales(e)?(e["Short Designation"]||""):e["Designation"]||""} · ${e["HQ"]||""}</div></div>`).join()||"<div style='color:var(--muted);font-size:12px;padding:10px 0;'>No employees</div>"}</div>`;
+
+  let popup=document.getElementById("imap-popup");
+  if(!popup){
+    popup=document.createElement("div");
+    popup.id="imap-popup";
+    popup.style.cssText="position:fixed;inset:0;background:rgba(10,15,40,.5);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);";
+    popup.addEventListener("click",e=>{if(e.target===popup)popup.style.display="none";});
+    document.body.appendChild(popup);
+  }
+  popup.style.display="flex";
+  popup.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;width:94%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:var(--sh3);padding:24px 28px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;">${state}</div>
+      <button onclick="document.getElementById('imap-popup').style.display='none'" style="background:var(--bg);border:1px solid var(--border);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    ${modalHtml}
+  </div>`;
 }
 
 function imapZoom(f){
