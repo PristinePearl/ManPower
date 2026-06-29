@@ -941,7 +941,7 @@ populateSelect('contacts-desig',[...new Set(allEmployees.map(e=>e['Short Designa
 const celebCount=[...activeEmps].filter(e=>{
   const bdDays=getDaysUntilAnniversary(getDOB(e),7);
   const annDays=getDaysUntilAnniversary(e['Date of Joining'],7);
-  const milestones=[1,2,3,5,7,10,15,20,25];
+  const milestones=[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,25];
   const validAnniv=annDays!==null&&milestones.includes(getYearsCompleted(e['Date of Joining'])+(annDays===0?0:1));
   return bdDays!==null||validAnniv;
 }).length;
