@@ -2872,7 +2872,7 @@ function renderCelebrations(){
   }).filter(Boolean).sort((a,b)=>a._days-b._days);
 
   // Work anniversaries — only milestone years (1,2,3,5,7,10,15,20,25)
-  const milestones=[1,2,3,5,7,10,15,20,25];
+  const milestones=[1,2,3,4,5,6,7,8,9,10,15,20,25];
   const anniversaries=activeEmps.map(e=>{
     const doj=e['Date of Joining'];
     const days=getDaysUntilAnniversary(doj, window);
@@ -2967,7 +2967,7 @@ function exportCelebXLSX(){
       Designation:e['Short Designation']||e['Designation']||'','Days Until':days,'Date':dob||''};
   }).filter(Boolean);
 
-  const milestones=[1,2,3,5,7,10,15,20,25];
+  const milestones=[1,2,3,4,5,6,7,8,9,10,15,20,25];
   const anniversaries=activeEmps.map(e=>{
     const days=getDaysUntilAnniversary(e['Date of Joining'],window);
     if(days===null) return null;
