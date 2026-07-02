@@ -335,6 +335,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="nav-item" onclick="navigate('division')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg></div>By Division</div>
     <div class="nav-item" onclick="navigate('team')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div>By Team</div>
     <div class="nav-item" onclick="navigate('location')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/></svg></div>By Location</div>
+    <div class="nav-item" onclick="navigate('region')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3.6 9h16.8M3.6 15h16.8M11.5 3a17 17 0 000 18M12.5 3a17 17 0 010 18"/><circle cx="12" cy="12" r="9"/></svg></div>By Region</div>
     <div class="nav-item" onclick="navigate('indiamap')">
   <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 20.586L3.707 15.293A8 8 0 1120.586 9H21a1 1 0 010 2h-1a8.001 8.001 0 01-7 7.938V20.586z"/></svg></div> Map Distribution
 </div>
@@ -639,6 +640,13 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   </div>
 </div>
 
+<!-- REGION -->
+<div id="page-region" class="page">
+  <div class="pg-header"><div class="pg-title">Region-Wise Report</div><button class="btn btn-excel" onclick="exportRegionXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export Excel</button></div>
+  <div class="pg-sub" style="margin-bottom:12px;">Grouped by reporting hierarchy under each region head · click a row to see the employee list</div>
+  <div id="region-report-grid"></div>
+</div>
+
 <!-- TREND -->
 <div id="page-trend" class="page">
   <div class="pg-header"><div class="pg-title">Joining & Attrition Trends</div></div>
@@ -874,6 +882,58 @@ let salesDesigFilter='';
 let empIdMap={};
 
 // ──────────────────────────────────────────────
+// REGION MAPPING (entire hierarchy under an anchor Emp ID
+// inherits that anchor's region). Add / edit entries here only.
+// ──────────────────────────────────────────────
+const REGION_ANCHORS = {           // Emp Id (as string) -> Region
+  '16642':'TN01 RO',  '16638':'TN01 RO',
+  '16840':'TN01 CBE',
+  '17883':'TN01 CHN',
+  '16761':'KA RO',    '16765':'KA RO',    '16795':'KA RO',
+  '16914':'KA BLR',
+  '17021':'MH',
+  '17545':'DMF',
+  '16432':'KL RO',
+  '16379':'KL COC',
+  // 'PUT_GOA_TEAM_HEAD_ID_HERE':'GOA',
+  // 'PUT_J&K_TEAM_HEAD_ID_HERE':'JK',
+  // 'PUT_DELHI_TEAM_HEAD_ID_HERE':'DL',
+};
+// Fallback by existing "Team Wise" value, used only when no anchor
+// is found walking up the reporting chain (covers Goa/J&K/Delhi
+// until their manager IDs are added above).
+const REGION_TEAM_FALLBACK = {
+  'Goa Team':'GOA',
+  'J&K Team':'JK',
+  'Delhi Team':'DL',
+  'Tamil Nadu Team-2':'TN02',
+  'Kerala Team':'KL',
+  'Karnataka Team':'KA',
+  'Head Office':'HO',
+  'Heads Team':'Heads',
+  'Regional office':'REG-OFF',
+  'Bangalore Depot':'REG-OFF',
+  
+};
+let regionCache={};
+function getRegion(emp){
+  const empId=String(emp['Emp Id']).trim();
+  if(regionCache[empId]!==undefined) return regionCache[empId];
+  let cur=emp, guard=0;
+  while(cur && guard++<50){
+    const curId=String(cur['Emp Id']).trim();
+    if(REGION_ANCHORS[curId]){ regionCache[empId]=REGION_ANCHORS[curId]; return regionCache[empId]; }
+    const mgrId=cur['Reporting Manager ID']&&String(cur['Reporting Manager ID']).trim();
+    if(!mgrId || mgrId===curId) break;
+    cur=empIdMap[mgrId];
+  }
+  const team=(emp['Team Wise']||'').toString().trim();
+  const region=REGION_TEAM_FALLBACK[team]||'Unmapped';
+  regionCache[empId]=region;
+  return region;
+}
+
+// ──────────────────────────────────────────────
 // NAVIGATION
 // ──────────────────────────────────────────────
 function navigate(page){
@@ -888,6 +948,7 @@ function navigate(page){
   if(page==='division')   renderDivReport();
   if(page==='team')       renderTeamReport();
   if(page==='location')   renderLocationReport();
+  if(page==='region')     renderRegionReport();
   if(page==='trend')      renderTrendReport();
   if(page==='export')     renderExportPage();
   if(page==='contacts')     {renderContacts();populateSelect('contacts-dept',[...new Set(activeEmps.map(e=>e['Department']).filter(Boolean))].sort());}
@@ -914,6 +975,7 @@ async function loadData(){
     }
     empIdMap={};
     allEmployees.forEach(e=>{empIdMap[String(e['Emp Id']).trim()]=e;});
+    regionCache={};
 
     activeEmps   = allEmployees.filter(isActive);
     resignedEmps = allEmployees.filter(e=>!isActive(e));
@@ -1994,6 +2056,69 @@ function renderTeamReport(){
           <td>${hqs.map(h=>`<span class="badge b-gray">${h}</span>`).join(' ')}</td>
         </tr>`;
       }).join('')}</tbody></table></div>`;
+}
+
+function renderRegionReport(){
+  const withRegion=activeEmps.map(e=>({e,region:getRegion(e)}));
+  const groups={};
+  withRegion.forEach(({e,region})=>{ (groups[region]=groups[region]||[]).push(e); });
+  const sorted=Object.entries(groups).sort((a,b)=>b[1].length-a[1].length);
+  document.getElementById('region-report-grid').innerHTML=
+    `<div class="table-wrap"><table class="emp-table">
+      <thead><tr><th>#</th><th>Region</th><th>Total</th><th>Designations</th><th>HQ Coverage</th></tr></thead>
+      <tbody>${sorted.map(([region,emps],i)=>{
+        const byDesig=groupBy(emps,'Short Designation');
+        const hqs=[...new Set(emps.map(e=>e['HQ']))].filter(Boolean).slice(0,3);
+        return `<tr style="cursor:pointer;" onclick='regionSelect(${safeJson(region)})'><td class="mono" style="color:var(--muted);font-size:12px;">${i+1}</td>
+          <td style="font-weight:700;">${region==='Unmapped'?'<span style="color:var(--muted);">Unmapped</span>':region}</td>
+          <td class="mono" style="font-weight:700;color:${COLORS[i%COLORS.length]};font-size:16px;">${emps.length}</td>
+          <td style="padding:10px 14px;">${Object.entries(byDesig).map(([d,a])=>`<span class="badge b-sky">${d} ${a.length}</span>`).join(' ')}</td>
+          <td>${hqs.map(h=>`<span class="badge b-gray">${h}</span>`).join(' ')}</td>
+        </tr>`;
+      }).join('')}</tbody></table></div>`;
+}
+
+function regionSelect(region){
+  const emps=activeEmps.filter(e=>getRegion(e)===region);
+  const sales=emps.filter(isSales), ho=emps.filter(e=>!isSales(e));
+  const desigMap={};
+  emps.forEach(e=>{const d=isSales(e)?(e['Short Designation']||'—'):'HO Staff';desigMap[d]=(desigMap[d]||0)+1;});
+  const modalHtml=`<div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:#3b5bdb;line-height:1;margin-bottom:4px;">${emps.length} Employees</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">${sales.length} Sales · ${ho.length} HO</div>
+    ${Object.keys(desigMap).length?`<div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">By Designation</div>${Object.entries(desigMap).sort((a,b)=>b[1]-a[1]).map(([d,c])=>`<div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px;"><span style="color:var(--text2);font-weight:600;">${d}</span><span style="font-weight:700;">${c}</span></div>`).join('')}`:''}
+    <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin:12px 0 6px;">Employees</div>
+    <div style="max-height:320px;overflow-y:auto;">${emps.map(e=>`<div onclick='document.getElementById("region-popup").style.display="none";openModal(${safeJson(e)})' style="padding:6px 0;border-bottom:1px solid var(--border);cursor:pointer;"><div style="font-weight:700;font-size:12px;">${e['Emp Name']}</div><div style="font-size:10px;color:var(--muted);">${e['Emp Id']} · ${isSales(e)?(e['Short Designation']||''):e['Designation']||''} · ${e['HQ']||''}</div></div>`).join('')||"<div style='color:var(--muted);font-size:12px;padding:10px 0;'>No employees</div>"}</div>`;
+
+  let popup=document.getElementById('region-popup');
+  if(!popup){
+    popup=document.createElement('div');
+    popup.id='region-popup';
+    popup.style.cssText='position:fixed;inset:0;background:rgba(10,15,40,.5);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);';
+    popup.addEventListener('click',e=>{if(e.target===popup)popup.style.display='none';});
+    document.body.appendChild(popup);
+  }
+  popup.style.display='flex';
+  popup.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;width:94%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:var(--sh3);padding:24px 28px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px;">
+      <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;">${region}</div>
+      <button onclick="document.getElementById('region-popup').style.display='none'" style="background:var(--bg);border:1px solid var(--border);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+    ${modalHtml}
+  </div>`;
+}
+
+function exportRegionXLSX(){
+  const rows=activeEmps.map(e=>({
+    'Region':getRegion(e),'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+    'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
+    'Department':e['Department']||'','Team':e['Team Wise']||'','HQ':e['HQ']||'',
+    'Reporting Manager ID':e['Reporting Manager ID']||'',
+    'Date of Joining':e['Date of Joining']||''
+  })).sort((a,b)=>(a['Region']||'').localeCompare(b['Region']||''));
+  const wb=XLSX.utils.book_new();
+  const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Region Wise');
+  XLSX.writeFile(wb,'Region_Wise_Report_'+new Date().toISOString().slice(0,10)+'.xlsx');
 }
 
 function renderLocationReport(){
