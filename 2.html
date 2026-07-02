@@ -912,6 +912,40 @@ async function loadData(){
       if(!data.success) throw new Error(data.error||'Failed');
       allEmployees=data.employees;
     }
+
+  updateHierarchyTeam("16642", "TN01 RO");
+updateHierarchyTeam("16638", "TN01 RO");
+
+updateHierarchyTeam("16840", "TN01 CBE");
+updateHierarchyTeam("17883", "TN01 CHN");
+
+updateHierarchyTeam("16761", "KA RO");
+updateHierarchyTeam("16765", "KA RO");
+
+updateHierarchyTeam("16914", "KA BLR");
+updateHierarchyTeam("17021", "MH");
+updateHierarchyTeam("17545", "DMF");
+updateHierarchyTeam("16432", "KL RO");
+updateHierarchyTeam("16379", "KL COC");
+
+
+    allEmployees.forEach(emp => {
+    switch ((emp["Team Wise"] || "").trim()) {
+        case "Goa Team":
+            emp["Team Wise"] = "GOA";
+            break;
+
+        case "J&K Team":
+            emp["Team Wise"] = "JK";
+            break;
+
+        case "Delhi Team":
+            emp["Team Wise"] = "DL";
+            break;
+    }
+});
+    
+    
     empIdMap={};
     allEmployees.forEach(e=>{empIdMap[String(e['Emp Id']).trim()]=e;});
 
@@ -1935,6 +1969,31 @@ function filterHierarchy(context){
   // Expand all when searching
   container.querySelectorAll('.hier-children').forEach(c=>c.style.display='block');
   container.querySelectorAll('.hier-toggle').forEach(t=>t.textContent='−');
+}
+
+  function updateHierarchyTeam(rootEmpId, newTeam) {
+    const empMap = {};
+    const children = {};
+
+    allEmployees.forEach(emp => {
+        const id = String(emp["Emp Id"]).trim();
+        const mgr = String(emp["Reporting Manager ID"] || "").trim();
+
+        empMap[id] = emp;
+
+        if (!children[mgr]) children[mgr] = [];
+        children[mgr].push(id);
+    });
+
+    function update(empId) {
+        if (!empMap[empId]) return;
+
+        empMap[empId]["Team Wise"] = newTeam;
+
+        (children[empId] || []).forEach(childId => update(childId));
+    }
+
+    update(rootEmpId);
 }
 
 // ──────────────────────────────────────────────
