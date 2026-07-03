@@ -9,52 +9,40 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  --bg:#f3f1fd;--surface:#ffffff;--card:#ffffff;--card2:#f7f5ff;--border:#e8e4fb;--border2:#d9d2f7;
-  --accent:#6d4aff;--accent-g:linear-gradient(135deg,#6d4aff,#a855f7);--accent2:#0fb88a;
-  --accent3:#ff9f1c;--accent4:#f5365c;--accent5:#a855f7;--sales:#0ea5c8;--ho:#7c3aed;
-  --text:#1a1533;--text2:#4a4470;--muted:#8b84ab;
-  --sh1:0 1px 3px rgba(70,50,150,.08),0 1px 2px rgba(70,50,150,.05);
-  --sh2:0 10px 28px rgba(70,50,150,.14),0 3px 8px rgba(70,50,150,.06);
-  --sh3:0 24px 64px rgba(40,20,110,.28);
-  --radius:18px;--radius-sm:12px;
+  --bg:#f0f2f8;--surface:#fff;--card:#fff;--card2:#f7f8fc;--border:#e4e8f2;--border2:#d2d9ec;
+  --accent:#3b5bdb;--accent-g:linear-gradient(135deg,#3b5bdb,#5c7cfa);--accent2:#0ca678;
+  --accent3:#f59f00;--accent4:#e03131;--accent5:#7048e8;--sales:#1098ad;--ho:#5f3dc4;
+  --text:#1a1f36;--text2:#4a5272;--muted:#8b93b3;
+  --sh1:0 1px 3px rgba(0,0,0,.07),0 1px 2px rgba(0,0,0,.04);
+  --sh2:0 4px 16px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.03);
+  --sh3:0 12px 40px rgba(0,0,0,.12);
+  --radius:14px;--radius-sm:9px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
-html{min-height:100%;}
-body{
-  background:
-    radial-gradient(circle at 8% 0%, rgba(168,85,247,.14), transparent 38%),
-    radial-gradient(circle at 92% 8%, rgba(255,159,28,.14), transparent 38%),
-    radial-gradient(circle at 15% 95%, rgba(15,184,138,.1), transparent 40%),
-    #f3f1fd;
-  background-attachment:fixed;
-  color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;
-}
+body{background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;}
 .font-title{font-family:'Space Grotesk',sans-serif;}
 .mono{font-family:'JetBrains Mono',monospace;}
 ::-webkit-scrollbar{width:5px;height:5px;}
 ::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:#cfc6f2;border-radius:4px;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
 /* SIDEBAR */
-#sidebar{width:240px;min-width:240px;background:linear-gradient(190deg,#1e1240 0%,#2f1a5e 55%,#4a1f6e 100%);border-right:1px solid rgba(255,255,255,.06);height:100vh;position:sticky;top:0;overflow-y:auto;overflow-x:hidden;box-shadow:4px 0 24px rgba(30,15,60,.15);display:flex;flex-direction:column;position:sticky;}
-#sidebar::before{content:'';position:absolute;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.10),transparent 70%);right:-90px;bottom:60px;pointer-events:none;}
-#sidebar::after{content:'';position:absolute;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,rgba(255,159,28,.14),transparent 70%);left:-60px;top:280px;pointer-events:none;}
-#sidebar>*{position:relative;z-index:1;}
-.sb-logo{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:12px;}
-.sb-icon{width:40px;height:40px;border-radius:12px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(109,74,255,.5);flex-shrink:0;}
-.sb-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#fff;}
-.sb-sub{font-size:10px;color:rgba(255,255,255,.55);font-weight:600;margin-top:1px;}
-.nav-sect{padding:14px 16px 4px;font-size:9.5px;color:rgba(255,255,255,.4);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
-.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:rgba(255,255,255,.72);font-size:13px;font-weight:600;margin:1px 8px;transition:all .15s;position:relative;}
-.nav-item:hover{background:rgba(255,255,255,.08);color:#fff;}
-.nav-item.active{background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;box-shadow:0 4px 14px rgba(180,60,180,.4);}
-.nav-item .ni-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.08);flex-shrink:0;transition:all .15s;}
-.nav-item.active .ni-icon{background:rgba(255,255,255,.22);}
+#sidebar{width:240px;min-width:240px;background:var(--surface);border-right:1px solid var(--border);height:100vh;position:sticky;top:0;overflow-y:auto;box-shadow:var(--sh1);display:flex;flex-direction:column;}
+.sb-logo{padding:20px 16px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;}
+.sb-icon{width:40px;height:40px;border-radius:12px;background:var(--accent-g);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(59,91,219,.35);flex-shrink:0;}
+.sb-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:var(--text);}
+.sb-sub{font-size:10px;color:var(--muted);font-weight:600;margin-top:1px;}
+.nav-sect{padding:14px 16px 4px;font-size:9.5px;color:var(--muted);font-weight:700;letter-spacing:.1em;text-transform:uppercase;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:600;margin:1px 8px;transition:all .15s;position:relative;}
+.nav-item:hover{background:var(--bg);color:var(--text);}
+.nav-item.active{background:var(--accent-g);color:#fff;box-shadow:0 4px 12px rgba(59,91,219,.3);}
+.nav-item .ni-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--bg);flex-shrink:0;transition:all .15s;}
+.nav-item.active .ni-icon{background:rgba(255,255,255,.2);}
 .nav-badge{margin-left:auto;padding:2px 7px;border-radius:999px;font-size:10px;font-weight:700;flex-shrink:0;}
-.sb-footer{padding:12px;border-top:1px solid rgba(255,255,255,.1);margin-top:auto;}
-.sb-refresh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:#fff;font-size:13px;font-weight:700;cursor:pointer;border:none;width:100%;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 4px 14px rgba(180,60,180,.4);transition:all .15s;}
-.sb-refresh:hover{box-shadow:0 6px 20px rgba(180,60,180,.5);transform:translateY(-1px);}
-.sb-time{font-size:10px;color:rgba(255,255,255,.4);text-align:center;margin-top:6px;font-weight:600;}
+.sb-footer{padding:12px;border-top:1px solid var(--border);margin-top:auto;}
+.sb-refresh{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;background:var(--accent-g);color:#fff;font-size:13px;font-weight:700;cursor:pointer;border:none;width:100%;justify-content:center;font-family:'Plus Jakarta Sans',sans-serif;box-shadow:0 4px 12px rgba(59,91,219,.3);transition:all .15s;}
+.sb-refresh:hover{box-shadow:0 6px 18px rgba(59,91,219,.4);transform:translateY(-1px);}
+.sb-time{font-size:10px;color:var(--muted);text-align:center;margin-top:6px;font-weight:600;}
 
 /* MAIN */
 main{flex:1;overflow:auto;padding:28px;min-width:0;}
@@ -66,31 +54,29 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 /* KPI */
 .kpi-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-bottom:22px;}
 .kpi{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px;box-shadow:var(--sh1);position:relative;overflow:hidden;cursor:pointer;transition:all .2s;}
-.kpi:hover{transform:translateY(-3px);box-shadow:var(--sh2);}
-.kpi-chip{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;color:#fff;margin-bottom:12px;}
+.kpi:hover{transform:translateY(-2px);box-shadow:var(--sh2);}
 .kpi-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:8px;}
 .kpi-val{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;line-height:1;}
 .kpi-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:5px;}
 .kpi-bar{height:3px;border-radius:999px;background:var(--border);margin-top:12px;overflow:hidden;}
 .kpi-bar-fill{height:3px;border-radius:999px;transition:width .8s cubic-bezier(.4,0,.2,1);}
-.kpi-icon{position:absolute;right:14px;top:14px;opacity:.14;}
-.kpi-icon svg{width:46px;height:46px;}
+.kpi-icon{position:absolute;right:16px;top:50%;transform:translateY(-50%);opacity:.12;font-size:42px;}
 
 /* TABLE */
-.table-wrap{overflow:auto;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--sh1);background:var(--card);}
+.table-wrap{overflow:auto;border-radius:var(--radius);border:1px solid var(--border);box-shadow:var(--sh1);}
 .emp-table{width:100%;border-collapse:collapse;font-size:13px;}
-.emp-table th{background:linear-gradient(180deg,#faf9ff,#f3f0ff);color:var(--text2);font-weight:700;padding:11px 14px;text-align:left;position:sticky;top:0;z-index:10;border-bottom:2px solid var(--border);white-space:nowrap;font-family:'Space Grotesk',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;user-select:none;}
-.emp-table th:hover{background:#ece5ff;color:var(--accent);}
+.emp-table th{background:var(--card2);color:var(--text2);font-weight:700;padding:11px 14px;text-align:left;position:sticky;top:0;z-index:10;border-bottom:2px solid var(--border);white-space:nowrap;font-family:'Space Grotesk',sans-serif;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;cursor:pointer;user-select:none;}
+.emp-table th:hover{background:#e8ecfa;color:var(--accent);}
 .emp-table th .sort-icon{margin-left:4px;opacity:.5;font-size:10px;}
 .emp-table th.sort-asc .sort-icon::after{content:'▲';}
 .emp-table th.sort-desc .sort-icon::after{content:'▼';}
 .emp-table th:not(.sort-asc):not(.sort-desc) .sort-icon::after{content:'⇅';}
 .emp-table td{padding:10px 14px;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap;color:var(--text);}
 .emp-table tr{cursor:pointer;transition:background .1s;}
-.emp-table tr:hover td{background:#f5f2ff;}
+.emp-table tr:hover td{background:#eff3ff;}
 .emp-table tbody tr:last-child td{border-bottom:none;}
-.tr-new td{background:#fff6df!important;}
-.tr-new:hover td{background:#ffedbb!important;}
+.tr-new td{background:#fffde7!important;}
+.tr-new:hover td{background:#fff9c4!important;}
 
 /* BADGE */
 .badge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;white-space:nowrap;}
@@ -101,20 +87,20 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 .b-new{background:#fff3bf;color:#854d0e;}
 
 /* INPUT */
-.inp{background:#fff;border:1.5px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;}
-.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(109,74,255,.15);}
+.inp{background:var(--card);border:1.5px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:8px 12px;font-size:13px;outline:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;}
+.inp:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,91,219,.12);}
 .inp::placeholder{color:var(--muted);}
 
 /* BUTTON */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;white-space:nowrap;}
-.btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 4px 14px rgba(109,74,255,.4);}
-.btn-primary:hover{box-shadow:0 6px 20px rgba(109,74,255,.5);transform:translateY(-1px);}
-.btn-success{background:linear-gradient(135deg,#0fb88a,#2dd4bf);color:#fff;box-shadow:0 4px 14px rgba(15,184,138,.35);}
-.btn-danger{background:linear-gradient(135deg,#f5365c,#ff6b8b);color:#fff;box-shadow:0 4px 14px rgba(245,54,92,.35);}
-.btn-ghost{background:#fff;border:1.5px solid var(--border2);color:var(--text2);}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:#f5f2ff;}
-.btn-excel{background:linear-gradient(135deg,#1d9a5c,#34c77e);color:#fff;box-shadow:0 4px 14px rgba(29,154,92,.35);}
-.btn-excel:hover{box-shadow:0 6px 20px rgba(29,154,92,.45);transform:translateY(-1px);}
+.btn-primary{background:var(--accent-g);color:#fff;box-shadow:0 2px 8px rgba(59,91,219,.25);}
+.btn-primary:hover{box-shadow:0 4px 14px rgba(59,91,219,.35);transform:translateY(-1px);}
+.btn-success{background:linear-gradient(135deg,#0ca678,#12b886);color:#fff;}
+.btn-danger{background:linear-gradient(135deg,#e03131,#f03e3e);color:#fff;}
+.btn-ghost{background:var(--card);border:1.5px solid var(--border2);color:var(--text2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);background:#eff3ff;}
+.btn-excel{background:linear-gradient(135deg,#1d7a3b,#2e9e4f);color:#fff;box-shadow:0 2px 8px rgba(29,122,59,.25);}
+.btn-excel:hover{box-shadow:0 4px 14px rgba(29,122,59,.35);transform:translateY(-1px);}
 
 /* PAGE */
 .page{display:none;}
@@ -128,8 +114,8 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 .pg-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 
 /* MODAL */
-.modal-ov{position:fixed;inset:0;background:rgba(30,15,60,.45);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);animation:fadeIn .18s ease;}
-.modal-box{background:#fff;border:1px solid var(--border);border-radius:22px;width:94%;max-width:800px;max-height:92vh;overflow-y:auto;box-shadow:var(--sh3);animation:scaleIn .2s ease;}
+.modal-ov{position:fixed;inset:0;background:rgba(10,15,40,.5);z-index:1000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px);animation:fadeIn .18s ease;}
+.modal-box{background:var(--card);border:1px solid var(--border);border-radius:20px;width:94%;max-width:800px;max-height:92vh;overflow-y:auto;box-shadow:var(--sh3);animation:scaleIn .2s ease;}
 .modal-header{padding:24px 28px 0;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border);padding-bottom:20px;margin-bottom:0;}
 .modal-content{padding:24px 28px;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
@@ -143,9 +129,9 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 .av-6{background:#e5dbff;color:#4c2899;}.av-7{background:#ffd8a8;color:#8d3b00;}
 
 /* TAB STRIP */
-.tabs{display:flex;gap:3px;background:var(--card2);padding:4px;border-radius:12px;border:1px solid var(--border);}
-.tab-btn{padding:7px 16px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;}
-.tab-btn.active{background:#fff;color:var(--accent);box-shadow:var(--sh1);}
+.tabs{display:flex;gap:3px;background:var(--card2);padding:4px;border-radius:10px;border:1px solid var(--border);}
+.tab-btn{padding:7px 16px;border-radius:7px;cursor:pointer;font-size:13px;font-weight:700;color:var(--muted);border:none;background:none;transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;}
+.tab-btn.active{background:var(--card);color:var(--accent);box-shadow:var(--sh1);}
 
 /* PROGRESS */
 .pbar{background:var(--border);border-radius:999px;overflow:hidden;}
@@ -153,18 +139,18 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 /* TOAST */
 #toast{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
-.toast-item{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px 16px;font-size:13px;min-width:240px;animation:slideUp .3s ease;box-shadow:var(--sh2);font-weight:600;}
+.toast-item{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:12px 16px;font-size:13px;min-width:240px;animation:slideUp .3s ease;box-shadow:var(--sh2);font-weight:600;}
 @keyframes slideUp{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* HIERARCHY */
 .hier-wrap{padding:4px;}
 .hier-node{position:relative;margin-bottom:2px;}
-.hier-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:13px;margin-bottom:3px;background:var(--card);border:1.5px solid var(--border);cursor:pointer;transition:all .12s;}
-.hier-item:hover{background:#f5f2ff;border-color:#c9b8ff;box-shadow:var(--sh1);}
-.hier-item.level-0{background:var(--accent-g);color:#fff;border-color:transparent;box-shadow:0 6px 18px rgba(109,74,255,.4);}
-.hier-item.level-1{background:#f0ecff;border-color:#c9b8ff;}
-.hier-item.level-2{background:#e3fbf3;border-color:#9de8cc;}
+.hier-item{display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:11px;margin-bottom:3px;background:var(--card);border:1.5px solid var(--border);cursor:pointer;transition:all .12s;}
+.hier-item:hover{background:#eff3ff;border-color:#bac8ff;box-shadow:var(--sh1);}
+.hier-item.level-0{background:var(--accent-g);color:#fff;border-color:transparent;box-shadow:0 4px 14px rgba(59,91,219,.3);}
+.hier-item.level-1{background:#eff3ff;border-color:#bac8ff;}
+.hier-item.level-2{background:#f0fdf4;border-color:#bbf7d0;}
 .hier-item.level-3{background:var(--card2);border-color:var(--border);}
 .hier-toggle{width:24px;height:24px;border-radius:7px;background:rgba(0,0,0,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px;font-weight:700;flex-shrink:0;transition:all .12s;border:none;color:inherit;}
 .hier-item.level-0 .hier-toggle{background:rgba(255,255,255,.2);}
@@ -191,10 +177,10 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 /* SUMMARY CHIPS */
 .summary-chip{display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:var(--radius);background:var(--card);border:2px solid var(--border);cursor:pointer;transition:all .15s;box-shadow:var(--sh1);}
 .summary-chip:hover{border-color:var(--accent);box-shadow:var(--sh2);}
-.summary-chip.active-filter{border-color:var(--accent);background:#f0ecff;box-shadow:0 0 0 3px rgba(109,74,255,.15);}
+.summary-chip.active-filter{border-color:var(--accent);background:#eff3ff;box-shadow:0 0 0 3px rgba(59,91,219,.12);}
 
 /* LOADING */
-#loadOv{position:fixed;inset:0;background:rgba(243,241,253,.94);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+#loadOv{position:fixed;inset:0;background:rgba(240,242,248,.92);z-index:2000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;backdrop-filter:blur(6px);}
 .spin{width:46px;height:46px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
 
 /* PULSE */
@@ -203,9 +189,9 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 @keyframes pulseA{0%{opacity:.6;transform:scale(.8);}100%{opacity:0;transform:scale(2);}}
 
 /* HERO */
-.stat-hero{background:linear-gradient(120deg,#6d4aff 0%,#a855f7 45%,#ec4899 85%,#ff9f6b 120%);border:1px solid rgba(255,255,255,.25);border-radius:var(--radius);padding:24px;color:#fff;position:relative;overflow:hidden;box-shadow:0 16px 40px rgba(109,74,255,.4);}
-.stat-hero::before{content:'';position:absolute;right:-40px;top:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.08);}
-.stat-hero::after{content:'';position:absolute;right:60px;bottom:-90px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);}
+.stat-hero{background:var(--accent-g);border-radius:var(--radius);padding:24px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 28px rgba(59,91,219,.28);}
+.stat-hero::before{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);}
+.stat-hero::after{content:'';position:absolute;right:40px;bottom:-60px;width:150px;height:150px;border-radius:50%;background:rgba(255,255,255,.04);}
 
 /* SECTION TITLE */
 .sec-title{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:14px;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
@@ -229,7 +215,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 /* QUICK STAT ROW */
 .qstat-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;}
-.qstat{background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;}
+.qstat{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px 12px;text-align:center;}
 .qstat-val{font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;}
 .qstat-lbl{font-size:10px;color:var(--muted);font-weight:600;margin-top:3px;}
 
@@ -242,7 +228,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 .celeb-card:last-child{border-bottom:none;}
 .celeb-badge{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
 .celeb-days{font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:700;padding:3px 10px;border-radius:999px;}
-.today-banner{background:linear-gradient(135deg,#f59f00,#ffd43b);border:1px solid rgba(255,255,255,.4);border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;box-shadow:0 10px 28px rgba(245,159,0,.3),var(--glass-hi);}
+.today-banner{background:linear-gradient(135deg,#f59f00,#ffd43b);border-radius:var(--radius);padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 16px rgba(245,159,0,.25);}
 
 /* HIER SEARCH BAR */
 .hier-search-bar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center;}
@@ -372,7 +358,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 <!-- MAIN -->
 <main>
-  <button id="mob-menu-btn" onclick="toggleMobileSidebar()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:900;width:52px;height:52px;border-radius:50%;background:var(--accent-g);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(59,91,219,.4);font-size:22px;color:#fff;align-items:center;justify-content:center;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  <button id="mob-menu-btn" onclick="toggleMobileSidebar()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:900;width:52px;height:52px;border-radius:50%;background:var(--accent-g);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(59,91,219,.4);font-size:22px;color:#fff;align-items:center;justify-content:center;">☰</button>
 <div id="loadOv">
   <div class="spin"></div>
   <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--text2);">Loading employees…</div>
@@ -393,12 +379,6 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
   <!-- Hero Banner -->
   <div class="stat-hero" style="margin-bottom:18px;">
-    <svg width="260" height="180" viewBox="0 0 260 180" style="position:absolute;right:0;top:0;opacity:.35;pointer-events:none;" fill="none">
-      <circle cx="205" cy="40" r="5" fill="#fff"/><circle cx="235" cy="80" r="4" fill="#fff"/>
-      <circle cx="190" cy="95" r="6" fill="#fff"/><circle cx="150" cy="55" r="3.5" fill="#fff"/>
-      <circle cx="230" cy="140" r="4.5" fill="#fff"/><circle cx="170" cy="130" r="3" fill="#fff"/>
-      <path d="M205 40L190 95M190 95L235 80M190 95L150 55M190 95L170 130M230 140L170 130" stroke="#fff" stroke-width="1.2" opacity=".6"/>
-    </svg>
     <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;">
       <div>
         <div style="font-size:11px;font-weight:700;opacity:.7;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px;">Total Workforce</div>
@@ -453,7 +433,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
         <div class="sec-title" style="margin:0;"><span class="sec-dot" style="background:var(--accent3);"></span>Recent Joiners <span class="badge b-new" style="margin-left:6px;">Last 10 days</span></div>
-        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;" onclick="navigate('newjoiners')">View All <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:5px 12px;" onclick="navigate('newjoiners')">View All →</button>
       </div>
       <div id="recent-joiners"></div>
     </div>
@@ -471,7 +451,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 <!-- NEW JOINERS -->
 <div id="page-newjoiners" class="page">
   <div class="pg-header">
-    <div><div class="pg-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 2l2.6 6.9L21 11l-6.4 2.1L12 20l-2.6-6.9L3 11l6.4-2.1z"/></svg> New Joiners</div><div class="pg-sub" id="new-subtitle"></div></div>
+    <div><div class="pg-title">🌟 New Joiners</div><div class="pg-sub" id="new-subtitle"></div></div>
     <div class="pg-actions">
       <label style="font-size:13px;font-weight:600;color:var(--text2);">Days:</label>
       <input class="inp" id="new-days" type="number" value="10" min="1" max="365" style="width:70px;" onchange="renderNewJoiners()"/>
@@ -499,7 +479,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
         <button class="tab-btn active" id="sales-tab-list" onclick="switchSalesTab('list')">Employee List</button>
         <button class="tab-btn" id="sales-tab-hier" onclick="switchSalesTab('hier')">Hierarchy</button>
       </div>
-      <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="sales-search" placeholder="Search…" oninput="filterSalesTable()" style="padding-left:28px;width:175px;"/></span>
+      <input class="inp" id="sales-search" placeholder="🔍 Search…" oninput="filterSalesTable()" style="width:175px;"/>
       <select class="inp" id="sales-desig-filter" onchange="filterSalesTable()"><option value="">All Designations</option></select>
       <select class="inp" id="sales-div-filter" onchange="filterSalesTable()"><option value="">All Divisions</option></select>
       <select class="inp" id="sales-hq-filter" onchange="filterSalesTable()"><option value="">All HQ</option></select>
@@ -535,7 +515,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="card">
       <div class="hier-search-bar">
         <div class="sec-title" style="margin:0;flex:1;">Sales Reporting Hierarchy <span class="badge b-sky" id="sales-hier-count" style="margin-left:6px;"></span></div>
-        <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="sales-hier-search" placeholder="Filter by name / ID…" oninput="filterHierarchy('sales')" style="padding-left:28px;width:200px;"/></span>
+        <input class="inp" id="sales-hier-search" placeholder="🔍 Filter by name / ID…" oninput="filterHierarchy('sales')" style="width:200px;"/>
         <button class="btn btn-ghost" style="font-size:12px;" onclick="expandAllHier('sales-hier-tree')">Expand All</button>
         <button class="btn btn-ghost" style="font-size:12px;" onclick="collapseAllHier('sales-hier-tree')">Collapse All</button>
       </div>
@@ -553,7 +533,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
         <button class="tab-btn active" id="ho-tab-list" onclick="switchHOTab('list')">Employee List</button>
         <button class="tab-btn" id="ho-tab-hier" onclick="switchHOTab('hier')">Hierarchy</button>
       </div>
-      <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="ho-search" placeholder="Search…" oninput="filterHOTable()" style="padding-left:28px;width:175px;"/></span>
+      <input class="inp" id="ho-search" placeholder="🔍 Search…" oninput="filterHOTable()" style="width:175px;"/>
       <select class="inp" id="ho-dept-filter" onchange="filterHOTable()"><option value="">All Depts</option></select>
       <select class="inp" id="ho-desig-filter" onchange="filterHOTable()"><option value="">All Designations</option></select>
       <select class="inp" id="ho-gender-filter" onchange="filterHOTable()"><option value="">All Genders</option></select>
@@ -585,7 +565,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="card">
       <div class="hier-search-bar">
         <div class="sec-title" style="margin:0;flex:1;">Head Office Reporting Hierarchy <span class="badge b-indigo" id="ho-hier-count" style="margin-left:6px;"></span></div>
-        <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="ho-hier-search" placeholder="Filter by name / ID…" oninput="filterHierarchy('ho')" style="padding-left:28px;width:200px;"/></span>
+        <input class="inp" id="ho-hier-search" placeholder="🔍 Filter by name / ID…" oninput="filterHierarchy('ho')" style="width:200px;"/>
         <button class="btn btn-ghost" style="font-size:12px;" onclick="expandAllHier('ho-hier-tree')">Expand All</button>
         <button class="btn btn-ghost" style="font-size:12px;" onclick="collapseAllHier('ho-hier-tree')">Collapse All</button>
       </div>
@@ -599,7 +579,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <div class="pg-header">
     <div><div class="pg-title" style="color:var(--accent4);">Resigned Employees</div><div class="pg-sub" id="resigned-subtitle"></div></div>
     <div class="pg-actions">
-      <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="resigned-search" placeholder="Search…" oninput="filterResignedTable()" style="padding-left:28px;width:190px;"/></span>
+      <input class="inp" id="resigned-search" placeholder="🔍 Search…" oninput="filterResignedTable()" style="width:190px;"/>
       <select class="inp" id="resigned-dept-filter" onchange="filterResignedTable()"><option value="">All Depts</option></select>
       <select class="inp" id="resigned-type-filter" onchange="filterResignedTable()"><option value="">Sales & HO</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option></select>
       <select class="inp" id="resigned-year-filter" onchange="filterResignedTable()"><option value="">All Years</option></select>
@@ -682,7 +662,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <div class="pg-header"><div class="pg-title">Employee Search</div></div>
   <div class="card" style="margin-bottom:18px;">
     <div style="display:flex;gap:10px;align-items:center;">
-      <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="global-search" placeholder="Search name, ID, department, city, designation…" style="padding-left:28px;flex:1;padding:11px 15px;font-size:14px;" oninput="runGlobalSearch()"/></span>
+      <input class="inp" id="global-search" placeholder="Search name, ID, department, city, designation…" style="flex:1;padding:11px 15px;font-size:14px;" oninput="runGlobalSearch()"/>
       <button class="btn btn-primary" onclick="runGlobalSearch()"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg>Search</button>
       <button class="btn btn-ghost" onclick="clearSearchFilters()">Clear</button>
     </div>
@@ -709,18 +689,18 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 <div id="page-export" class="page">
   <div class="pg-header"><div class="pg-title">Export Data</div></div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin-bottom:16px;">
-    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="11" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="14" rx="1"/><rect x="16" y="2" width="4" height="18" rx="1"/></svg></div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Sales Team</div><div id="export-sales-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportSalesXLSX()">Download XLSX</button></div>
-    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg></div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Head Office</div><div id="export-ho-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportHOXLSX()">Download XLSX</button></div>
-    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0114 0"/><path d="M16 11l2 2 4-4"/></svg></div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Resigned</div><div id="export-resigned-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportResignedXLSX()">Download XLSX</button></div>
-    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg></div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">All Employees</div><div id="export-all-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportAllXLSX()">Download XLSX</button></div>
-    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 2l2.6 6.9L21 11l-6.4 2.1L12 20l-2.6-6.9L3 11l6.4-2.1z"/></svg></div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">New Joiners (10d)</div><div id="export-new-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportNewXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">📊</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Sales Team</div><div id="export-sales-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportSalesXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">🏢</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Head Office</div><div id="export-ho-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportHOXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">👋</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">Resigned</div><div id="export-resigned-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportResignedXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">👥</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">All Employees</div><div id="export-all-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportAllXLSX()">Download XLSX</button></div>
+    <div class="card" style="text-align:center;padding:28px 18px;"><div style="font-size:38px;margin-bottom:10px;">🌟</div><div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:15px;margin-bottom:5px;">New Joiners (10d)</div><div id="export-new-count" style="color:var(--muted);font-size:12px;margin-bottom:14px;font-weight:600;">—</div><button class="btn btn-excel" style="width:100%;justify-content:center;" onclick="exportNewXLSX()">Download XLSX</button></div>
   </div>
   <div class="card"><div class="sec-title">Export by Department</div><div id="dept-export-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div></div>
 </div>
 <div id="page-indiamap" class="page">
   <div class="pg-header">
     <div>
-      <div class="pg-title"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="2.3"/></svg> — Employee Distribution Map</div>
+      <div class="pg-title">🗺 — Employee Distribution Map</div>
       <div class="pg-sub">State-wise employee density · Click any state to explore</div>
     </div>
     <div class="pg-actions">
@@ -765,9 +745,9 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 <!-- CONTACTS -->
 <div id="page-contacts" class="page">
   <div class="pg-header">
-    <div><div class="pg-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/></svg> Bulk Contacts</div><div class="pg-sub" id="contacts-subtitle"></div></div>
+    <div><div class="pg-title">📋 Bulk Contacts</div><div class="pg-sub" id="contacts-subtitle"></div></div>
     <div class="pg-actions">
-      <span style="position:relative;display:inline-block;"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position:absolute;left:9px;top:50%;transform:translateY(-50%);opacity:.55;pointer-events:none;"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg><input class="inp" id="contacts-search" placeholder="Search name / ID…" oninput="renderContacts()" style="padding-left:28px;width:180px;"/></span>
+      <input class="inp" id="contacts-search" placeholder="🔍 Search name / ID…" oninput="renderContacts()" style="width:180px;"/>
       <select class="inp" id="contacts-type" onchange="renderContacts()"><option value="active">Active Employees</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option><option value="all">All Employees</option></select>
       <select class="inp" id="contacts-team" onchange="renderContacts()">
   <option value="">All Teams</option>
@@ -797,8 +777,8 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
         <textarea id="contacts-textarea" readonly style="width:100%;height:320px;background:var(--card2);border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text);resize:vertical;outline:none;line-height:1.6;"></textarea>
       </div>
       <div style="margin-top:10px;display:flex;gap:8px;">
-        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="copyContacts()"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M9 4H6a2 2 0 00-2 2v14a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-3"/></svg> Copy to Clipboard</button>
-        <button class="btn btn-ghost" id="whatsapp-btn" onclick="copyContactsFormatted('whatsapp')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M21 11.5a8.38 8.38 0 01-4.4 7.4 8.5 8.5 0 01-8.6-.2L3 21l1.9-5.3a8.38 8.38 0 01-1.4-4.7 8.5 8.5 0 018.5-8.5h.3a8.48 8.48 0 018.7 8.5z"/></svg> WhatsApp Format</button>
+        <button class="btn btn-primary" style="flex:1;justify-content:center;" onclick="copyContacts()">📋 Copy to Clipboard</button>
+        <button class="btn btn-ghost" id="whatsapp-btn" onclick="copyContactsFormatted('whatsapp')">💬 WhatsApp Format</button>
       </div>
     </div>
     <div class="card">
@@ -816,7 +796,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 <!-- CELEBRATIONS -->
 <div id="page-celebrations" class="page">
   <div class="pg-header">
-    <div><div class="pg-title"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18"/><path d="M12 9C9.5 9 8 7.6 8 6a2 2 0 014-.3A2 2 0 0116 6c0 1.6-1.5 3-4 3z"/></svg> Celebrations</div><div class="pg-sub">Upcoming birthdays & work anniversaries</div></div>
+    <div><div class="pg-title">🎉 Celebrations</div><div class="pg-sub">Upcoming birthdays & work anniversaries</div></div>
     <div class="pg-actions">
       <select class="inp" id="celeb-window" onchange="renderCelebrations()">
         <option value="7">Next 7 days</option>
@@ -836,11 +816,11 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <!-- Two panels -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
     <div class="card">
-      <div class="sec-title"><span class="sec-dot" style="background:#e64980;"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M4 21v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><path d="M4 17h16"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 7c0-1 1-1 1-2M12 7c0-1 1-1 1-2M16 7c0-1 1-1 1-2"/></svg> Upcoming Birthdays</div>
+      <div class="sec-title"><span class="sec-dot" style="background:#e64980;"></span>🎂 Upcoming Birthdays</div>
       <div id="birthday-list"></div>
     </div>
     <div class="card">
-      <div class="sec-title"><span class="sec-dot" style="background:var(--accent3);"></span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 5H4a3 3 0 003 3M17 5h3a3 3 0 01-3 3"/></svg> Work Anniversaries</div>
+      <div class="sec-title"><span class="sec-dot" style="background:var(--accent3);"></span>🏆 Work Anniversaries</div>
       <div id="anniversary-list"></div>
     </div>
   </div>
@@ -862,7 +842,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
           <div id="modal-status" style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;"></div>
         </div>
       </div>
-      <button onclick="document.getElementById('modal').style.display='none'" style="background:var(--bg);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <button onclick="document.getElementById('modal').style.display='none'" style="background:var(--bg);border:1px solid var(--border);color:var(--text2);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;">✕</button>
     </div>
     <div class="modal-content">
       <div id="modal-mgr-banner" style="display:none;background:linear-gradient(135deg,#eff3ff,#e5dbff);border:1.5px solid #bac8ff;border-radius:10px;padding:12px 16px;margin-bottom:18px;align-items:center;gap:12px;">
@@ -1216,15 +1196,14 @@ function renderDashboard(){
 
   // KPIs — no resigned card
   const kpis=[
-    {label:'Active',val:active,sub:total?Math.round(active/total*100)+'% of total':'',color:'#0ca678',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>',pct:total?active/total:0,page:'dashboard'},
-    {label:'Sales Field',val:salesEmps.length,sub:'Active field staff',color:'#1098ad',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>',pct:active?salesEmps.length/active:0,page:'sales'},
-    {label:'Head Office',val:hoEmps.length,sub:'Support functions',color:'#5f3dc4',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg>',pct:active?hoEmps.length/active:0,page:'headoffice'},
-    {label:'New Joiners (10 days)',val:newJ.length,sub:'Recent joiners',color:'#f59f00',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 2l2.6 6.9L21 11l-6.4 2.1L12 20l-2.6-6.9L3 11l6.4-2.1z"/></svg>',pct:active?newJ.length/active:0,page:'newjoiners'},
+    {label:'Active',val:active,sub:total?Math.round(active/total*100)+'% of total':'',color:'#0ca678',icon:'✅',pct:total?active/total:0,page:'dashboard'},
+    {label:'Sales Field',val:salesEmps.length,sub:'Active field staff',color:'#1098ad',icon:'📈',pct:active?salesEmps.length/active:0,page:'sales'},
+    {label:'Head Office',val:hoEmps.length,sub:'Support functions',color:'#5f3dc4',icon:'🏢',pct:active?hoEmps.length/active:0,page:'headoffice'},
+    {label:'New Joiners (10 days)',val:newJ.length,sub:'Recent joiners',color:'#f59f00',icon:'🌟',pct:active?newJ.length/active:0,page:'newjoiners'},
   ];
   document.getElementById('kpi-wrap').innerHTML=kpis.map(k=>`
     <div class="kpi" onclick="navigate('${k.page}')">
       <div class="kpi-icon">${k.icon}</div>
-      <div class="kpi-chip" style="background:${k.color};box-shadow:0 6px 16px ${k.color}55;">${k.icon}</div>
       <div class="kpi-label">${k.label}</div>
       <div class="kpi-val" style="color:${k.color};">${k.val}</div>
       <div class="kpi-sub">${k.sub}</div>
@@ -1291,7 +1270,7 @@ function renderDashboard(){
       <div class="qstat"><div class="qstat-val" style="color:var(--accent4);">${resThisYear}</div><div class="qstat-lbl">${thisYear} Exits</div></div>
       <div class="qstat"><div class="qstat-val" style="color:var(--muted);">${resLastYear}</div><div class="qstat-lbl">${thisYear-1} Exits</div></div>
     </div>
-    <div style="margin-top:12px;"><button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="navigate('resigned')">View Resigned <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button></div>`;
+    <div style="margin-top:12px;"><button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="navigate('resigned')">View Resigned →</button></div>`;
 
   // Top 5 HQs
   const hqMap=groupBy(activeEmps,'HQ');
@@ -1320,7 +1299,7 @@ function renderDashboard(){
           <td><span class="badge b-gray">${(isSales(e)?e['Short Designation']:e['Designation'])||'—'}</span></td>
           <td>${e['Department']||'—'}</td>
           <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
-          <td>${ds===0?'<span class="badge b-new"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18"/><path d="M12 9C9.5 9 8 7.6 8 6a2 2 0 014-.3A2 2 0 0116 6c0 1.6-1.5 3-4 3z"/></svg> Today</span>':ds+'d ago'}</td>
+          <td>${ds===0?'<span class="badge b-new">🎉 Today</span>':ds+'d ago'}</td>
         </tr>`;
       }).join('')}</tbody></table></div>`
     :'<div style="color:var(--muted);font-size:13px;font-weight:600;padding:16px 0;">No recent joiners in the last 10 days.</div>';
@@ -1382,12 +1361,12 @@ function renderNewJoiners(){
   const todayJ=joiners.filter(e=>daysSince(e['Date of Joining'])===0);
   document.getElementById('new-subtitle').textContent=`Employees who joined in the last ${days} days`;
   document.getElementById('nj-kpis').innerHTML=[
-    {val:joiners.length,label:'Total New',color:'#f59f00',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 2l2.6 6.9L21 11l-6.4 2.1L12 20l-2.6-6.9L3 11l6.4-2.1z"/></svg>'},
-    {val:salesJ.length,label:'Sales',color:'#1098ad',icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg>'},
-    {val:hoJ.length,label:'Head Office',color:'#5f3dc4',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg>'},
-    {val:todayJ.length,label:'Joined Today',color:'#0ca678',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18"/><path d="M12 9C9.5 9 8 7.6 8 6a2 2 0 014-.3A2 2 0 0116 6c0 1.6-1.5 3-4 3z"/></svg>'},
+    {val:joiners.length,label:'Total New',color:'#f59f00',icon:'🌟'},
+    {val:salesJ.length,label:'Sales',color:'#1098ad',icon:'📈'},
+    {val:hoJ.length,label:'Head Office',color:'#5f3dc4',icon:'🏢'},
+    {val:todayJ.length,label:'Joined Today',color:'#0ca678',icon:'🎉'},
   ].map(k=>`<div class="card" style="text-align:center;padding:16px;">
-    <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;background:${k.color};color:#fff;box-shadow:0 4px 12px ${k.color}55;">${k.icon}</div>
+    <div style="font-size:20px;margin-bottom:4px;">${k.icon}</div>
     <div style="font-family:'Space Grotesk',sans-serif;font-size:30px;font-weight:700;color:${k.color};">${k.val}</div>
     <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:3px;">${k.label}</div>
   </div>`).join('');
@@ -1405,7 +1384,7 @@ function renderNewJoiners(){
           <td>${e['Division']||'—'}</td>
           <td>${e['HQ']||'—'}</td>
           <td style="font-size:12px;">${e['Date of Joining']||'—'}</td>
-          <td>${ds===0?'<span class="badge b-new"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18"/><path d="M12 9C9.5 9 8 7.6 8 6a2 2 0 014-.3A2 2 0 0116 6c0 1.6-1.5 3-4 3z"/></svg> Today</span>':ds===1?'Yesterday':ds+'d ago'}</td>
+          <td>${ds===0?'<span class="badge b-new">🎉 Today</span>':ds===1?'Yesterday':ds+'d ago'}</td>
         </tr>`;
       }).join('')
     :`<tr><td colspan="10" style="text-align:center;color:var(--muted);padding:32px;font-weight:600;">No joiners in the last ${days} days.</td></tr>`;
@@ -1668,11 +1647,11 @@ function renderPaginatedTable(tbodyId,paginId,data,page,rowFn){
   if(pages<=1){pg.innerHTML='';return;}
   let html=`<span style="color:var(--muted);font-size:12px;font-weight:600;">${total} records · Page ${page} of ${pages}</span>`;
   if(page>2) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',1)">« First</button>`;
-  if(page>1) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${page-1})"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M19 12H5M11 6l-6 6 6 6"/></svg> Prev</button>`;
+  if(page>1) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${page-1})">← Prev</button>`;
   // Show up to 5 page numbers
   const start=Math.max(1,page-2),end=Math.min(pages,start+4);
   for(let p2=start;p2<=end;p2++) html+=`<button class="btn ${p2===page?'btn-primary':'btn-ghost'}" style="padding:5px 10px;font-size:12px;min-width:34px;" onclick="pgChange('${tbodyId}',${p2})">${p2}</button>`;
-  if(page<pages) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${page+1})">Next <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>`;
+  if(page<pages) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${page+1})">Next →</button>`;
   if(page<pages-1) html+=`<button class="btn btn-ghost" style="padding:5px 10px;font-size:12px;" onclick="pgChange('${tbodyId}',${pages})">Last »</button>`;
   pg.innerHTML=html;
 }
@@ -1866,8 +1845,8 @@ function renderHierarchy(containerId, emps, desigField, context){
           </div>
           <div style="font-weight:700;font-size:${nameSize};line-height:1.25;color:${L.text};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${emp['Emp Name']}</div>
           ${(hq||div)?`<div style="font-size:10.5px;color:${L.subtext};margin-top:3px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-            ${hq?`<span style="display:flex;align-items:center;gap:3px;"><span style="opacity:0.7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="2.3"/></svg></span>${hq}</span>`:''}
-            ${div?`<span style="display:flex;align-items:center;gap:3px;"><span style="opacity:0.7;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></span>${div}</span>`:''}
+            ${hq?`<span style="display:flex;align-items:center;gap:3px;"><span style="opacity:0.7;">📍</span>${hq}</span>`:''}
+            ${div?`<span style="display:flex;align-items:center;gap:3px;"><span style="opacity:0.7;">🗂</span>${div}</span>`:''}
           </div>`:''}
         </div>
 
@@ -2037,7 +2016,7 @@ function renderDeptReport(){
           <span class="mono" style="font-size:24px;font-weight:700;color:${COLORS[ci%COLORS.length]};">${emps.length}</span>
         </div>
         <div class="pbar" style="height:7px;margin-bottom:12px;"><div class="pbar-fill" style="width:${emps.length/max*100}%;height:7px;background:${COLORS[ci%COLORS.length]};"></div></div>
-        <div style="display:flex;gap:7px;flex-wrap:wrap;">${sal?`<span class="badge b-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> ${sal} Sales</span>`:''}${ho?`<span class="badge b-indigo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg> ${ho} HO</span>`:''}</div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;">${sal?`<span class="badge b-sky">📈 ${sal} Sales</span>`:''}${ho?`<span class="badge b-indigo">🏢 ${ho} HO</span>`:''}</div>
       </div>`;
     }).join('')}</div>`;
 }
@@ -2122,7 +2101,7 @@ function regionSelect(region){
   popup.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;width:94%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:var(--sh3);padding:24px 28px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px;">
       <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;">${region}</div>
-      <button onclick="document.getElementById('region-popup').style.display='none'" style="background:var(--bg);border:1px solid var(--border);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <button onclick="document.getElementById('region-popup').style.display='none'" style="background:var(--bg);border:1px solid var(--border);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     ${modalHtml}
   </div>`;
@@ -2269,10 +2248,10 @@ function openModal(emp){
   document.getElementById('modal-name').textContent=emp['Emp Name']||'—';
   document.getElementById('modal-desig').textContent=(sal?emp['Short Designation']:emp['Designation']||'')+(emp['Department']?' · '+emp['Department']:'');
   document.getElementById('modal-status').innerHTML=
-    `${sal?'<span class="badge b-sky"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg> Sales</span>':'<span class="badge b-indigo"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M9 8h1M14 8h1M9 12h1M14 12h1M9 16h1M14 16h1"/></svg> Head Office</span>'}
-     ${act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="9" cy="8" r="4"/><path d="M2 21a7 7 0 0114 0"/><path d="M16 11l2 2 4-4"/></svg> Resigned '+emp['Date Of Resignation']+'</span>'}
-     ${emp['HQ']?`<span class="badge b-gray"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="2.3"/></svg> ${emp['HQ']}</span>`:''}
-     ${emp['Division']?`<span class="badge b-purple"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg> ${emp['Division']}</span>`:''}`;
+    `${sal?'<span class="badge b-sky">📈 Sales</span>':'<span class="badge b-indigo">🏢 Head Office</span>'}
+     ${act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red">👋 Resigned '+emp['Date Of Resignation']+'</span>'}
+     ${emp['HQ']?`<span class="badge b-gray">📍 ${emp['HQ']}</span>`:''}
+     ${emp['Division']?`<span class="badge b-purple">🗂 ${emp['Division']}</span>`:''}`;
 
   const mgrId=emp['Reporting Manager ID']&&String(emp['Reporting Manager ID']).trim();
   const mgrBanner=document.getElementById('modal-mgr-banner');
@@ -2294,7 +2273,7 @@ function openModal(emp){
   }
 
   const fields=[
-    {title:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2"/></svg> Employment',items:[
+    {title:'💼 Employment',items:[
       {l:'Employee ID',v:emp['Emp Id']},
       {l:'Designation',v:emp['Short Designation']||emp['Designation']},
       {l:'Department',v:emp['Department']},
@@ -2306,7 +2285,7 @@ function openModal(emp){
       {l:'Official Email',v:emp['Official E-Mail Id']},
       {l:'Resignation Date',v:emp['Date Of Resignation']},
     ]},
-    {title:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0116 0"/></svg> Personal',items:[
+    {title:'👤 Personal',items:[
       {l:'Age',v:emp['Age']},
       {l:'Date of Birth',v:getDOB(emp)},
       {l:'Gender',v:emp['Gender']},
@@ -2315,13 +2294,13 @@ function openModal(emp){
       {l:'Phone',v:emp['Current Phone']},
       {l:'Emergency Contact',v:emp['EmergencyContact']},
     ]},
-    {title:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="2.3"/></svg> Current Address',items:[
+    {title:'📍 Current Address',items:[
       {l:'Address',v:emp['Current Address']},
       {l:'City',v:emp['Current City']},
       {l:'State',v:emp['Current State']},
       {l:'Pincode',v:emp['Current Pincode']},
     ]},
-    {title:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M3 12l9-9 9 9"/><path d="M9 21V12h6v9"/></svg> Permanent Address',items:[
+    {title:'🏠 Permanent Address',items:[
       {l:'Address',v:emp['Permanent Address']},
       {l:'City',v:emp['Permanent City']},
       {l:'State',v:emp['Permanent State']},
@@ -2652,7 +2631,7 @@ function showToast(msg,type){
   const el=document.createElement('div');el.className='toast-item';
   const col=type==='success'?'var(--accent2)':type==='error'?'var(--accent4)':'var(--accent)';
   el.style.borderLeft=`3px solid ${col}`;
-  const icon=type==='success'?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>';
+  const icon=type==='success'?'✅':'❌';
   el.innerHTML=`<div style="display:flex;align-items:center;gap:8px;">${icon} <span>${msg}</span></div>`;
   t.appendChild(el);setTimeout(()=>el.remove(),3500);
 }
@@ -2808,12 +2787,12 @@ function renderContacts(){
 
   // KPIs
   document.getElementById('contacts-kpis').innerHTML=[
-    {val:pool.length,label:'Total Selected',color:'#3b5bdb',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>'},
-    {val:withContact.length,label:'Have '+fieldLabel,color:'#0ca678',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/></svg>'},
-    {val:noContact.length,label:'Missing',color:'#e03131',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>'},
-    {val:Math.round(withContact.length/Math.max(pool.length,1)*100)+'%',label:'Coverage',color:'#f59f00',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="4" y="11" width="4" height="9" rx="1"/><rect x="10" y="6" width="4" height="14" rx="1"/><rect x="16" y="2" width="4" height="18" rx="1"/></svg>'},
+    {val:pool.length,label:'Total Selected',color:'#3b5bdb',icon:'👥'},
+    {val:withContact.length,label:'Have '+fieldLabel,color:'#0ca678',icon:'✅'},
+    {val:noContact.length,label:'Missing',color:'#e03131',icon:'❌'},
+    {val:Math.round(withContact.length/Math.max(pool.length,1)*100)+'%',label:'Coverage',color:'#f59f00',icon:'📊'},
   ].map(k=>`<div class="card" style="text-align:center;padding:14px;">
-    <div style="width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;background:${k.color};color:#fff;box-shadow:0 4px 10px ${k.color}55;">${k.icon}</div>
+    <div style="font-size:18px;margin-bottom:3px;">${k.icon}</div>
     <div style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:${k.color};">${k.val}</div>
     <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;">${k.label}</div>
   </div>`).join('');
@@ -3039,12 +3018,12 @@ function renderCelebrations(){
 
   // KPIs
   document.getElementById('celeb-kpis').innerHTML=[
-    {val:birthdays.length,label:'Birthdays',color:'#e64980',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M4 21v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><path d="M4 17h16"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 7c0-1 1-1 1-2M12 7c0-1 1-1 1-2M16 7c0-1 1-1 1-2"/></svg>'},
-    {val:anniversaries.length,label:'Anniversaries',color:'#f59f00',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 5H4a3 3 0 003 3M17 5h3a3 3 0 01-3 3"/></svg>'},
-    {val:totalToday,label:'Today',color:'#0ca678',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18"/><path d="M12 9C9.5 9 8 7.6 8 6a2 2 0 014-.3A2 2 0 0116 6c0 1.6-1.5 3-4 3z"/></svg>'},
-    {val:window,label:'Day Window',color:'#3b5bdb',icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>'},
+    {val:birthdays.length,label:'Birthdays',color:'#e64980',icon:'🎂'},
+    {val:anniversaries.length,label:'Anniversaries',color:'#f59f00',icon:'🏆'},
+    {val:totalToday,label:'Today',color:'#0ca678',icon:'🎉'},
+    {val:window,label:'Day Window',color:'#3b5bdb',icon:'📅'},
   ].map(k=>`<div class="card" style="text-align:center;padding:14px;">
-    <div style="width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin:0 auto 8px;background:${k.color};color:#fff;box-shadow:0 4px 12px ${k.color}55;">${k.icon}</div>
+    <div style="font-size:20px;margin-bottom:4px;">${k.icon}</div>
     <div style="font-family:'Space Grotesk',sans-serif;font-size:28px;font-weight:700;color:${k.color};">${k.val}</div>
     <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;">${k.label}</div>
   </div>`).join('');
@@ -3054,13 +3033,13 @@ function renderCelebrations(){
   if(totalToday>0){
     const names=[...todayBdays,...todayAnnivs].map(e=>e['Emp Name'].split(' ')[0]).join(', ');
     banner.innerHTML=`<div class="today-banner">
-      <div style="font-size:36px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><rect x="3" y="9" width="18" height="12" rx="1"/><path d="M12 9v12M3 13h18"/><path d="M12 9C9.5 9 8 7.6 8 6a2 2 0 014-.3A2 2 0 0116 6c0 1.6-1.5 3-4 3z"/></svg></div>
+      <div style="font-size:36px;">🎉</div>
       <div>
         <div style="font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:16px;color:#1a1f36;">Today's Celebrations!</div>
         <div style="font-size:13px;color:#4a5272;margin-top:3px;">
-          ${todayBdays.length?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M4 21v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><path d="M4 17h16"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 7c0-1 1-1 1-2M12 7c0-1 1-1 1-2M16 7c0-1 1-1 1-2"/></svg> ${todayBdays.map(e=>e['Emp Name']).join(', ')} — Birthday`:''}
+          ${todayBdays.length?`🎂 ${todayBdays.map(e=>e['Emp Name']).join(', ')} — Birthday`:''}
           ${todayBdays.length&&todayAnnivs.length?'<br>':''}
-          ${todayAnnivs.length?`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 5H4a3 3 0 003 3M17 5h3a3 3 0 01-3 3"/></svg> ${todayAnnivs.map(e=>e['Emp Name']+' ('+e._years+'y)').join(', ')} — Work Anniversary`:''}
+          ${todayAnnivs.length?`🏆 ${todayAnnivs.map(e=>e['Emp Name']+' ('+e._years+'y)').join(', ')} — Work Anniversary`:''}
         </div>
       </div>
     </div>`;
@@ -3084,7 +3063,7 @@ function celebCard(emp, type){
   const daysText=emp._days===0?'Today':emp._days===1?'Tomorrow':`In ${emp._days} days`;
   const badgeColor=emp._days===0?'#0ca678':emp._days<=2?'#f59f00':'#3b5bdb';
   const bgColor=isBday?'#fce7f3':'#fef3c7';
-  const emoji=isBday?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M4 21v-7a2 2 0 012-2h12a2 2 0 012 2v7"/><path d="M4 17h16"/><path d="M8 12V9M12 12V9M16 12V9"/><path d="M8 7c0-1 1-1 1-2M12 7c0-1 1-1 1-2M16 7c0-1 1-1 1-2"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M8 21h8M12 17v4M7 4h10v4a5 5 0 01-10 0V4z"/><path d="M7 5H4a3 3 0 003 3M17 5h3a3 3 0 01-3 3"/></svg>';
+  const emoji=isBday?'🎂':'🏆';
   const detail=isBday
     ? (emp._date?`Born ${emp._date}`:'')
     : `${emp._years} year${emp._years>1?'s':''} anniversary · Joined ${emp['Date of Joining']}`;
@@ -3262,12 +3241,12 @@ function renderIndiaMap(){
   // KPIs
   const kpiEl=document.getElementById("imap-kpis");
   if(kpiEl) kpiEl.innerHTML=[
-    {val:pool.length,label:"Total Employees",color:"#3b5bdb",icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>'},
-    {val:statesCovered,label:"States Covered",color:"#0ca678",icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="2.3"/></svg>'},
-    {val:maxVal,label:"Max in a State",color:"#f59f00",icon:'<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><circle cx="12" cy="11" r="2.3"/></svg>'},
-    {val:noState,label:"No State Data",color:"#e03131",icon:'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 0c0 1.5-2.5 2-2.5 4"/><circle cx="12" cy="17" r=".6" fill="currentColor"/></svg>'},
+    {val:pool.length,label:"Total Employees",color:"#3b5bdb",icon:"👥"},
+    {val:statesCovered,label:"States Covered",color:"#0ca678",icon:"🗺️"},
+    {val:maxVal,label:"Max in a State",color:"#f59f00",icon:"📍"},
+    {val:noState,label:"No State Data",color:"#e03131",icon:"❓"},
   ].map(k=>`<div class="card" style="text-align:center;padding:14px;">
-    <div style="width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin:0 auto 6px;background:${k.color};color:#fff;box-shadow:0 4px 10px ${k.color}55;">${k.icon}</div>
+    <div style="font-size:18px;margin-bottom:3px;">${k.icon}</div>
     <div style="font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:700;color:${k.color};">${k.val}</div>
     <div style="font-size:10px;color:var(--muted);font-weight:600;margin-top:2px;">${k.label}</div>
   </div>`).join("");
@@ -3392,7 +3371,7 @@ function imapSelectState(state,counts,pool){
   popup.innerHTML=`<div style="background:var(--card);border:1px solid var(--border);border-radius:20px;width:94%;max-width:480px;max-height:85vh;overflow-y:auto;box-shadow:var(--sh3);padding:24px 28px;">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px;">
       <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:700;">${state}</div>
-      <button onclick="document.getElementById('imap-popup').style.display='none'" style="background:var(--bg);border:1px solid var(--border);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;flex-shrink:0;"><path d="M18 6L6 18M6 6l12 12"/></svg></button>
+      <button onclick="document.getElementById('imap-popup').style.display='none'" style="background:var(--bg);border:1px solid var(--border);cursor:pointer;font-size:18px;width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;">✕</button>
     </div>
     ${modalHtml}
   </div>`;
