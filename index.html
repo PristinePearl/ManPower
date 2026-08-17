@@ -2351,6 +2351,50 @@ function renderBarChart(id,map,limit,showPct,singleColor){
 // ──────────────────────────────────────────────
 // MODAL
 // ──────────────────────────────────────────────
+// Get the entire manager chain (all layers)
+function getManagerChain(emp, visited=new Set()){
+  const chain=[];
+  let current=emp;
+  let depth=1;
+  const maxDepth=10;
+  
+  while(depth<=maxDepth){
+    const mgrId=current['Reporting Manager ID']&&String(current['Reporting Manager ID']).trim();
+    if(!mgrId || visited.has(mgrId)) break;
+    visited.add(mgrId);
+    const mgr=empIdMap[mgrId];
+    if(!mgr) break;
+    chain.push({level:depth, mgr});
+    current=mgr;
+    depth++;
+  }
+  return chain;
+}
+
+// Open Gmail with staff email in TO and all managers in CC
+function sendMailToStaff(emp){
+  const staffEmail=emp['Official E-Mail Id']&&emp['Official E-Mail Id'].toString().trim();
+  if(!staffEmail){
+    showToast('No official email found for this staff','error');
+    return;
+  }
+  
+  const staffName=emp['Emp Name']||'Staff';
+  const mgrChain=getManagerChain(emp);
+  const ccEmails=mgrChain
+    .map(c=>c.mgr['Official E-Mail Id']&&c.mgr['Official E-Mail Id'].toString().trim())
+    .filter(Boolean);
+  
+  const subject=encodeURIComponent(`Communication with ${staffName}`);
+  const body=encodeURIComponent(`Dear ${staffName},\n\n`);
+  const cc=encodeURIComponent(ccEmails.join(';'));
+  
+  // Gmail compose URL with TO, CC pre-filled
+  const gmailUrl=`https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(staffEmail)}&cc=${cc}&su=${subject}&body=${body}`;
+  
+  window.open(gmailUrl,'_blank','width=800,height=600');
+}
+
 function openModal(emp){
   if(typeof emp==='string') emp=JSON.parse(emp);
   const act=isActive(emp),sal=isSales(emp);
@@ -2366,7 +2410,10 @@ function openModal(emp){
     `${sal?'<span class="badge b-sky">📈 Sales</span>':'<span class="badge b-indigo">🏢 Head Office</span>'}
      ${act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red">👋 Resigned '+emp['Date Of Resignation']+'</span>'}
      ${emp['HQ']?`<span class="badge b-gray">📍 ${emp['HQ']}</span>`:''}
-     ${emp['Division']?`<span class="badge b-purple">🗂 ${emp['Division']}</span>`:''}`;
+     ${emp['Division']?`<span class="badge b-purple">🗂 ${emp['Division']}</span>`:''}
+     <button class="btn btn-primary" style="margin-left:auto;gap:5px;" onclick='sendMailToStaff(${safeJson(emp)})' title="Send email to this staff with managers in CC">
+       <span style="font-size:14px;">✉️</span> Send Mail
+     </button>`;
 
   const mgrId=emp['Reporting Manager ID']&&String(emp['Reporting Manager ID']).trim();
   const mgrBanner=document.getElementById('modal-mgr-banner');
