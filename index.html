@@ -305,6 +305,35 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 /* KPI bar grow-in */
 .kpi-bar-fill,.pbar-fill{width:0;}
 
+/* ADDRESS PRINT */
+.addr-print-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--sh1);}
+.addr-staff-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border);margin-bottom:6px;cursor:pointer;transition:all .15s;background:var(--card);}
+.addr-staff-item:hover{border-color:var(--accent);background:#eff3ff;}
+.addr-staff-item.selected{border-color:var(--accent);background:#eff3ff;box-shadow:0 0 0 2px rgba(59,91,219,.15);}
+.addr-staff-item .check{width:18px;height:18px;border-radius:5px;border:2px solid var(--border2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.addr-staff-item.selected .check{background:var(--accent);border-color:var(--accent);color:#fff;}
+.env-preview{width:100%;max-width:420px;aspect-ratio:9.5/4.125;border:1.5px dashed var(--border2);border-radius:10px;background:#fff;padding:22px 28px;font-family:'Plus Jakarta Sans',sans-serif;position:relative;box-shadow:var(--sh1);}
+.env-stamp{position:absolute;top:14px;right:18px;width:52px;height:38px;border:1.5px dashed var(--border2);border-radius:4px;background:#f7f8fc;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted);font-weight:600;}
+.env-from{font-size:10px;color:var(--muted);margin-bottom:18px;font-weight:600;}
+.env-to-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:6px;}
+.env-name{font-size:17px;font-weight:800;color:#1a1f36;line-height:1.2;margin-bottom:4px;}
+.env-addr{font-size:11.5px;color:#333;line-height:1.7;font-weight:500;}
+@media print{
+  body *{visibility:hidden!important;}
+  #print-area,#print-area *{visibility:visible!important;}
+  #print-area{position:fixed!important;left:0!important;top:0!important;width:100%!important;height:100%!important;z-index:99999!important;}
+  @page{size:A4 portrait;margin:10mm;}
+}
+.cut-h{width:100%;display:flex;align-items:center;gap:6px;margin:0;color:#aaa;}
+.cut-h-line{flex:1;border-top:1.5px dashed #ccc;}
+.cut-h-icon{font-size:13px;color:#bbb;transform:rotate(90deg);}
+.cut-v{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:4px;}
+.cut-v-line{flex:1;border-left:1.5px dashed #ccc;}
+.cut-v-icon{font-size:13px;color:#bbb;}
+.bulk-label-cell{background:#fff;padding:16px 20px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;flex-direction:column;justify-content:center;min-height:120px;page-break-inside:avoid;}
+.bulk-label-name{font-size:15px;font-weight:800;color:#1a1f36;margin-bottom:3px;}
+.bulk-label-addr{font-size:10.5px;color:#333;line-height:1.65;font-weight:500;}
+
 /* QUICK SEARCH / COMMAND PALETTE */
 #cmd-overlay{position:fixed;inset:0;background:rgba(10,15,40,.55);z-index:2000;display:none;align-items:flex-start;justify-content:center;backdrop-filter:blur(8px);padding-top:80px;}
 #cmd-overlay.open{display:flex;}
@@ -393,6 +422,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="nav-item" onclick="navigate('search')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35"/></svg></div>Search</div>
     <div class="nav-item" onclick="navigate('export')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg></div>Export Data</div>
   <div class="nav-item" onclick="navigate('contacts')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.948V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 8V7a2 2 0 012-2z"/></svg></div>Contacts</div>
+  <div class="nav-item" onclick="navigate('addrprint')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm1-4h4v4H9v-4z"/></svg></div>Address Print</div>
 
 <div class="nav-item" onclick="navigate('celebrations')"><div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 15.546c-.523 0-1.046.151-1.5.454a2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0 2.704 2.704 0 00-3 0 2.704 2.704 0 01-3 0M9 6l3-3 3 3M12 3v12"/></svg></div>Celebrations <span id="nav-celeb-count" class="nav-badge b-new"></span></div>
  
@@ -842,6 +872,74 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   </div>
 </div>
 
+<!-- ADDRESS PRINT -->
+<div id="page-addrprint" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title">🖨️ Address Print</div><div class="pg-sub">Print staff addresses on envelopes or A4 labels</div></div>
+    <div class="pg-actions">
+      <input class="inp" id="ap-search" placeholder="🔍 Search staff…" oninput="apFilter()" style="width:200px;"/>
+      <select class="inp" id="ap-type" onchange="apFilter()">
+        <option value="active">Active Employees</option>
+        <option value="sales">Sales Only</option>
+        <option value="ho">Head Office Only</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:10px;margin-bottom:20px;align-items:center;flex-wrap:wrap;">
+    <div class="tabs">
+      <button class="tab-btn active" id="ap-tab-env" onclick="apSwitchTab('env')">✉️ Envelope #10</button>
+      <button class="tab-btn" id="ap-tab-bulk" onclick="apSwitchTab('bulk')">📄 Bulk A4 Labels</button>
+    </div>
+    <span style="font-size:12px;color:var(--muted);font-weight:600;" id="ap-sel-count">0 selected</span>
+    <button class="btn btn-ghost" onclick="apClearSel()" style="font-size:12px;">Clear Selection</button>
+    <button class="btn btn-primary" onclick="apPrint()" id="ap-print-btn">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm1-4h4v4H9v-4z"/></svg>
+      Print
+    </button>
+  </div>
+
+  <!-- ENVELOPE TAB -->
+  <div id="ap-panel-env">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <!-- Staff list -->
+      <div class="addr-print-card">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Select One Staff — Envelope #10</div>
+        <div id="ap-env-list" style="max-height:460px;overflow-y:auto;"></div>
+      </div>
+      <!-- Preview -->
+      <div class="addr-print-card">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Preview</div>
+        <div id="ap-env-preview" style="display:flex;flex-direction:column;align-items:center;gap:16px;">
+          <div style="color:var(--muted);font-size:13px;font-weight:600;padding:40px 0;">Select a staff to preview the envelope</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK TAB -->
+  <div id="ap-panel-bulk" style="display:none;">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+      <!-- Staff list -->
+      <div class="addr-print-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+          <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Select Multiple Staff — A4 Labels</div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-left:auto;" onclick="apSelectAll()">Select All</button>
+        </div>
+        <div id="ap-bulk-list" style="max-height:460px;overflow-y:auto;"></div>
+      </div>
+      <!-- Preview -->
+      <div class="addr-print-card">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Label Preview (A4 — 2 × N grid)</div>
+        <div id="ap-bulk-preview" style="max-height:460px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:#f9f9f9;">
+          <div style="color:var(--muted);font-size:13px;font-weight:600;padding:40px;text-align:center;">Select staff to preview labels</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- CELEBRATIONS -->
 <div id="page-celebrations" class="page">
   <div class="pg-header">
@@ -1003,6 +1101,7 @@ function navigate(page){
   if(page==='contacts')     {renderContacts();populateSelect('contacts-dept',[...new Set(activeEmps.map(e=>e['Department']).filter(Boolean))].sort());}
 if(page==='celebrations') renderCelebrations();
 if(page==='indiamap')     renderIndiaMap();
+if(page==='addrprint')    renderAddrPrint();
   if(page==='search')     {populateSearchFilters();runGlobalSearch();}
   if(page==='newjoiners') renderNewJoiners();
   if(page==='sales')      {renderSalesTable();renderSalesDesigKPIs();}
@@ -3629,6 +3728,7 @@ const CMD_PAGES=[
   {label:'Export Data',page:'export',icon:'⬇️'},
   {label:'Contacts',page:'contacts',icon:'📋'},
   {label:'Celebrations',page:'celebrations',icon:'🎉'},
+  {label:'Address Print',page:'addrprint',icon:'🖨️'},
 ];
 let cmdIdx=0;
 
@@ -3696,6 +3796,281 @@ document.addEventListener('keydown',e=>{
   if((e.ctrlKey||e.metaKey)&&e.key==='k'){ e.preventDefault(); cmdOpen(); }
   if(e.key==='Escape'){ document.getElementById('cmd-overlay').classList.remove('open'); }
 });
+
+// ──────────────────────────────────────────────
+// ADDRESS PRINT
+// ──────────────────────────────────────────────
+let apMode='env'; // 'env' or 'bulk'
+let apEnvSel=null; // single emp for envelope
+let apBulkSel=new Set(); // emp ids for bulk
+let apPool=[];
+
+function renderAddrPrint(){
+  apPool=apGetPool();
+  apRenderList();
+  apUpdateCount();
+  if(apMode==='env') apRenderEnvPreview();
+  else apRenderBulkPreview();
+}
+
+function apGetPool(){
+  const t=document.getElementById('ap-type')?.value||'active';
+  if(t==='sales') return [...salesEmps];
+  if(t==='ho') return [...hoEmps];
+  return [...activeEmps];
+}
+
+function apFilter(){
+  apPool=apGetPool();
+  const q=(document.getElementById('ap-search')?.value||'').toLowerCase();
+  if(q) apPool=apPool.filter(e=>(e['Emp Name']||'').toLowerCase().includes(q)||(e['Emp Id']||'').toString().includes(q));
+  apRenderList();
+}
+
+function apRenderList(){
+  if(apMode==='env'){
+    const el=document.getElementById('ap-env-list');
+    if(!el) return;
+    el.innerHTML=apPool.map(e=>{
+      const sel=apEnvSel&&apEnvSel['Emp Id']===e['Emp Id'];
+      const hasAddr=!!(e['Current Address']||e['Current City']||e['Current State']);
+      return `<div class="addr-staff-item ${sel?'selected':''}" onclick="apEnvSelect(${safeJson(e)})">
+        <div class="check">${sel?'<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>':''}</div>
+        ${buildAvatar(e,'28px','11px')}
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e['Emp Name']||'—'}</div>
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}</div>
+        </div>
+        ${!hasAddr?'<span class="badge b-amber" style="font-size:9px;">No address</span>':''}
+      </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:13px;padding:20px;text-align:center;">No staff found</div>';
+  } else {
+    const el=document.getElementById('ap-bulk-list');
+    if(!el) return;
+    el.innerHTML=apPool.map(e=>{
+      const sel=apBulkSel.has(String(e['Emp Id']));
+      const hasAddr=!!(e['Current Address']||e['Current City']||e['Current State']);
+      return `<div class="addr-staff-item ${sel?'selected':''}" onclick="apBulkToggle(${safeJson(e)})">
+        <div class="check">${sel?'<svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg>':''}</div>
+        ${buildAvatar(e,'28px','11px')}
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e['Emp Name']||'—'}</div>
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}</div>
+        </div>
+        ${!hasAddr?'<span class="badge b-amber" style="font-size:9px;">No address</span>':''}
+      </div>`;
+    }).join('') || '<div style="color:var(--muted);font-size:13px;padding:20px;text-align:center;">No staff found</div>';
+  }
+}
+
+function apEnvSelect(emp){
+  if(typeof emp==='string') emp=JSON.parse(emp);
+  apEnvSel=emp;
+  apRenderList();
+  apRenderEnvPreview();
+  apUpdateCount();
+}
+
+function apBulkToggle(emp){
+  if(typeof emp==='string') emp=JSON.parse(emp);
+  const id=String(emp['Emp Id']);
+  if(apBulkSel.has(id)) apBulkSel.delete(id);
+  else apBulkSel.add(id);
+  apRenderList();
+  apRenderBulkPreview();
+  apUpdateCount();
+}
+
+function apSelectAll(){
+  apPool.forEach(e=>apBulkSel.add(String(e['Emp Id'])));
+  apRenderList();
+  apRenderBulkPreview();
+  apUpdateCount();
+}
+
+function apClearSel(){
+  apEnvSel=null;
+  apBulkSel.clear();
+  apRenderList();
+  if(apMode==='env') apRenderEnvPreview();
+  else apRenderBulkPreview();
+  apUpdateCount();
+}
+
+function apUpdateCount(){
+  const c=apMode==='env'?(apEnvSel?1:0):apBulkSel.size;
+  const el=document.getElementById('ap-sel-count');
+  if(el) el.textContent=c+' selected';
+}
+
+function apBuildAddressBlock(e){
+  const u=s=>s?s.toString().trim().toUpperCase():'';
+  const lines=[];
+  if(e['Current Address']&&e['Current Address'].toString().trim()) lines.push(u(e['Current Address']));
+  const cityState=[];
+  if(e['Current City']) cityState.push(u(e['Current City']));
+  const st=u(e['Current State']);
+  const pin=u(e['Current Pincode']);
+  if(st||pin) cityState.push((st+(pin?' - '+pin:'')).trim());
+  if(cityState.length) lines.push(cityState.join(', '));
+  if(e['Current Phone']&&e['Current Phone'].toString().trim()) lines.push('PH : '+e['Current Phone'].toString().trim());
+  return lines;
+}
+
+function apRenderEnvPreview(){
+  const el=document.getElementById('ap-env-preview');
+  if(!el) return;
+  if(!apEnvSel){
+    el.innerHTML='<div style="color:var(--muted);font-size:13px;font-weight:600;padding:40px 0;text-align:center;">Select a staff to preview the envelope</div>';
+    return;
+  }
+  const e=apEnvSel;
+  const addrLines=apBuildAddressBlock(e);
+  const name=(e['Emp Name']||'—').toUpperCase();
+  el.innerHTML=`
+    <div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;align-self:flex-start;">Envelope #10 Preview (9.5" × 4.125")</div>
+    <div class="env-preview">
+      <div class="env-to-label">TO,</div>
+      <div class="env-name">${name}</div>
+      <div class="env-addr">${addrLines.join('<br>')}</div>
+    </div>
+    <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:8px;">${addrLines.length===0?'⚠️ No address data available for this staff':'Address looks good — click Print to proceed'}</div>`;
+}
+
+function apRenderBulkPreview(){
+  const el=document.getElementById('ap-bulk-preview');
+  if(!el) return;
+  const allPool=[...new Map([...allEmployees].map(e=>[String(e['Emp Id']),e])).values()];
+  const emps=allPool.filter(e=>apBulkSel.has(String(e['Emp Id'])));
+  if(!emps.length){
+    el.innerHTML='<div style="color:var(--muted);font-size:13px;font-weight:600;padding:40px;text-align:center;">Select staff to preview labels</div>';
+    return;
+  }
+  // Build 2-per-row grid preview
+  let html='<table style="width:100%;border-collapse:collapse;">';
+  for(let i=0;i<emps.length;i+=2){
+    html+='<tr>';
+    [emps[i], emps[i+1]].forEach((e,ci)=>{
+      if(!e){html+='<td style="width:50%;"></td>';return;}
+      const lines=apBuildAddressBlock(e);
+      const name=(e['Emp Name']||'—').toUpperCase();
+      html+=`<td style="width:50%;vertical-align:top;padding:0;${ci===0?'border-right:1.5px dashed #ccc;':''}">
+        <div class="bulk-label-cell">
+          <div class="bulk-label-name">TO,</div>
+          <div class="bulk-label-name">${name}</div>
+          <div class="bulk-label-addr">${lines.join('<br>') || '<span style="color:#bbb;">No address</span>'}</div>
+        </div>
+      </td>`;
+    });
+    html+='</tr>';
+    if(i+2<emps.length){
+      html+=`<tr><td colspan="2" style="padding:0;">
+        <div class="cut-h"><div class="cut-h-line"></div><span class="cut-h-icon">✂</span><div class="cut-h-line"></div></div>
+      </td></tr>`;
+    }
+  }
+  html+='</table>';
+  el.innerHTML=html;
+}
+
+function apSwitchTab(tab){
+  apMode=tab;
+  document.getElementById('ap-tab-env').classList.toggle('active',tab==='env');
+  document.getElementById('ap-tab-bulk').classList.toggle('active',tab==='bulk');
+  document.getElementById('ap-panel-env').style.display=tab==='env'?'block':'none';
+  document.getElementById('ap-panel-bulk').style.display=tab==='bulk'?'block':'none';
+  apRenderList();
+  apUpdateCount();
+  if(tab==='env') apRenderEnvPreview();
+  else apRenderBulkPreview();
+}
+
+function apPrint(){
+  if(apMode==='env'){
+    if(!apEnvSel){showToast('Select a staff first','error');return;}
+    apPrintEnvelope(apEnvSel);
+  } else {
+    const allPool=[...new Map([...allEmployees].map(e=>[String(e['Emp Id']),e])).values()];
+    const emps=allPool.filter(e=>apBulkSel.has(String(e['Emp Id'])));
+    if(!emps.length){showToast('Select at least one staff','error');return;}
+    apPrintBulk(emps);
+  }
+}
+
+function apPrintEnvelope(e){
+  if(typeof e==='string') e=JSON.parse(e);
+  const addrLines=apBuildAddressBlock(e);
+  const name=(e['Emp Name']||'—').toUpperCase();
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Envelope — ${name}</title>
+  <style>
+    @page{size:9.5in 4.125in landscape;margin:0;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{width:9.5in;height:4.125in;font-family:'Segoe UI',Arial,sans-serif;background:#fff;position:relative;overflow:hidden;}
+    .env-wrap{width:9.5in;height:4.125in;padding:0.35in 0.5in;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch;}
+    .addr-block{margin-left:auto;text-align:left;min-width:3in;max-width:4.5in;}
+    .to-label{font-size:11pt;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;color:#444;margin-bottom:0.1in;}
+    .name{font-size:20pt;font-weight:900;color:#111;margin-bottom:0.1in;line-height:1.15;text-transform:uppercase;}
+    .addr{font-size:12pt;color:#333;line-height:1.85;font-weight:500;text-transform:uppercase;}
+  </style></head><body>
+  <div class="env-wrap">
+    <div class="addr-block">
+      <div class="to-label">TO,</div>
+      <div class="name">${name}</div>
+      <div class="addr">${addrLines.join('<br>')}</div>
+    </div>
+  </div>
+  <script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>
+  </body></html>`);
+  win.document.close();
+}
+
+function apPrintBulk(emps){
+  let rows='';
+  for(let i=0;i<emps.length;i+=2){
+    const pair=[emps[i],emps[i+1]];
+    const isLast=i+2>=emps.length;
+    rows+=`<tr class="label-row">`;
+    pair.forEach((e,ci)=>{
+      if(!e){rows+=`<td class="label-cell empty-cell"></td>`;return;}
+      const lines=apBuildAddressBlock(e);
+      const name=(e['Emp Name']||'—').toUpperCase();
+      rows+=`<td class="label-cell ${ci===0?'left-cell':'right-cell'}">
+        <div class="to-lbl">TO,</div>
+        <div class="emp-name">${name}</div>
+        <div class="emp-addr">${lines.join('<br>')||'—'}</div>
+      </td>`;
+    });
+    rows+=`</tr>`;
+    if(!isLast){
+      rows+=`<tr class="cut-row"><td colspan="2"><div class="cut-h-line"><span class="scissors">✂</span></div></td></tr>`;
+    }
+  }
+
+  const win=window.open('','_blank');
+  win.document.write(`<!DOCTYPE html><html><head><title>Address Labels — Bulk Print</title>
+  <style>
+    @page{size:A4 portrait;margin:10mm;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;width:190mm;}
+    table{width:100%;border-collapse:collapse;}
+    .label-row{}
+    .label-cell{width:50%;vertical-align:top;padding:14px 18px;min-height:30mm;}
+    .left-cell{border-right:1.5px dashed #bbb;}
+    .right-cell{}
+    .empty-cell{background:#fafafa;}
+    .to-lbl{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:3px;}
+    .emp-name{font-size:14pt;font-weight:900;color:#111;margin-bottom:4px;line-height:1.2;text-transform:uppercase;}
+    .emp-addr{font-size:9.5pt;color:#333;line-height:1.75;font-weight:500;text-transform:uppercase;}
+    .cut-row td{padding:0;}
+    .cut-h-line{display:flex;align-items:center;width:100%;border-top:1.5px dashed #bbb;position:relative;height:16px;}
+    .scissors{position:absolute;left:50%;transform:translateX(-50%);background:#fff;padding:0 4px;font-size:11pt;color:#aaa;line-height:1;}
+  </style></head><body>
+  <table>${rows}</table>
+  <script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>
+  </body></html>`);
+  win.document.close();
+}
 
 window.addEventListener('DOMContentLoaded',loadData);
 </script>
