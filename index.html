@@ -330,7 +330,8 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 .cut-v{position:absolute;top:0;bottom:0;display:flex;flex-direction:column;align-items:center;gap:4px;}
 .cut-v-line{flex:1;border-left:1.5px dashed #ccc;}
 .cut-v-icon{font-size:13px;color:#bbb;}
-.bulk-label-cell{background:#fff;padding:16px 20px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;flex-direction:column;justify-content:center;min-height:120px;page-break-inside:avoid;}
+.bulk-label-cell{background:#fff;padding:16px 20px;font-family:'Plus Jakarta Sans',sans-serif;display:flex;flex-direction:column;justify-content:center;min-height:120px;page-break-inside:avoid;position:relative;}
+.courier-mode-badge{position:absolute;top:6px;right:8px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#555;border:1px solid #999;border-radius:4px;padding:1px 7px;background:#f4f4f4;}
 .bulk-label-name{font-size:15px;font-weight:800;color:#1a1f36;margin-bottom:3px;}
 .bulk-label-addr{font-size:10.5px;color:#333;line-height:1.65;font-weight:500;}
 
@@ -923,9 +924,16 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <!-- Staff list -->
       <div class="addr-print-card">
-        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
           <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;">Select Multiple Staff — A4 Labels</div>
-          <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;margin-left:auto;" onclick="apSelectAll()">Select All</button>
+          <div style="display:flex;align-items:center;gap:6px;margin-left:auto;">
+            <label for="ap-courier-mode" style="font-size:10.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Mode of Courier</label>
+            <select class="inp" id="ap-courier-mode" onchange="apCourierMode=this.value;apRenderBulkPreview();" style="padding:5px 10px;font-size:12px;">
+              <option value="Surface" selected>Surface</option>
+              <option value="Air">Air</option>
+            </select>
+          </div>
+          <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px;" onclick="apSelectAll()">Select All</button>
         </div>
         <div id="ap-bulk-list" style="max-height:460px;overflow-y:auto;"></div>
       </div>
@@ -3801,6 +3809,7 @@ document.addEventListener('keydown',e=>{
 // ADDRESS PRINT
 // ──────────────────────────────────────────────
 let apMode='env'; // 'env' or 'bulk'
+let apCourierMode='Surface'; // 'Surface' or 'Air'
 let apEnvSel=null; // single emp for envelope
 let apBulkSel=new Set(); // emp ids for bulk
 let apPool=[];
@@ -3956,6 +3965,7 @@ function apRenderBulkPreview(){
       const name=(e['Emp Name']||'—').toUpperCase();
       html+=`<td style="width:50%;vertical-align:top;padding:0;${ci===0?'border-right:1.5px dashed #ccc;':''}">
         <div class="bulk-label-cell">
+          <div class="courier-mode-badge">${apCourierMode}</div>
           <div class="bulk-label-name">TO,</div>
           <div class="bulk-label-name">${name}</div>
           <div class="bulk-label-addr">${lines.join('<br>') || '<span style="color:#bbb;">No address</span>'}</div>
@@ -4036,6 +4046,7 @@ function apPrintBulk(emps){
       const lines=apBuildAddressBlock(e);
       const name=(e['Emp Name']||'—').toUpperCase();
       rows+=`<td class="label-cell ${ci===0?'left-cell':'right-cell'}">
+        <div class="courier-mode-badge">${apCourierMode}</div>
         <div class="to-lbl">TO,</div>
         <div class="emp-name">${name}</div>
         <div class="emp-addr">${lines.join('<br>')||'—'}</div>
@@ -4055,10 +4066,11 @@ function apPrintBulk(emps){
     body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;width:190mm;}
     table{width:100%;border-collapse:collapse;}
     .label-row{}
-    .label-cell{width:50%;vertical-align:top;padding:14px 18px;min-height:30mm;}
+    .label-cell{width:50%;vertical-align:top;padding:14px 18px;min-height:30mm;position:relative;}
     .left-cell{border-right:1.5px dashed #bbb;}
     .right-cell{}
     .empty-cell{background:#fafafa;}
+    .courier-mode-badge{position:absolute;top:6px;right:8px;font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#555;border:1px solid #999;border-radius:4px;padding:1px 7px;background:#f4f4f4;}
     .to-lbl{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:3px;}
     .emp-name{font-size:14pt;font-weight:900;color:#111;margin-bottom:4px;line-height:1.2;text-transform:uppercase;}
     .emp-addr{font-size:9.5pt;color:#333;line-height:1.75;font-weight:500;text-transform:uppercase;}
