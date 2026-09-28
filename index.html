@@ -6,6 +6,7 @@
 <link rel="icon" type="image/png" href="https://pristinepearl.github.io/Home/alt-logo.png">
 <title>ManPower — Pristine Pearl Pharma</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -305,6 +306,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 /* KPI bar grow-in */
 .kpi-bar-fill,.pbar-fill{width:0;}
 
+.apzoom .aplp{zoom:.5;margin:0 auto 10px;box-shadow:0 2px 8px rgba(0,0,0,.25);}
 /* ADDRESS PRINT */
 .addr-print-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--sh1);}
 .addr-staff-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border);margin-bottom:6px;cursor:pointer;transition:all .15s;background:var(--card);}
@@ -939,7 +941,24 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       </div>
       <!-- Preview -->
       <div class="addr-print-card">
-        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Label Preview (A4 — 2 × N grid)</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Label Preview (A4)</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--text2);">
+          <label>Layout <select class="inp" id="ap-lay" onchange="apRenderBulkPreview()"><option value="8">8 per A4</option><option value="6">6 per A4</option></select></label>
+          <label>Copies <input class="inp" id="ap-cp" type="number" value="1" min="1" max="20" style="width:60px;" oninput="apRenderBulkPreview()"></label>
+          <label>Start at # <input class="inp" id="ap-start" type="number" value="1" min="1" max="8" style="width:60px;" oninput="apRenderBulkPreview()"></label>
+          <label>Text <select class="inp" id="ap-fz" onchange="apRenderBulkPreview()"><option value="0.85">Small</option><option value="1" selected>Normal</option><option value="1.15">Large</option></select></label>
+          <label>QR <select class="inp" id="ap-qt" onchange="apRenderBulkPreview()"><option value="from">Sender details</option><option value="none">No QR</option></select></label>
+          <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" id="ap-cut" checked onchange="apRenderBulkPreview()"> Cut lines</label>
+          <input class="inp" id="ap-note" placeholder="Extra line on every label (e.g. Ref: INV-1024)" style="flex:1;min-width:180px;" oninput="apRenderBulkPreview()">
+        </div>
+        <details style="margin-bottom:10px;font-size:12px;">
+          <summary style="cursor:pointer;font-weight:700;color:var(--accent);">✏️ Sender (FROM) details — used in QR</summary>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
+            <input class="inp" id="ap-fn" placeholder="Name" style="grid-column:1/-1;" oninput="apFromChange()">
+            <textarea class="inp" id="ap-fa" rows="3" placeholder="Address (one line per row; last line: CITY - PINCODE)" style="grid-column:1/-1;" oninput="apFromChange()"></textarea>
+            <input class="inp" id="ap-fm" placeholder="Mobile" oninput="apFromChange()"><input class="inp" id="ap-fe" placeholder="Mail" oninput="apFromChange()">
+          </div>
+        </details>
         <div id="ap-bulk-preview" style="max-height:460px;overflow-y:auto;border:1px solid var(--border);border-radius:8px;padding:8px;background:#f9f9f9;">
           <div style="color:var(--muted);font-size:13px;font-weight:600;padding:40px;text-align:center;">Select staff to preview labels</div>
         </div>
@@ -3815,6 +3834,7 @@ let apBulkSel=new Set(); // emp ids for bulk
 let apPool=[];
 
 function renderAddrPrint(){
+  apInit();
   apPool=apGetPool();
   apRenderList();
   apUpdateCount();
@@ -3946,41 +3966,122 @@ function apRenderEnvPreview(){
     <div style="font-size:11px;color:var(--muted);font-weight:600;margin-top:8px;">${addrLines.length===0?'⚠️ No address data available for this staff':'Address looks good — click Print to proceed'}</div>`;
 }
 
+/* ── Bulk label engine: grid layout + sender QR + pincode → city/state ── */
+const AP_CSS=`.aplp{width:210mm;height:296.6mm;padding:5mm;display:grid;grid-template-columns:1fr 1fr;background:#fff;page-break-after:always;font-family:'Segoe UI',Arial,sans-serif;color:#111;box-sizing:border-box}
+.aplp:last-child{page-break-after:auto}
+.aplbl{border:1px dashed #777;padding:3.5mm;display:flex;flex-direction:column;overflow:hidden;font-size:var(--fs,10pt);line-height:1.25;box-sizing:border-box}
+.aplbl.em{border-color:#ddd}.apnc .aplbl{border-color:transparent}
+.apto{flex:1;display:flex;gap:3mm;min-height:0}.apt{flex:1;min-width:0}
+.apk{font-size:.8em;font-weight:700;letter-spacing:.5px;display:flex;justify-content:space-between;align-items:center}
+.apcb{font-size:.75em;font-weight:800;color:#555;border:1px solid #999;border-radius:3px;padding:0 4px;background:#f4f4f4;text-transform:uppercase;letter-spacing:.04em}
+.apn{font-weight:700;font-size:1.12em;margin:.5mm 0 1mm}.apa{word-break:break-word}
+.apcs{margin-top:1mm;font-weight:600}.app{font-weight:700;margin-top:1mm}.apph{margin-top:.5mm}
+.apnote{margin-top:1mm;font-size:.85em;font-style:italic}
+.apqrw{width:27mm;flex:none;text-align:center}.apqr{width:100%;aspect-ratio:1}
+.apqr svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
+.apcap{font-size:6.5pt;line-height:1.1;font-weight:600;margin-top:.5mm}`;
+const AP_FROM={name:'PRISTINE PEARL PHARMA PVT LTD',addr:['SECOND FLOOR - 2B, DOOR NO: 129, THOTTASALAI EAST,','POWER HOUSE ROAD, PERUR VILLAGE,','COIMBATORE - 641002'],mobile:'',mail:''};
+const AP_SET=['ap-lay','ap-cp','ap-start','ap-fz','ap-qt','ap-cut','ap-note'];
+const apG=id=>document.getElementById(id);
+const apEsc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let apInited=false, apPinCache={}; const apPinTried=new Set();
+try{apPinCache=JSON.parse(localStorage.getItem('pinCache')||'{}')}catch(e){}
+
+function apInit(){
+  if(apInited) return; apInited=true;
+  const st=document.createElement('style'); st.textContent=AP_CSS; document.head.appendChild(st);
+  try{
+    const o=JSON.parse(localStorage.getItem('ap_lbl_set')||'{}');
+    AP_SET.forEach(id=>{if(o[id]!==undefined){const el=apG(id); if(el.type==='checkbox') el.checked=o[id]; else el.value=o[id];}});
+    if(o.from) Object.assign(AP_FROM,o.from);
+  }catch(e){}
+  apG('ap-fn').value=AP_FROM.name; apG('ap-fa').value=AP_FROM.addr.join('\n');
+  apG('ap-fm').value=AP_FROM.mobile; apG('ap-fe').value=AP_FROM.mail;
+}
+function apSave(){
+  try{const o={}; AP_SET.forEach(id=>{const el=apG(id); o[id]=el.type==='checkbox'?el.checked:el.value;}); o.from=AP_FROM; localStorage.setItem('ap_lbl_set',JSON.stringify(o));}catch(e){}
+}
+function apFromChange(){
+  AP_FROM.name=apG('ap-fn').value.trim();
+  AP_FROM.addr=apG('ap-fa').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  AP_FROM.mobile=apG('ap-fm').value.trim(); AP_FROM.mail=apG('ap-fe').value.trim();
+  apRenderBulkPreview();
+}
+
+/* Pincode → District / State (India Post API), cached */
+const apPin=e=>String(e['Current Pincode']||'').replace(/\D/g,'');
+async function apLookupPin(p){
+  try{
+    const r=await fetch('https://api.postalpincode.in/pincode/'+p), j=await r.json(), po=j&&j[0]&&j[0].PostOffice;
+    if(po&&po.length){
+      apPinCache[p]={city:(po[0].District||po[0].Division||'').toUpperCase(),state:(po[0].State||'').toUpperCase()};
+      try{localStorage.setItem('pinCache',JSON.stringify(apPinCache))}catch(e){}
+    }
+  }catch(e){}
+}
+function apEnsurePins(emps){
+  const need=[...new Set(emps.map(apPin))].filter(x=>/^\d{6}$/.test(x)&&!apPinCache[x]&&!apPinTried.has(x));
+  if(!need.length) return Promise.resolve(false);
+  need.forEach(x=>apPinTried.add(x));
+  return Promise.all(need.map(apLookupPin)).then(()=>true);
+}
+
+/* Sender vCard QR */
+function apVcard(){
+  const F=AP_FROM, e=x=>x.replace(/,/g,'\\,'), L=F.addr.slice(), last=L.pop()||'';
+  const m=last.match(/^(.*?)[\s,-]*(\d{6})\s*$/), city=m?m[1]:last, zip=m?m[2]:'';
+  return ['BEGIN:VCARD','VERSION:3.0','N:;;;;','FN:'+F.name,'ORG:'+F.name,'TEL;TYPE=CELL:'+F.mobile.replace(/\s/g,''),'EMAIL:'+F.mail,
+    'ADR;TYPE=WORK:;;'+e(L.join(' ').replace(/,\s*$/,''))+';'+e(city)+';;'+zip+';','END:VCARD'].join('\n');
+}
+function apQrBox(){
+  if(typeof qrcode!=='function') return '';
+  try{
+    const q=qrcode(0,'M'); q.addData(apVcard().replace(/\n/g,'\r\n')); q.make();
+    return `<div class="apqrw"><div class="apqr">${q.createSvgTag({cellSize:4,margin:4,scalable:true})}</div><div class="apcap">Scan to view sender details</div></div>`;
+  }catch(e){return '';}
+}
+
+function apLabelHTML(e,o,qr){
+  const pin=apPin(e), c=apPinCache[pin]||{}, up=s=>String(s||'').trim().toUpperCase();
+  const city=c.city||up(e['Current City'])||'—', st=c.state||up(e['Current State'])||'—';
+  const addr=up(e['Current Address']), ph=String(e['Current Phone']||'').trim();
+  const cs=(pin||city!=='—'||st!=='—')?`<div class="apcs">CITY : ${apEsc(city)} | STATE : ${apEsc(st)}</div>`:'';
+  return `<div class="aplbl"><div class="apto"><div class="apt">
+    <div class="apk"><span>TO,</span><span class="apcb">${apEsc(apCourierMode)}</span></div>
+    <div class="apn">${apEsc(up(e['Emp Name'])||'—')}</div>
+    <div class="apa">${addr?apEsc(addr):'<span style="color:#aaa">No address</span>'}</div>${cs}
+    ${pin?`<div class="app">PIN : ${apEsc(pin)}</div>`:''}${ph?`<div class="apph">PH : ${apEsc(ph)}</div>`:''}
+    ${o.note?`<div class="apnote">${apEsc(o.note)}</div>`:''}</div>${qr}</div></div>`;
+}
+function apOpts(){
+  return {n:apG('ap-lay').value==='6'?6:8, cp:Math.max(1,Math.min(20,+apG('ap-cp').value||1)), st:Math.max(1,+apG('ap-start').value||1)-1,
+    z:+apG('ap-fz').value||1, qr:apG('ap-qt').value!=='none', cut:apG('ap-cut').checked, note:apG('ap-note').value.trim()};
+}
+function apSheets(emps,o){
+  const items=[]; emps.forEach(e=>{for(let k=0;k<o.cp;k++) items.push(e);});
+  const st=Math.min(o.n-1,o.st); for(let k=0;k<st;k++) items.unshift(null);
+  const qr=o.qr?apQrBox():'', fs=(o.n===8?10.5:12.5)*o.z+'pt', empty='<div class="aplbl em"></div>';
+  let html='';
+  for(let s=0;s<items.length;s+=o.n){
+    const cells=items.slice(s,s+o.n).map(e=>e?apLabelHTML(e,o,qr):empty);
+    while(cells.length<o.n) cells.push(empty);
+    html+=`<div class="aplp${o.cut?'':' apnc'}" style="grid-template-rows:repeat(${o.n/2},1fr);--fs:${fs}">${cells.join('')}</div>`;
+  }
+  return {html,count:items.length-st,pages:Math.ceil(items.length/o.n)};
+}
+
 function apRenderBulkPreview(){
-  const el=document.getElementById('ap-bulk-preview');
-  if(!el) return;
-  const allPool=[...new Map([...allEmployees].map(e=>[String(e['Emp Id']),e])).values()];
-  const emps=allPool.filter(e=>apBulkSel.has(String(e['Emp Id'])));
+  const el=apG('ap-bulk-preview'); if(!el) return;
+  const all=[...new Map(allEmployees.map(e=>[String(e['Emp Id']),e])).values()];
+  const emps=all.filter(e=>apBulkSel.has(String(e['Emp Id'])));
+  apSave();
   if(!emps.length){
     el.innerHTML='<div style="color:var(--muted);font-size:13px;font-weight:600;padding:40px;text-align:center;">Select staff to preview labels</div>';
     return;
   }
-  // Build 2-per-row grid preview
-  let html='<table style="width:100%;border-collapse:collapse;">';
-  for(let i=0;i<emps.length;i+=2){
-    html+='<tr>';
-    [emps[i], emps[i+1]].forEach((e,ci)=>{
-      if(!e){html+='<td style="width:50%;"></td>';return;}
-      const lines=apBuildAddressBlock(e);
-      const name=(e['Emp Name']||'—').toUpperCase();
-      html+=`<td style="width:50%;vertical-align:top;padding:0;${ci===0?'border-right:1.5px dashed #ccc;':''}">
-        <div class="bulk-label-cell">
-          <div class="courier-mode-badge">${apCourierMode}</div>
-          <div class="bulk-label-name">TO,</div>
-          <div class="bulk-label-name">${name}</div>
-          <div class="bulk-label-addr">${lines.join('<br>') || '<span style="color:#bbb;">No address</span>'}</div>
-        </div>
-      </td>`;
-    });
-    html+='</tr>';
-    if(i+2<emps.length){
-      html+=`<tr><td colspan="2" style="padding:0;">
-        <div class="cut-h"><div class="cut-h-line"></div><span class="cut-h-icon">✂</span><div class="cut-h-line"></div></div>
-      </td></tr>`;
-    }
-  }
-  html+='</table>';
-  el.innerHTML=html;
+  apEnsurePins(emps).then(ch=>{if(ch) apRenderBulkPreview();});
+  const r=apSheets(emps,apOpts());
+  el.innerHTML=`<div style="font-size:11px;color:var(--muted);font-weight:600;margin-bottom:6px;">${r.count} label(s) · ${r.pages} page(s)</div><div class="apzoom">${r.html}</div>`;
 }
 
 function apSwitchTab(tab){
@@ -4035,52 +4136,12 @@ function apPrintEnvelope(e){
   win.document.close();
 }
 
-function apPrintBulk(emps){
-  let rows='';
-  for(let i=0;i<emps.length;i+=2){
-    const pair=[emps[i],emps[i+1]];
-    const isLast=i+2>=emps.length;
-    rows+=`<tr class="label-row">`;
-    pair.forEach((e,ci)=>{
-      if(!e){rows+=`<td class="label-cell empty-cell"></td>`;return;}
-      const lines=apBuildAddressBlock(e);
-      const name=(e['Emp Name']||'—').toUpperCase();
-      rows+=`<td class="label-cell ${ci===0?'left-cell':'right-cell'}">
-        <div class="courier-mode-badge">${apCourierMode}</div>
-        <div class="to-lbl">TO,</div>
-        <div class="emp-name">${name}</div>
-        <div class="emp-addr">${lines.join('<br>')||'—'}</div>
-      </td>`;
-    });
-    rows+=`</tr>`;
-    if(!isLast){
-      rows+=`<tr class="cut-row"><td colspan="2"><div class="cut-h-line"><span class="scissors">✂</span></div></td></tr>`;
-    }
-  }
-
+async function apPrintBulk(emps){
   const win=window.open('','_blank');
-  win.document.write(`<!DOCTYPE html><html><head><title>Address Labels — Bulk Print</title>
-  <style>
-    @page{size:A4 portrait;margin:10mm;}
-    *{box-sizing:border-box;margin:0;padding:0;}
-    body{font-family:'Segoe UI',Arial,sans-serif;background:#fff;width:190mm;}
-    table{width:100%;border-collapse:collapse;}
-    .label-row{}
-    .label-cell{width:50%;vertical-align:top;padding:14px 18px;min-height:30mm;position:relative;}
-    .left-cell{border-right:1.5px dashed #bbb;}
-    .right-cell{}
-    .empty-cell{background:#fafafa;}
-    .courier-mode-badge{position:absolute;top:6px;right:8px;font-size:7pt;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:#555;border:1px solid #999;border-radius:4px;padding:1px 7px;background:#f4f4f4;}
-    .to-lbl{font-size:8pt;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#555;margin-bottom:3px;}
-    .emp-name{font-size:14pt;font-weight:900;color:#111;margin-bottom:4px;line-height:1.2;text-transform:uppercase;}
-    .emp-addr{font-size:9.5pt;color:#333;line-height:1.75;font-weight:500;text-transform:uppercase;}
-    .cut-row td{padding:0;}
-    .cut-h-line{display:flex;align-items:center;width:100%;border-top:1.5px dashed #bbb;position:relative;height:16px;}
-    .scissors{position:absolute;left:50%;transform:translateX(-50%);background:#fff;padding:0 4px;font-size:11pt;color:#aaa;line-height:1;}
-  </style></head><body>
-  <table>${rows}</table>
-  <script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script>
-  </body></html>`);
+  if(!win){showToast('Allow pop-ups to print labels','error');return;}
+  await apEnsurePins(emps);
+  const r=apSheets(emps,apOpts());
+  win.document.write(`<!DOCTYPE html><html><head><title>Address Labels — Bulk Print</title><style>@page{size:A4 portrait;margin:0}*{margin:0}body{background:#fff}${AP_CSS}</style></head><body>${r.html}<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script></body></html>`);
   win.document.close();
 }
 
