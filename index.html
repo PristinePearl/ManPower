@@ -308,6 +308,23 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
 .apzoom .aplp{zoom:.5;margin:0 auto 10px;box-shadow:0 2px 8px rgba(0,0,0,.25);}
 
+
+/* BIRTHDAYS & ANNIVERSARIES */
+.bd-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--sh1);padding:18px 22px 16px 26px;margin-bottom:18px;overflow:hidden;}
+.bd-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent-g);}
+.bd-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
+.bd-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.bd-h{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:13.5px;margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.bd-list{display:grid;gap:8px;max-height:236px;overflow-y:auto;padding-right:4px;align-content:start;}
+@media(max-width:768px){.bd-cols{grid-template-columns:1fr;}}
+.bd-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--border);border-radius:10px;cursor:pointer;background:var(--card2);transition:all .15s;}
+.bd-item:hover{border-color:var(--accent);box-shadow:var(--sh1);}
+.bd-item.today{border-color:var(--accent3);background:rgba(245,159,0,.09);}
+.bd-when{margin-left:auto;text-align:right;font-size:11px;font-weight:700;color:var(--muted);white-space:nowrap;}
+.bd-when b{display:block;font-size:12px;color:var(--accent);}
+.bd-item.today .bd-when b{color:var(--accent3);}
+.bd-empty{padding:18px;text-align:center;color:var(--muted);font-size:13px;font-weight:600;}
+
 /* MULTISELECT CHECKBOX DROPDOWN */
 .ms-wrap{position:relative;display:inline-block;}
 .ms-btn{display:flex;align-items:center;gap:8px;justify-content:space-between;min-width:160px;cursor:pointer;text-align:left;white-space:nowrap;}
@@ -449,7 +466,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
  
   </nav>
   <div class="sb-footer">
-    <button class="sb-refresh" onclick="loadData()">
+    <button class="sb-refresh" onclick="loadData(true)">
       <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh Data
     </button>
     <div id="lastRefresh" class="sb-time">Not loaded</div>
@@ -461,7 +478,15 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <button id="mob-menu-btn" onclick="toggleMobileSidebar()" style="display:none;position:fixed;bottom:20px;right:20px;z-index:900;width:52px;height:52px;border-radius:50%;background:var(--accent-g);border:none;cursor:pointer;box-shadow:0 4px 16px rgba(59,91,219,.4);font-size:22px;color:#fff;align-items:center;justify-content:center;">☰</button>
 <div id="loadOv">
   <div class="spin"></div>
-  <div style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--text2);">Loading employees…</div>
+  <div id="loadOvText" style="font-family:'Space Grotesk',sans-serif;font-size:15px;font-weight:700;color:var(--text2);text-align:center;max-width:80vw;">Loading employees…</div>
+</div>
+<div id="load-error" style="display:none;position:fixed;bottom:18px;left:50%;transform:translateX(-50%);z-index:10000;max-width:min(760px,92vw);background:#fff5f5;border:1.5px solid #ffa8a8;color:#c92a2a;border-radius:12px;padding:12px 16px;box-shadow:0 8px 30px rgba(0,0,0,.15);font-size:12.5px;font-weight:600;line-height:1.5;">
+  <div id="load-error-msg"></div>
+  <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
+    <button class="btn btn-primary" style="font-size:12px;" onclick="loadData(true)">Retry</button>
+    <a class="btn btn-ghost" style="font-size:12px;text-decoration:none;" id="load-error-test" target="_blank" rel="noopener">Test backend ↗</a>
+    <button class="btn btn-ghost" style="font-size:12px;" onclick="document.getElementById('load-error').style.display='none'">Dismiss</button>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
@@ -473,7 +498,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     </div>
     <div class="pg-actions">
       <button class="btn btn-ghost" onclick="navigate('export')"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Export</button>
-      <button class="btn btn-primary" onclick="loadData()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
+      <button class="btn btn-primary" onclick="loadData(true)"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>Refresh</button>
     </div>
   </div>
 
@@ -493,6 +518,15 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     </div>
   </div>
 
+  <!-- Today's Birthdays & Work Anniversaries -->
+  <div class="bd-card" id="bd-card" style="display:none;">
+    <div class="bd-top"><div class="sec-title" style="margin:0;"><span class="sec-dot" style="background:var(--accent3);"></span>Today's Celebrations <span id="bd-date" style="color:var(--muted);font-weight:600;margin-left:6px;font-size:12px;"></span></div></div>
+    <div class="bd-cols">
+      <div id="bd-sec-bday"><div class="bd-h">🎂 Birthdays <span class="badge b-amber" id="bd-cnt-bday">0</span></div><div id="bd-list-bday" class="bd-list"></div></div>
+      <div id="bd-sec-anniv"><div class="bd-h">🏆 Work Anniversaries <span class="badge b-amber" id="bd-cnt-anniv">0</span></div><div id="bd-list-anniv" class="bd-list"></div></div>
+    </div>
+  </div>
+
   <!-- KPI Row (no resigned) -->
   <div class="kpi-wrap" id="kpi-wrap"></div>
 
@@ -509,7 +543,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   </div>
 
   <!-- Row 3: Gender + Experience snapshot -->
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
     <div class="card">
       <div class="sec-title"><span class="sec-dot" style="background:var(--accent2);"></span>Gender Split</div>
       <div id="dash-gender"></div>
@@ -517,10 +551,6 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div class="card">
       <div class="sec-title"><span class="sec-dot" style="background:var(--accent3);"></span>Experience Bands</div>
       <div id="dash-exp"></div>
-    </div>
-    <div class="card">
-      <div class="sec-title"><span class="sec-dot" style="background:var(--accent4);"></span>Attrition Snapshot</div>
-      <div id="dash-attrition"></div>
     </div>
   </div>
 
@@ -599,7 +629,6 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
             <th onclick="sortTable('sales','Emp Id',false)">Emp ID<span class="sort-icon"></span></th>
             <th onclick="sortTable('sales','Emp Name',false)">Name<span class="sort-icon"></span></th>
             <th onclick="sortTable('sales','Short Designation',false)">Designation<span class="sort-icon"></span></th>
-            <th onclick="sortTable('sales','Division',false)">Division<span class="sort-icon"></span></th>
             <th onclick="sortTable('sales','HQ',false)">HQ<span class="sort-icon"></span></th>
             <th onclick="sortTable('sales','Date of Joining',false)">Date of Joining<span class="sort-icon"></span></th>
             <th onclick="sortTable('sales','Team Wise',false)">Team<span class="sort-icon"></span></th>
@@ -1160,15 +1189,7 @@ if(page==='addrprint')    renderAddrPrint();
 // ──────────────────────────────────────────────
 // LOAD
 // ──────────────────────────────────────────────
-async function loadData(){
-  showLoading(true);
-  try{
-    if(DEMO_MODE){allEmployees=generateDemoData();}
-    else{
-      const data=await fetchGAS();
-      if(!data.success) throw new Error(data.error||'Failed');
-      allEmployees=data.employees;
-    }
+function applyData(){
     empIdMap={};
     allEmployees.forEach(e=>{empIdMap[String(e['Emp Id']).trim()]=e;});
     regionCache={};
@@ -1205,21 +1226,100 @@ const celebCount=[...activeEmps].filter(e=>{
 }).length;
 document.getElementById('nav-celeb-count').textContent=celebCount||'';
     document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString();
-    showToast('Loaded '+allEmployees.length+' employees','success');
-  }catch(e){showToast('Error: '+e.message,'error');console.error(e);}
+}
+
+function showLoadError(msg){
+  const bar=document.getElementById('load-error'); if(!bar) return;
+  document.getElementById('load-error-msg').textContent=msg;
+  document.getElementById('load-error-test').href=GAS_URL+'?action=getAllEmployees&refresh=1';
+  bar.style.display='block';
+}
+
+async function loadData(force){
+  const isForce=force===true;
+  const boot=!window._mpBooted; window._mpBooted=true;
+  let paintedFromCache=false, usedCache=0;
+  const bar=document.getElementById('load-error'); if(bar) bar.style.display='none';
+
+  // 1) Instant first paint from the last saved copy (so the page is never blank while Google wakes up)
+  if(boot&&!isForce&&!DEMO_MODE){
+    try{
+      const c=loadLocalCache();
+      if(c){
+        allEmployees=c.employees; applyData(); paintedFromCache=true;
+        document.getElementById('lastRefresh').textContent='Saved copy '+new Date(c.t).toLocaleTimeString()+' · updating…';
+      }
+    }catch(e){console.error(e);}
+  }
+  if(!paintedFromCache) showLoading(true);
+
+  // elapsed-time indicator
+  const t0=Date.now(), ovT=document.getElementById('loadOvText');
+  const tick=setInterval(()=>{
+    const sec=Math.round((Date.now()-t0)/1000);
+    if(ovT&&!paintedFromCache) ovT.textContent='Loading employees… '+sec+'s'+(sec>8?'\n(Google is waking up — first load after idle can take up to a minute)':'');
+  },1000);
+  if(ovT) ovT.style.whiteSpace='pre-line';
+
+  try{
+    if(DEMO_MODE){allEmployees=generateDemoData(); applyData(); showToast('Loaded '+allEmployees.length+' employees','success');}
+    else{
+      let data=null, fetchErr=null;
+      try{
+        data=await fetchGAS(isForce);
+        if(!data.success) throw new Error(data.error||'Backend returned success=false');
+        if(!Array.isArray(data.employees)||!data.employees.length) throw new Error('Backend returned 0 employees — check SHEET_NAME in Code.gs and that the sheet has data rows.');
+      }catch(err){fetchErr=err;data=null;}
+
+      if(data){
+        allEmployees=data.employees; saveLocalCache(allEmployees); applyData();
+        showToast('Loaded '+allEmployees.length+' employees in '+Math.round((Date.now()-t0)/100)/10+'s','success');
+      }else{
+        const c=loadLocalCache();
+        if(c){
+          if(!paintedFromCache){allEmployees=c.employees; applyData();}
+          usedCache=c.t;
+          document.getElementById('lastRefresh').textContent='Saved copy '+new Date(c.t).toLocaleTimeString()+' (offline)';
+          showLoadError('Live data could not be fetched, showing saved copy from '+new Date(c.t).toLocaleString()+'. Reason: '+fetchErr.message);
+        }else throw fetchErr;
+      }
+    }
+  }catch(e){
+    console.error(e);
+    showLoadError('No data loaded. '+e.message);
+    showToast('Error: '+e.message,'error');
+  }
+  clearInterval(tick);
   showLoading(false);
 }
 
-async function fetchGAS(){
-  const url=GAS_URL+'?action=getAllEmployees&t='+Date.now();
+function saveLocalCache(emps){try{localStorage.setItem('mp_cache_v1',JSON.stringify({t:Date.now(),employees:emps}));}catch(_){}}
+function loadLocalCache(){try{const c=JSON.parse(localStorage.getItem('mp_cache_v1')||'null');return c&&Array.isArray(c.employees)&&c.employees.length?c:null;}catch(_){return null;}}
+function fetchT(url,opts,ms){
+  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms);
+  return fetch(url,Object.assign({signal:ctl.signal},opts)).finally(()=>clearTimeout(t));
+}
+async function fetchGAS(force){
+  const ACTION='getAllEmployees', TMO=30000;
+  const parse=txt=>{try{return JSON.parse(txt);}catch(_){return JSON.parse(txt.replace(/^\)\]\}'\n/,''));}};
+  const qs='?action='+ACTION+(force?'&refresh=1':'');
+  let lastErr='';
+  // Up to 2 GET attempts (first call after idle can be a slow cold start), then POST fallback
+  for(let i=0;i<2;i++){
+    try{
+      const res=await fetchT(GAS_URL+qs+'&t='+Date.now(),{method:'GET',mode:'cors'},TMO);
+      const data=parse(await res.text());
+      if(data&&data.success) return data;
+      lastErr=(data&&data.error)||'GET failed';
+    }catch(e){lastErr=e.name==='AbortError'?'timeout ('+TMO/1000+'s)':(e.message||String(e));}
+  }
   try{
-    const res=await fetch(url,{method:'GET',mode:'cors'});
-    const txt=await res.text();
-    try{return JSON.parse(txt);}catch(_){}
-    return JSON.parse(txt.replace(/^\)\]\}'\n/,''));
-  }catch(e){
-    const res2=await fetch(GAS_URL,{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'action=getAllEmployees'});
-    return await res2.json();
+    const res2=await fetchT(GAS_URL+qs,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ACTION,refresh:!!force})},TMO);
+    const data2=parse(await res2.text());
+    if(data2&&data2.success) return data2;
+    throw new Error((data2&&data2.error)||'POST failed');
+  }catch(e2){
+    throw new Error('Could not load data. GET: '+lastErr+' | POST: '+(e2.name==='AbortError'?'timeout':(e2.message||e2)));
   }
 }
 
@@ -1453,7 +1553,59 @@ function applySortAndRender(table){
 // ──────────────────────────────────────────────
 // DASHBOARD
 // ──────────────────────────────────────────────
+
+// ──────────────────────────────────────────────
+// BIRTHDAYS & WORK ANNIVERSARIES (dashboard)
+// ──────────────────────────────────────────────
+function bdCompute(mode){
+  const t=new Date(TODAY); t.setHours(0,0,0,0);
+  const out=[];
+  activeEmps.forEach(e=>{
+    const d=parseDateStr(mode==='bday'?getDOB(e):e['Date of Joining']);
+    if(!d||isNaN(d)) return;
+    const next=new Date(t.getFullYear(),d.getMonth(),d.getDate());
+    if(next<t) next.setFullYear(t.getFullYear()+1);
+    const diff=Math.round((next-t)/86400000);
+    const yrs=next.getFullYear()-d.getFullYear();
+    if(mode==='anniv'&&yrs<1) return;
+    out.push({e,diff,next,yrs});
+  });
+  return out.sort((a,b)=>a.diff-b.diff||(a.e['Emp Name']||'').localeCompare(b.e['Emp Name']||''));
+}
+function bdRender(){
+  const dt=document.getElementById('bd-date');
+  if(dt) dt.textContent=new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long'});
+  let total=0;
+  ['bday','anniv'].forEach(mode=>{
+    const box=document.getElementById('bd-list-'+mode); if(!box) return;
+    const rows=bdCompute(mode).filter(x=>x.diff===0);
+    total+=rows.length;
+    document.getElementById('bd-cnt-'+mode).textContent=rows.length;
+    document.getElementById('bd-sec-'+mode).style.display=rows.length?'':'none';
+    if(!rows.length){box.innerHTML='';return;}
+    box.innerHTML=rows.map(({e,yrs})=>{
+      const sub=(isSales(e)?e['Short Designation']:e['Designation'])||'';
+      const right=mode==='anniv'?`<b>${yrs} yr${yrs>1?'s':''}</b>service`:`<b>🎂</b>Today`;
+      return `<div class="bd-item today" onclick='openModal(${safeJson(e)})'>
+        ${buildAvatar(e,'32px','12px')}
+        <div style="min-width:0;">
+          <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e['Emp Name']||'—'}</div>
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${sub}${e['HQ']?' · '+e['HQ']:''}</div>
+        </div>
+        <div class="bd-when">${right}</div>
+      </div>`;
+    }).join('');
+  });
+  const card=document.getElementById('bd-card');
+  if(card){
+    card.style.display=total?'':'none';
+    const both=bdCompute('bday').some(x=>x.diff===0)&&bdCompute('anniv').some(x=>x.diff===0);
+    const cols=card.querySelector('.bd-cols'); if(cols) cols.style.gridTemplateColumns=both?'':'1fr';
+  }
+}
+
 function renderDashboard(){
+  bdRender();
   const total=allEmployees.length,active=activeEmps.length;
   const newJ=getNewJoiners(10);
   document.getElementById('dash-date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
@@ -1526,21 +1678,6 @@ function renderDashboard(){
         </div>`).join('')}
       </div>
     </div>`;
-
-  // Attrition snapshot
-  const res=resignedEmps.length;
-  const thisYear=new Date().getFullYear();
-  const resThisYear=resignedEmps.filter(e=>extractYear(e['Date Of Resignation'])===String(thisYear)).length;
-  const resLastYear=resignedEmps.filter(e=>extractYear(e['Date Of Resignation'])===String(thisYear-1)).length;
-  const attrRate=total?((res/total)*100).toFixed(1):0;
-  document.getElementById('dash-attrition').innerHTML=`
-    <div class="qstat-row">
-      <div class="qstat"><div class="qstat-val" style="color:var(--accent4);">${res}</div><div class="qstat-lbl">Total Resigned</div></div>
-      <div class="qstat"><div class="qstat-val" style="color:var(--accent3);">${attrRate}%</div><div class="qstat-lbl">Attrition Rate</div></div>
-      <div class="qstat"><div class="qstat-val" style="color:var(--accent4);">${resThisYear}</div><div class="qstat-lbl">${thisYear} Exits</div></div>
-      <div class="qstat"><div class="qstat-val" style="color:var(--muted);">${resLastYear}</div><div class="qstat-lbl">${thisYear-1} Exits</div></div>
-    </div>
-    <div style="margin-top:12px;"><button class="btn btn-ghost" style="width:100%;justify-content:center;font-size:12px;" onclick="navigate('resigned')">View Resigned →</button></div>`;
 
   // Top 5 HQs
   const hqMap=groupBy(activeEmps,'HQ');
@@ -1716,7 +1853,6 @@ function renderSalesTable(data){
       <td class="mono" style="color:var(--sales);font-size:12px;">${e['Emp Id']}</td>
       <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
       <td><span class="badge b-sky">${e['Short Designation']||e['Designation']||'—'}</span></td>
-      <td>${fmtDivs(e)}</td>
       <td>${e['HQ']||'—'}</td>
       <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
       <td>${e['Team Wise']||'—'}</td>
