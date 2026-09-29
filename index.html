@@ -1257,7 +1257,7 @@ async function loadData(force){
   const t0=Date.now(), ovT=document.getElementById('loadOvText');
   const tick=setInterval(()=>{
     const sec=Math.round((Date.now()-t0)/1000);
-    if(ovT&&!paintedFromCache) ovT.textContent='Loading employees… '+sec+'s'+(sec>8?'\n(Server is waking up — first load after idle can take up to a minute)':'');
+    if(ovT&&!paintedFromCache) ovT.textContent='Loading employees… '+sec+'s'+(sec>8?'\n(Google is waking up — first load after idle can take up to a minute)':'');
   },1000);
   if(ovT) ovT.style.whiteSpace='pre-line';
 
@@ -1273,7 +1273,10 @@ async function loadData(force){
 
       if(data){
         allEmployees=data.employees; saveLocalCache(allEmployees); applyData();
-        showToast('Loaded '+allEmployees.length+' employees in '+Math.round((Date.now()-t0)/100)/10+'s','success');
+        if(data.source==='sheet'){
+          document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString()+' · direct from Sheet';
+          showToast('Backend unavailable — loaded '+allEmployees.length+' employees directly from Server','success');
+        }else showToast('Loaded '+allEmployees.length+' employees in '+Math.round((Date.now()-t0)/100)/10+'s','success');
       }else{
         const c=loadLocalCache();
         if(c){
@@ -1299,27 +1302,99 @@ function fetchT(url,opts,ms){
   const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms);
   return fetch(url,Object.assign({signal:ctl.signal},opts)).finally(()=>clearTimeout(t));
 }
+// ── Direct Google Sheet fallback (used only when the Apps Script backend fails) ──
+// Requires the sheet to be shared as: General access → "Anyone with the link" → Viewer
+const SHEET_FALLBACK={id:'1xC_TtvoGVLSSarPhGdHAR5hFKsV4U61k_PMS5TVm56w',gid:'1713960785'};
+
+function parseCSV(text){
+  if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
+  const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=c;
+    }else{
+      if(c==='"') q=true;
+      else if(c===','){row.push(cur);cur='';}
+      else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n')i++; row.push(cur);cur=''; rows.push(row);row=[]; }
+      else cur+=c;
+    }
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row);}
+  return rows;
+}
+const _MON={jan:1,feb:2,mar:3,apr:4,may:5,jun:6,jul:7,aug:8,sep:9,oct:10,nov:11,dec:12};
+function normDate(v){
+  v=String(v||'').trim(); if(!v) return '';
+  v=v.replace(/[ T]\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM)?$/i,'').trim();          // drop time part
+  const p2=n=>String(n).padStart(2,'0'); let m;
+  if((m=v.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/))) return p2(m[3])+'-'+p2(m[2])+'-'+m[1];      // yyyy-mm-dd
+  if((m=v.match(/^(\d{1,2})[-\/ ]([A-Za-z]{3,9})[-\/ ,]+(\d{2,4})$/))){                                  // 15-Mar-2020
+    const mo=_MON[m[2].slice(0,3).toLowerCase()]; if(mo){let y=+m[3]; if(y<100)y+=2000; return p2(m[1])+'-'+p2(mo)+'-'+y;}
+  }
+  if((m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})$/))){                                         // dd/mm/yyyy (India)
+    let y=+m[3]; if(y<100)y+=2000; return p2(m[1])+'-'+p2(m[2])+'-'+y;
+  }
+  return v;
+}
+function csvToEmployees(text){
+  if(/^\s*<(!doctype|html)/i.test(text)) throw new Error('Sheet is not publicly viewable (got a login page)');
+  const rows=parseCSV(text);
+  if(rows.length<2) throw new Error('Sheet returned no rows');
+  const headers=rows[0].map(h=>String(h).trim());
+  const dateCols=new Set(headers.map((h,i)=>/date|dob/i.test(h)?i:-1).filter(i=>i>=0));
+  const out=[];
+  for(let r=1;r<rows.length;r++){
+    const row=rows[r]; if(!row.some(c=>String(c).trim()!=='')) continue;
+    const e={};
+    headers.forEach((h,i)=>{ if(!h) return; let v=(row[i]===undefined?'':String(row[i])).trim(); if(dateCols.has(i)) v=normDate(v); e[h]=v; });
+    out.push(e);
+  }
+  return out;
+}
+async function fetchSheetDirect(){
+  const {id,gid}=SHEET_FALLBACK;
+  const urls=[
+    `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`,
+    `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&gid=${gid}`
+  ];
+  let err='';
+  for(const u of urls){
+    try{
+      const res=await fetchT(u+(u.includes('?')?'&':'?')+'t='+Date.now(),{method:'GET',cache:'no-store'},20000);
+      if(!res.ok) throw new Error('HTTP '+res.status);
+      const emps=csvToEmployees(await res.text());
+      if(emps.length) return {success:true,employees:emps,source:'sheet'};
+      err='no data rows';
+    }catch(e){err=e.name==='AbortError'?'timeout':(e.message||String(e));}
+  }
+  throw new Error(err);
+}
+
 async function fetchGAS(force){
-  const ACTION='getAllEmployees', TMO=30000;
+  const ACTION='getAllEmployees', TMO=25000;
   const parse=txt=>{try{return JSON.parse(txt);}catch(_){return JSON.parse(txt.replace(/^\)\]\}'\n/,''));}};
   const qs='?action='+ACTION+(force?'&refresh=1':'');
-  let lastErr='';
-  // Up to 2 GET attempts (first call after idle can be a slow cold start), then POST fallback
-  for(let i=0;i<2;i++){
-    try{
-      const res=await fetchT(GAS_URL+qs+'&t='+Date.now(),{method:'GET',mode:'cors'},TMO);
-      const data=parse(await res.text());
-      if(data&&data.success) return data;
-      lastErr=(data&&data.error)||'GET failed';
-    }catch(e){lastErr=e.name==='AbortError'?'timeout ('+TMO/1000+'s)':(e.message||String(e));}
-  }
+  let gasErr='';
+  // 1) Apps Script backend (GET)
+  try{
+    const res=await fetchT(GAS_URL+qs+'&t='+Date.now(),{method:'GET',mode:'cors'},TMO);
+    const data=parse(await res.text());
+    if(data&&data.success) return data;
+    gasErr=(data&&data.error)||'GET failed';
+  }catch(e){gasErr=e.name==='AbortError'?'timeout ('+TMO/1000+'s)':(e.message||String(e));}
+  // 2) Direct read of the Google Sheet
+  let sheetErr='';
+  try{ return await fetchSheetDirect(); }catch(e){sheetErr=e.message||String(e);}
+  // 3) Last resort: backend POST
   try{
     const res2=await fetchT(GAS_URL+qs,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ACTION,refresh:!!force})},TMO);
     const data2=parse(await res2.text());
     if(data2&&data2.success) return data2;
     throw new Error((data2&&data2.error)||'POST failed');
   }catch(e2){
-    throw new Error('Could not load data. GET: '+lastErr+' | POST: '+(e2.name==='AbortError'?'timeout':(e2.message||e2)));
+    throw new Error('Backend: '+gasErr+' | Direct sheet: '+sheetErr+' (share the sheet as "Anyone with the link – Viewer")');
   }
 }
 
