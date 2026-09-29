@@ -307,6 +307,24 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 .kpi-bar-fill,.pbar-fill{width:0;}
 
 .apzoom .aplp{zoom:.5;margin:0 auto 10px;box-shadow:0 2px 8px rgba(0,0,0,.25);}
+
+/* MULTISELECT CHECKBOX DROPDOWN */
+.ms-wrap{position:relative;display:inline-block;}
+.ms-btn{display:flex;align-items:center;gap:8px;justify-content:space-between;min-width:160px;cursor:pointer;text-align:left;white-space:nowrap;}
+.ms-btn .ms-arrow{font-size:9px;color:var(--muted);}
+.ms-btn.has-sel{border-color:var(--accent);background:rgba(59,91,219,.06);font-weight:700;}
+.ms-panel{display:none;position:absolute;top:calc(100% + 4px);left:0;min-width:240px;max-width:340px;background:var(--card);border:1.5px solid var(--border2);border-radius:var(--radius-sm);box-shadow:var(--sh3);z-index:9999;padding:8px;}
+.ms-panel.open{display:block;}
+.ms-search{width:100%;margin-bottom:6px;}
+.ms-actions{display:flex;justify-content:space-between;gap:6px;margin-bottom:6px;font-size:11.5px;font-weight:700;}
+.ms-actions a{color:var(--accent);cursor:pointer;}
+.ms-list{max-height:260px;overflow-y:auto;}
+.ms-item{display:flex;align-items:center;gap:8px;padding:6px 6px;border-radius:6px;cursor:pointer;font-size:12.5px;font-weight:600;}
+.ms-item:hover{background:var(--card2);}
+.ms-item input{accent-color:var(--accent);width:15px;height:15px;cursor:pointer;flex-shrink:0;}
+.ms-item span.ms-cnt{margin-left:auto;color:var(--muted);font-size:11px;}
+@media(max-width:768px){.ms-wrap{width:100%;}.ms-btn{width:100%;}.ms-panel{max-width:100%;width:100%;}}
+
 /* ADDRESS PRINT */
 .addr-print-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--sh1);}
 .addr-staff-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;border:1.5px solid var(--border);margin-bottom:6px;cursor:pointer;transition:all .15s;background:var(--card);}
@@ -881,11 +899,14 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
     <div><div class="pg-title">🖨️ Address Print</div><div class="pg-sub">Print staff addresses on envelopes or A4 labels</div></div>
     <div class="pg-actions">
       <input class="inp" id="ap-search" placeholder="🔍 Search staff…" oninput="apFilter()" style="width:200px;"/>
-      <select class="inp" id="ap-type" onchange="apFilter()">
+      <select class="inp" id="ap-type" onchange="apTypeChange()">
         <option value="active">Active Employees</option>
         <option value="sales">Sales Only</option>
         <option value="ho">Head Office Only</option>
       </select>
+      <div class="ms-wrap" id="ms-wrap-desig"></div>
+      <div class="ms-wrap" id="ms-wrap-team"></div>
+      <div class="ms-wrap" id="ms-wrap-div"></div>
     </div>
   </div>
 
@@ -1220,6 +1241,15 @@ function daysSince(ds){const d=parseDateStr(ds);if(!d)return null;d.setHours(0,0
 function extractYear(s){if(!s)return null;const p=String(s).split(/[-\/]/);if(p[0].length===4)return p[0];if(p[2]&&p[2].length===4)return p[2];return null;}
 function calcTenure(doj,dor){const a=parseDateStr(doj),b=parseDateStr(dor);if(!a||!b)return '—';const m=Math.round((b-a)/2592000000);return m<12?m+'m':Math.floor(m/12)+'y '+(m%12)+'m';}
 function groupBy(arr,key){return arr.reduce((acc,e)=>{const k=e[key]||'Unknown';if(!acc[k])acc[k]=[];acc[k].push(e);return acc;},{});}
+// ── Multi-division support: "Div 1 || Div 2 || Div 3" ──
+function splitDivs(e){
+  const v=(e&&e['Division'])||'';
+  return String(v).split('||').map(x=>x.trim()).filter(Boolean);
+}
+function hasDiv(e,d){return splitDivs(e).includes(d);}
+function allDivs(arr){const set=new Set();arr.forEach(e=>splitDivs(e).forEach(d=>set.add(d)));return [...set].sort();}
+function groupByDiv(arr){const o={};arr.forEach(e=>{const ds=splitDivs(e);(ds.length?ds:['Unknown']).forEach(d=>{(o[d]=o[d]||[]).push(e);});});return o;}
+function fmtDivs(e){const ds=splitDivs(e);return ds.length?ds.map(d=>`<span class="badge b-purple" style="margin:1px 2px 1px 0;">${d}</span>`).join(''):'—';}
 function hashStr(s){let h=0;for(let c of s||'')h=(h*31+c.charCodeAt(0))|0;return h;}
 function buildAvatar(e,size='28px',fs='11px'){
   const init=(e['Emp Name']||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
@@ -1453,7 +1483,7 @@ function renderDashboard(){
   // Charts
   renderBarChart('dash-sales-chart',groupBy(salesEmps,'Short Designation'),10,true,'#1098ad');
   renderBarChart('dash-ho-chart',groupBy(hoEmps,'Department'),10,true,'#5f3dc4');
-  renderBarChart('div-chart',groupBy(salesEmps,'Division'),8,false,null);
+  renderBarChart('div-chart',groupByDiv(salesEmps),8,false,null);
   renderBarChart('hq-chart',groupBy(activeEmps,'HQ'),10,false,null);
 
   // Gender split
@@ -1622,7 +1652,7 @@ function renderNewJoiners(){
           <td>${isSales(e)?'<span class="badge b-sky">Sales</span>':'<span class="badge b-indigo">HO</span>'}</td>
           <td><span class="badge b-gray">${(isSales(e)?e['Short Designation']:e['Designation'])||'—'}</span></td>
           <td>${e['Department']||'—'}</td>
-          <td>${e['Division']||'—'}</td>
+          <td>${fmtDivs(e)}</td>
           <td>${e['HQ']||'—'}</td>
           <td style="font-size:12px;">${e['Date of Joining']||'—'}</td>
           <td>${ds===0?'<span class="badge b-new">🎉 Today</span>':ds===1?'Yesterday':ds+'d ago'}</td>
@@ -1654,7 +1684,7 @@ function renderSalesDesigKPIs(){
   const curTeam=document.getElementById('sales-team-filter').value;
   const curGender=document.getElementById('sales-gender-filter').value;
   populateSelect('sales-desig-filter',Object.keys(dm).sort());
-  populateSelect('sales-div-filter',[...new Set(salesEmps.map(e=>e['Division']).filter(Boolean))].sort());
+  populateSelect('sales-div-filter',allDivs(salesEmps));
   populateSelect('sales-hq-filter',[...new Set(salesEmps.map(e=>e['HQ']).filter(Boolean))].sort());
   populateSelect('sales-team-filter',[...new Set(salesEmps.map(e=>e['Team Wise']).filter(Boolean))].sort());
   populateSelect('sales-gender-filter',[...new Set(salesEmps.map(e=>e['Gender']).filter(Boolean))].sort());
@@ -1686,7 +1716,7 @@ function renderSalesTable(data){
       <td class="mono" style="color:var(--sales);font-size:12px;">${e['Emp Id']}</td>
       <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
       <td><span class="badge b-sky">${e['Short Designation']||e['Designation']||'—'}</span></td>
-      <td>${e['Division']||'—'}</td>
+      <td>${fmtDivs(e)}</td>
       <td>${e['HQ']||'—'}</td>
       <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
       <td>${e['Team Wise']||'—'}</td>
@@ -1714,7 +1744,7 @@ function filterSalesTable(){
   salesFiltered=salesEmps.filter(e=>
     (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
     (!desig||e['Short Designation']===desig)&&
-    (!div||e['Division']===div)&&
+    (!div||hasDiv(e,div))&&
     (!hq||e['HQ']===hq)&&
     (!gender||e['Gender']===gender)&&
     (!team||e['Team Wise']===team));
@@ -1846,7 +1876,7 @@ function renderResignedTable(data){
     <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
     <td><span class="badge b-amber">${e['Short Designation']||e['Designation']||'—'}</span></td>
     <td>${e['Department']||'—'}</td>
-    <td>${e['Division']||'—'}</td>
+    <td>${fmtDivs(e)}</td>
     <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
     <td style="color:var(--accent4);font-size:12px;font-weight:600;">${e['Date Of Resignation']||'—'}</td>
     <td><span class="badge b-red">${calcTenure(e['Date of Joining'],e['Date Of Resignation'])}</span></td>
@@ -2014,7 +2044,7 @@ function renderHierarchy(containerId, emps, desigField, context){
     const init=(emp['Emp Name']||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
     const isSalesEmp=isSales(emp);
     const hq=emp['HQ']||'';
-    const div=emp['Division']&&emp['Division']!=='HO'?emp['Division']:'';
+    const div=splitDivs(emp).filter(d=>d!=='HO').join(' | ');
     const doj=emp['Date of Joining']||'';
     const totalSubs=countAllChildren(empId);
     const openKey=containerId+'_'+empId;
@@ -2263,7 +2293,7 @@ function renderDeptReport(){
 }
 
 function renderDivReport(){
-  const divs=groupBy(salesEmps,'Division');
+  const divs=groupByDiv(salesEmps);
   const sorted=Object.entries(divs).sort((a,b)=>b[1].length-a[1].length);
   const max=sorted[0]?.[1].length||1;
   document.getElementById('div-report-grid').innerHTML=
@@ -2403,7 +2433,7 @@ function renderExportPage(){
 // ──────────────────────────────────────────────
 function populateSearchFilters(){
   populateSelect('s-dept',[...new Set(allEmployees.map(e=>e['Department']).filter(Boolean))].sort());
-  populateSelect('s-div',[...new Set(allEmployees.map(e=>e['Division']).filter(Boolean))].sort());
+  populateSelect('s-div',allDivs(allEmployees));
   populateSelect('s-hq',[...new Set(allEmployees.map(e=>e['HQ']).filter(Boolean))].sort());
   // Combine sales short desig + HO desig
   const desigs=[...new Set([
@@ -2425,7 +2455,7 @@ function runGlobalSearch(){
   _searchResultData=allEmployees.filter(e=>
     (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
     (!dept||e['Department']===dept)&&
-    (!div||e['Division']===div)&&
+    (!div||hasDiv(e,div))&&
     (!hq||e['HQ']===hq)&&
     (!desig||(isSales(e)?e['Short Designation']:e['Designation'])===desig)&&
     (!status||(status==='active'?isActive(e):!isActive(e)))&&
@@ -2446,7 +2476,7 @@ function renderSearchTable(){
       <td><span class="badge ${act?'b-green':'b-red'}">${act?'Active':'Resigned'}</span></td>
       <td><span class="badge b-gray">${(sal?e['Short Designation']:e['Designation'])||'—'}</span></td>
       <td>${e['Department']||'—'}</td>
-      <td>${e['Division']||'—'}</td>
+      <td>${fmtDivs(e)}</td>
       <td>${e['HQ']||'—'}</td>
       <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
     </tr>`;
@@ -2536,7 +2566,7 @@ function openModal(emp){
     `${sal?'<span class="badge b-sky">📈 Sales</span>':'<span class="badge b-indigo">🏢 Head Office</span>'}
      ${act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red">👋 Resigned '+emp['Date Of Resignation']+'</span>'}
      ${emp['HQ']?`<span class="badge b-gray">📍 ${emp['HQ']}</span>`:''}
-     ${emp['Division']?`<span class="badge b-purple">🗂 ${emp['Division']}</span>`:''}
+     ${splitDivs(emp).map(d=>`<span class="badge b-purple">🗂 ${d}</span>`).join('')}
      <button class="btn btn-primary" style="margin-left:auto;gap:5px;" onclick='sendMailToStaff(${safeJson(emp)})' title="Send email to this staff with managers in CC">
        <span style="font-size:14px;">✉️</span> Send Mail
      </button>`;
@@ -2565,7 +2595,7 @@ function openModal(emp){
       {l:'Employee ID',v:emp['Emp Id']},
       {l:'Designation',v:emp['Short Designation']||emp['Designation']},
       {l:'Department',v:emp['Department']},
-      {l:'Division',v:emp['Division']},
+      {l:'Division',v:splitDivs(emp).join(' | ')},
       {l:'HQ / Location',v:emp['HQ']},
       {l:'Team',v:emp['Team Wise']},
       {l:'Date of Joining',v:emp['Date of Joining']},
@@ -2666,7 +2696,7 @@ function exportSalesXLSX(){
   const rows=data.map((e,i)=>{
     const mgr=getMgrInfo(e['Reporting Manager ID']);
     return {'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
-      'Designation':e['Short Designation']||e['Designation']||'','Division':e['Division']||'','HQ':e['HQ']||'',
+      'Designation':e['Short Designation']||e['Designation']||'','Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'',
       'Date of Joining':e['Date of Joining']||'','Team':e['Team Wise']||'',
       'Reporting Manager ID':e['Reporting Manager ID']||'','Reporting Manager Name':mgr?mgr.name:'',
       'Phone':e['Current Phone']||''};
@@ -2695,7 +2725,7 @@ function exportResignedXLSX(){
   if(!data.length){showToast('No data','error');return;}
   const rows=data.map((e,i)=>({'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
     'Designation':e['Short Designation']||e['Designation']||'','Department':e['Department']||'',
-    'Division':e['Division']||'','Date of Joining':e['Date of Joining']||'',
+    'Division':splitDivs(e).join(' | '),'Date of Joining':e['Date of Joining']||'',
     'Resignation Date':e['Date Of Resignation']||'','Tenure':calcTenure(e['Date of Joining'],e['Date Of Resignation']),
     'Personal Mail':e['Personal Mail ID']||''}));
   const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
@@ -2716,7 +2746,7 @@ function exportNewXLSX(){
   if(!data.length){showToast('No data','error');return;}
   const rows=data.map((e,i)=>({'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
     'Type':isSales(e)?'Sales':'HO','Designation':(isSales(e)?e['Short Designation']:e['Designation'])||'',
-    'Department':e['Department']||'','Division':e['Division']||'','HQ':e['HQ']||'',
+    'Department':e['Department']||'','Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'',
     'Date of Joining':e['Date of Joining']||'','Days Ago':daysSince(e['Date of Joining'])}));
   const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
   XLSX.utils.book_append_sheet(wb,ws,'New Joiners');downloadXLSX(wb,'New_Joiners_'+today());
@@ -2761,7 +2791,7 @@ function exportLocationXLSX(){
       'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
       'Type':isSales(e)?'Sales':'HO',
       'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
-      'Department':e['Department']||'','Division':e['Division']||'','Team':e['Team Wise']||'',
+      'Department':e['Department']||'','Division':splitDivs(e).join(' | '),'Team':e['Team Wise']||'',
       'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
       'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
     };
@@ -2809,7 +2839,7 @@ function exportDeptReportXLSX(){
       '#':i+1,'Department':e['Department']||'','Type':isSales(e)?'Sales':'HO',
       'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
       'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
-      'Division':e['Division']||'','HQ':e['HQ']||'','Team':e['Team Wise']||'',
+      'Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'','Team':e['Team Wise']||'',
       'Date of Joining':e['Date of Joining']||'','Phone':e['Current Phone']||'',
       'Email':e['Official E-Mail Id']||'',
       'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
@@ -2826,7 +2856,7 @@ function exportDeptReportXLSX(){
         '#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
         'Type':isSales(e)?'Sales':'HO',
         'Designation':isSales(e)?(e['Short Designation']||''):(e['Designation']||''),
-        'Division':e['Division']||'','HQ':e['HQ']||'','Team':e['Team Wise']||'',
+        'Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'','Team':e['Team Wise']||'',
         'Date of Joining':e['Date of Joining']||'','Phone':e['Current Phone']||'',
         'Email':e['Official E-Mail Id']||'',
         'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
@@ -2843,7 +2873,7 @@ function exportDivReportXLSX(){
   const wb=XLSX.utils.book_new();
 
   // Sheet 1: Summary
-  const divs=groupBy(salesEmps,'Division');
+  const divs=groupByDiv(salesEmps);
   const summary=Object.entries(divs).sort((a,b)=>b[1].length-a[1].length).map(([d,emps])=>{
     const byDesig=groupBy(emps,'Short Designation');
     const row={'Division':d,'Total':emps.length};
@@ -2857,7 +2887,7 @@ function exportDivReportXLSX(){
   const breakdown=salesEmps.slice().sort((a,b)=>(a['Division']||'').localeCompare(b['Division']||'')).map((e,i)=>{
     const mgr=getMgrInfo(e['Reporting Manager ID']);
     return {
-      '#':i+1,'Division':e['Division']||'','Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+      '#':i+1,'Division':splitDivs(e).join(' | '),'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
       'Designation':e['Short Designation']||e['Designation']||'',
       'HQ':e['HQ']||'','Team':e['Team Wise']||'','Date of Joining':e['Date of Joining']||'',
       'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
@@ -2907,7 +2937,7 @@ function exportTeamReportXLSX(){
     return {
       '#':i+1,'Team':e['Team Wise']||'','Emp ID':e['Emp Id'],'Name':e['Emp Name'],
       'Designation':e['Short Designation']||e['Designation']||'',
-      'Division':e['Division']||'','HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
+      'Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
       'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
       'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
     };
@@ -2922,7 +2952,7 @@ function exportTeamReportXLSX(){
       return {
         '#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
         'Designation':e['Short Designation']||e['Designation']||'',
-        'Division':e['Division']||'','HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
+        'Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
         'Phone':e['Current Phone']||'','Email':e['Official E-Mail Id']||'',
         'Reporting Manager':mgr?mgr.name:'','Manager ID':mgr?mgr.id:''
       };
@@ -3835,6 +3865,7 @@ let apPool=[];
 
 function renderAddrPrint(){
   apInit();
+  apRefreshFilterOpts();
   apPool=apGetPool();
   apRenderList();
   apUpdateCount();
@@ -3842,17 +3873,75 @@ function renderAddrPrint(){
   else apRenderBulkPreview();
 }
 
-function apGetPool(){
+function apBasePool(){
   const t=document.getElementById('ap-type')?.value||'active';
   if(t==='sales') return [...salesEmps];
   if(t==='ho') return [...hoEmps];
   return [...activeEmps];
 }
+function apDesigOf(e){return (isSales(e)?(e['Short Designation']||e['Designation']):e['Designation'])||'';}
+
+// ── Multiselect checkbox filters ──
+const AP_MS={
+  desig:{label:'Designations',sel:new Set(),opts:[],q:''},
+  team: {label:'Teams',       sel:new Set(),opts:[],q:''},
+  div:  {label:'Divisions',   sel:new Set(),opts:[],q:''}
+};
+function apMsRender(k){
+  const m=AP_MS[k], wrap=document.getElementById('ms-wrap-'+k); if(!wrap) return;
+  const wasOpen=wrap.querySelector('.ms-panel')?.classList.contains('open');
+  const n=m.sel.size;
+  const txt=n===0?'All '+m.label:(n===1?[...m.sel][0]:n+' '+m.label+' selected');
+  const list=m.opts.filter(o=>!m.q||o.toLowerCase().includes(m.q.toLowerCase()));
+  wrap.innerHTML=`
+    <button type="button" class="inp ms-btn ${n?'has-sel':''}" onclick="apMsToggle('${k}',event)"><span style="overflow:hidden;text-overflow:ellipsis;max-width:180px;">${apEsc(txt)}</span><span class="ms-arrow">▼</span></button>
+    <div class="ms-panel ${wasOpen?'open':''}" onclick="event.stopPropagation()">
+      <input class="inp ms-search" placeholder="Search…" value="${apEsc(m.q)}" oninput="apMsSearch('${k}',this.value)"/>
+      <div class="ms-actions"><a onclick="apMsAll('${k}')">Select All</a><a onclick="apMsClear('${k}')">Clear</a></div>
+      <div class="ms-list">${list.map(o=>`<label class="ms-item"><input type="checkbox" ${m.sel.has(o)?'checked':''} onchange="apMsPick('${k}',this.dataset.v,this.checked)" data-v="${apEsc(o)}"/><span>${apEsc(o)}</span></label>`).join('')||'<div style="padding:8px;color:var(--muted);font-size:12px;">No options</div>'}</div>
+    </div>`;
+  if(wasOpen){const si=wrap.querySelector('.ms-search'); if(si&&m.q){si.focus();si.setSelectionRange(si.value.length,si.value.length);}}
+}
+function apMsToggle(k,ev){
+  ev.stopPropagation();
+  document.querySelectorAll('.ms-panel.open').forEach(p=>{if(p.parentElement.id!=='ms-wrap-'+k)p.classList.remove('open');});
+  const p=document.querySelector('#ms-wrap-'+k+' .ms-panel'); p.classList.toggle('open');
+}
+function apMsPick(k,v,on){
+  const m=AP_MS[k]; if(on) m.sel.add(v); else m.sel.delete(v);
+  apMsRender(k); apFilter();
+}
+function apMsAll(k){const m=AP_MS[k];m.opts.forEach(o=>{if(!m.q||o.toLowerCase().includes(m.q.toLowerCase()))m.sel.add(o);});apMsRender(k);apFilter();}
+function apMsClear(k){AP_MS[k].sel.clear();apMsRender(k);apFilter();}
+function apMsSearch(k,v){AP_MS[k].q=v;apMsRender(k);}
+document.addEventListener('click',()=>document.querySelectorAll('.ms-panel.open').forEach(p=>p.classList.remove('open')));
+
+function apRefreshFilterOpts(){
+  const base=apBasePool();
+  AP_MS.desig.opts=[...new Set(base.map(apDesigOf).filter(Boolean))].sort();
+  AP_MS.team.opts =[...new Set(base.map(e=>(e['Team Wise']||'').toString().trim()).filter(Boolean))].sort();
+  AP_MS.div.opts  =allDivs(base);
+  // drop selections no longer available for this staff type
+  Object.keys(AP_MS).forEach(k=>{const m=AP_MS[k];[...m.sel].forEach(v=>{if(!m.opts.includes(v))m.sel.delete(v);});apMsRender(k);});
+}
+
+function apGetPool(){
+  let pool=apBasePool();
+  const q=(document.getElementById('ap-search')?.value||'').toLowerCase();
+  if(q) pool=pool.filter(e=>(e['Emp Name']||'').toLowerCase().includes(q)||(e['Emp Id']||'').toString().includes(q));
+  if(AP_MS.desig.sel.size) pool=pool.filter(e=>AP_MS.desig.sel.has(apDesigOf(e)));
+  if(AP_MS.team.sel.size)  pool=pool.filter(e=>AP_MS.team.sel.has((e['Team Wise']||'').toString().trim()));
+  if(AP_MS.div.sel.size)   pool=pool.filter(e=>splitDivs(e).some(d=>AP_MS.div.sel.has(d)));
+  return pool;
+}
+
+function apTypeChange(){
+  apRefreshFilterOpts();
+  apFilter();
+}
 
 function apFilter(){
   apPool=apGetPool();
-  const q=(document.getElementById('ap-search')?.value||'').toLowerCase();
-  if(q) apPool=apPool.filter(e=>(e['Emp Name']||'').toLowerCase().includes(q)||(e['Emp Id']||'').toString().includes(q));
   apRenderList();
 }
 
@@ -3868,7 +3957,7 @@ function apRenderList(){
         ${buildAvatar(e,'28px','11px')}
         <div style="flex:1;min-width:0;">
           <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e['Emp Name']||'—'}</div>
-          <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}</div>
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}${e['Team Wise']?' · '+e['Team Wise']:''}${splitDivs(e).length?' · '+splitDivs(e).join(' | '):''}</div>
         </div>
         ${!hasAddr?'<span class="badge b-amber" style="font-size:9px;">No address</span>':''}
       </div>`;
@@ -3884,7 +3973,7 @@ function apRenderList(){
         ${buildAvatar(e,'28px','11px')}
         <div style="flex:1;min-width:0;">
           <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e['Emp Name']||'—'}</div>
-          <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}</div>
+          <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}${e['Team Wise']?' · '+e['Team Wise']:''}${splitDivs(e).length?' · '+splitDivs(e).join(' | '):''}</div>
         </div>
         ${!hasAddr?'<span class="badge b-amber" style="font-size:9px;">No address</span>':''}
       </div>`;
