@@ -1257,7 +1257,7 @@ async function loadData(force){
   const t0=Date.now(), ovT=document.getElementById('loadOvText');
   const tick=setInterval(()=>{
     const sec=Math.round((Date.now()-t0)/1000);
-    if(ovT&&!paintedFromCache) ovT.textContent='Loading employees… '+sec+'s'+(sec>8?'\n(Google is waking up — first load after idle can take up to a minute)':'');
+    if(ovT&&!paintedFromCache) ovT.textContent='Loading employees… '+sec+'s'+(sec>8?'\n(Server is waking up — first load after idle can take up to a minute)':'');
   },1000);
   if(ovT) ovT.style.whiteSpace='pre-line';
 
