@@ -402,7 +402,6 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   </div>
 </div>
 
-<div id="gasUrl" data-url="https://script.google.com/macros/s/AKfycbxdOs22qKMLlf-0PCOjb4KHBXW2WtHaWKclaSFW5vRVxfk87d3PltASdbRGcVDi_yabSw/exec" style="display:none"></div>
 <div style="display:flex;min-height:100vh;">
 
 <!-- SIDEBAR -->
@@ -484,7 +483,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <div id="load-error-msg"></div>
   <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
     <button class="btn btn-primary" style="font-size:12px;" onclick="loadData(true)">Retry</button>
-    <a class="btn btn-ghost" style="font-size:12px;text-decoration:none;" id="load-error-test" target="_blank" rel="noopener">Test backend ↗</a>
+    <a class="btn btn-ghost" style="font-size:12px;text-decoration:none;" id="load-error-test" target="_blank" rel="noopener">Open sheet ↗</a>
     <button class="btn btn-ghost" style="font-size:12px;" onclick="document.getElementById('load-error').style.display='none'">Dismiss</button>
   </div>
 </div>
@@ -1085,8 +1084,9 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 <div id="toast"></div>
 
 <script>
-const GAS_URL = document.getElementById('gasUrl').dataset.url;
-const DEMO_MODE = (GAS_URL === 'YOUR_WEB_APP_URL_HERE');
+// Data source: Google Sheet (sheet must be shared: Anyone with the link → Viewer)
+const SHEET_SOURCE={id:'1xC_TtvoGVLSSarPhGdHAR5hFKsV4U61k_PMS5TVm56w',gid:'1713960785'};
+const DEMO_MODE=false;
 const SALES_DEPT = 'Sales';
 
 let allEmployees=[], activeEmps=[], resignedEmps=[];
@@ -1231,7 +1231,7 @@ document.getElementById('nav-celeb-count').textContent=celebCount||'';
 function showLoadError(msg){
   const bar=document.getElementById('load-error'); if(!bar) return;
   document.getElementById('load-error-msg').textContent=msg;
-  document.getElementById('load-error-test').href=GAS_URL+'?action=getAllEmployees&refresh=1';
+  document.getElementById('load-error-test').href='https://docs.google.com/spreadsheets/d/'+SHEET_SOURCE.id+'/edit?gid='+SHEET_SOURCE.gid;
   bar.style.display='block';
 }
 
@@ -1266,17 +1266,14 @@ async function loadData(force){
     else{
       let data=null, fetchErr=null;
       try{
-        data=await fetchGAS(isForce);
-        if(!data.success) throw new Error(data.error||'Backend returned success=false');
-        if(!Array.isArray(data.employees)||!data.employees.length) throw new Error('Backend returned 0 employees — check SHEET_NAME in Code.gs and that the sheet has data rows.');
+        data=await fetchSheetData();
+        if(!data.success) throw new Error(data.error||'Sheet returned no data');
+        if(!Array.isArray(data.employees)||!data.employees.length) throw new Error('Sheet returned 0 employees — check that the tab has a header row and data rows.');
       }catch(err){fetchErr=err;data=null;}
 
       if(data){
         allEmployees=data.employees; saveLocalCache(allEmployees); applyData();
-        if(data.source==='sheet'){
-          document.getElementById('lastRefresh').textContent='Updated '+new Date().toLocaleTimeString()+' · direct from Sheet';
-          showToast('Backend unavailable — loaded '+allEmployees.length+' employees directly from Server','success');
-        }else showToast('Loaded '+allEmployees.length+' employees in '+Math.round((Date.now()-t0)/100)/10+'s','success');
+        showToast('Loaded '+allEmployees.length+' employees from Server in '+Math.round((Date.now()-t0)/100)/10+'s','success');
       }else{
         const c=loadLocalCache();
         if(c){
@@ -1302,9 +1299,7 @@ function fetchT(url,opts,ms){
   const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms);
   return fetch(url,Object.assign({signal:ctl.signal},opts)).finally(()=>clearTimeout(t));
 }
-// ── Direct Google Sheet fallback (used only when the Apps Script backend fails) ──
-// Requires the sheet to be shared as: General access → "Anyone with the link" → Viewer
-const SHEET_FALLBACK={id:'1xC_TtvoGVLSSarPhGdHAR5hFKsV4U61k_PMS5TVm56w',gid:'1713960785'};
+// ── Google Sheet loader (direct CSV read) ──
 
 function parseCSV(text){
   if(text.charCodeAt(0)===0xFEFF) text=text.slice(1);
@@ -1354,7 +1349,7 @@ function csvToEmployees(text){
   return out;
 }
 async function fetchSheetDirect(){
-  const {id,gid}=SHEET_FALLBACK;
+  const {id,gid}=SHEET_SOURCE;
   const urls=[
     `https://docs.google.com/spreadsheets/d/${id}/export?format=csv&gid=${gid}`,
     `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:csv&headers=1&gid=${gid}`
@@ -1372,30 +1367,13 @@ async function fetchSheetDirect(){
   throw new Error(err);
 }
 
-async function fetchGAS(force){
-  const ACTION='getAllEmployees', TMO=25000;
-  const parse=txt=>{try{return JSON.parse(txt);}catch(_){return JSON.parse(txt.replace(/^\)\]\}'\n/,''));}};
-  const qs='?action='+ACTION+(force?'&refresh=1':'');
-  let gasErr='';
-  // 1) Apps Script backend (GET)
-  try{
-    const res=await fetchT(GAS_URL+qs+'&t='+Date.now(),{method:'GET',mode:'cors'},TMO);
-    const data=parse(await res.text());
-    if(data&&data.success) return data;
-    gasErr=(data&&data.error)||'GET failed';
-  }catch(e){gasErr=e.name==='AbortError'?'timeout ('+TMO/1000+'s)':(e.message||String(e));}
-  // 2) Direct read of the Google Sheet
-  let sheetErr='';
-  try{ return await fetchSheetDirect(); }catch(e){sheetErr=e.message||String(e);}
-  // 3) Last resort: backend POST
-  try{
-    const res2=await fetchT(GAS_URL+qs,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({action:ACTION,refresh:!!force})},TMO);
-    const data2=parse(await res2.text());
-    if(data2&&data2.success) return data2;
-    throw new Error((data2&&data2.error)||'POST failed');
-  }catch(e2){
-    throw new Error('Backend: '+gasErr+' | Direct sheet: '+sheetErr+' (share the sheet as "Anyone with the link – Viewer")');
+async function fetchSheetData(){
+  let err1='';
+  for(let attempt=0;attempt<2;attempt++){
+    try{ return await fetchSheetDirect(); }
+    catch(e){ err1=e.message||String(e); if(attempt===0) await new Promise(r=>setTimeout(r,1500)); }
   }
+  throw new Error('Could not read the Server ('+err1+'). Check the internet connection and that the sheet is shared as "Anyone with the link – Viewer".');
 }
 
 // ──────────────────────────────────────────────
