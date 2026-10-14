@@ -441,6 +441,10 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1"/></svg></div>HO Staff
       <span id="nav-ho-count" class="nav-badge b-indigo"></span>
     </div>
+    <div class="nav-item" onclick="navigate('notice')">
+      <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" stroke-linejoin="round" d="M12 7v5l3 2"/></svg></div>Notice Period
+      <span id="nav-notice-count" class="nav-badge b-amber"></span>
+    </div>
     <div class="nav-item" onclick="navigate('resigned')">
       <div class="ni-icon"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg></div>Resigned
       <span id="nav-resigned-count" class="nav-badge b-red"></span>
@@ -702,6 +706,40 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   </div>
 </div>
 
+<!-- NOTICE PERIOD -->
+<div id="page-notice" class="page">
+  <div class="pg-header">
+    <div><div class="pg-title" style="color:var(--accent3);">Notice Period</div><div class="pg-sub" id="notice-subtitle"></div></div>
+    <div class="pg-actions">
+      <input class="inp" id="notice-search" placeholder="🔍 Search…" oninput="filterNoticeTable()" style="width:190px;"/>
+      <select class="inp" id="notice-dept-filter" onchange="filterNoticeTable()"><option value="">All Depts</option></select>
+      <select class="inp" id="notice-type-filter" onchange="filterNoticeTable()"><option value="">Sales &amp; HO</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option></select>
+      <button class="btn btn-ghost" onclick="clearNoticeFilters()">Clear</button>
+      <button class="btn btn-excel" onclick="exportNoticeXLSX()"><svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>Excel</button>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="emp-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th onclick="sortTable('notice','Emp Id',false)">Emp ID<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','Emp Name',false)">Name<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','Short Designation',false)">Designation<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','Department',false)">Department<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','Division',false)">Division<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','HQ',false)">HQ<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','Date of Joining',false)">Date of Joining<span class="sort-icon"></span></th>
+          <th onclick="sortTable('notice','Date Of Resignation',false)" class="sort-asc">Last Working Day<span class="sort-icon"></span></th>
+          <th>Days Left</th>
+        </tr>
+      </thead>
+      <tbody id="notice-tbody"></tbody>
+    </table>
+  </div>
+  <div id="notice-pagination" style="display:flex;justify-content:flex-end;gap:6px;margin-top:12px;align-items:center;"></div>
+</div>
+
 <!-- RESIGNED -->
 <div id="page-resigned" class="page">
   <div class="pg-header">
@@ -799,7 +837,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <select class="inp" id="s-div" onchange="runGlobalSearch()"><option value="">All Divisions</option></select>
       <select class="inp" id="s-hq" onchange="runGlobalSearch()"><option value="">All HQ</option></select>
       <select class="inp" id="s-desig" onchange="runGlobalSearch()"><option value="">All Designations</option></select>
-      <select class="inp" id="s-status" onchange="runGlobalSearch()"><option value="">All Status</option><option value="active">Active</option><option value="resigned">Resigned</option></select>
+      <select class="inp" id="s-status" onchange="runGlobalSearch()"><option value="">All Status</option><option value="active">Active</option><option value="notice">Notice</option><option value="resigned">Resigned</option></select>
       <select class="inp" id="s-type" onchange="runGlobalSearch()"><option value="">Sales & HO</option><option value="sales">Sales Only</option><option value="ho">Head Office Only</option></select>
     </div>
   </div>
@@ -1091,14 +1129,15 @@ const SALES_DEPT = 'Sales';
 
 let allEmployees=[], activeEmps=[], resignedEmps=[];
 let salesEmps=[], hoEmps=[];
-let salesFiltered=[], hoFiltered=[], resignedFiltered=[], searchFiltered=[];
+let salesFiltered=[], hoFiltered=[], resignedFiltered=[], searchFiltered=[], noticeEmps=[], noticeFiltered=[];
+let noticePage=1;
 let salesPage=1, hoPage=1, resignedPage=1, searchPage=1;
 const PAGE_SIZE=50;
 const TODAY=new Date(); TODAY.setHours(0,0,0,0);
 const COLORS=['#3b5bdb','#0ca678','#f59f00','#e03131','#7048e8','#1098ad','#5f3dc4','#e64980','#2f9e44','#0077b6'];
 const AV_CLS=['av-0','av-1','av-2','av-3','av-4','av-5','av-6','av-7'];
 
-let sortState={sales:{col:'',dir:'asc'},ho:{col:'',dir:'asc'},resigned:{col:'Date Of Resignation',dir:'desc'}};
+let sortState={sales:{col:'',dir:'asc'},ho:{col:'',dir:'asc'},resigned:{col:'Date Of Resignation',dir:'desc'},notice:{col:'Date Of Resignation',dir:'asc'}};
 
 // Active chip filters — track separately from dropdown so they stay in sync
 let salesDesigFilter='';
@@ -1184,6 +1223,7 @@ if(page==='addrprint')    renderAddrPrint();
   if(page==='sales')      {renderSalesTable();renderSalesDesigKPIs();}
   if(page==='headoffice') {renderHOTable();renderHODeptKPIs();}
   if(page==='resigned')   renderResignedTable();
+  if(page==='notice')     renderNoticeTable();
 }
 
 // ──────────────────────────────────────────────
@@ -1196,6 +1236,8 @@ function applyData(){
 
     activeEmps   = allEmployees.filter(isActive);
     resignedEmps = allEmployees.filter(e=>!isActive(e));
+    noticeEmps   = activeEmps.filter(isNotice);
+    noticeFiltered = [...noticeEmps].sort((a,b)=>parseDateStr(a['Date Of Resignation'])-parseDateStr(b['Date Of Resignation']));
     salesEmps    = activeEmps.filter(isSales);
     hoEmps       = activeEmps.filter(e=>!isSales(e));
     salesFiltered=[...salesEmps]; hoFiltered=[...hoEmps];
@@ -1206,6 +1248,7 @@ function applyData(){
     renderSalesTable(); renderSalesDesigKPIs();
     renderHOTable();    renderHODeptKPIs();
     renderResignedTable();
+    renderNoticeTable();
     populateFilters(); populateSearchFilters();
     populateSelect('contacts-team',[...new Set(allEmployees.map(e=>e['Team Wise']).filter(Boolean))].sort());
 
@@ -1215,6 +1258,7 @@ populateSelect('contacts-desig',[...new Set(allEmployees.map(e=>e['Short Designa
     document.getElementById('nav-sales-count').textContent=salesEmps.length;
     document.getElementById('nav-ho-count').textContent=hoEmps.length;
     document.getElementById('nav-resigned-count').textContent=resignedEmps.length;
+    document.getElementById('nav-notice-count').textContent=noticeEmps.length;
     document.getElementById('nav-new-count').textContent=nc;
     // Celebrations badge (7 day window)
 const celebCount=[...activeEmps].filter(e=>{
@@ -1380,7 +1424,20 @@ async function fetchSheetData(){
 // HELPERS
 // ──────────────────────────────────────────────
 const isSales=e=>(e['Department']||'').toLowerCase().trim()===SALES_DEPT.toLowerCase();
-const isActive=e=>!e['Date Of Resignation']||e['Date Of Resignation'].toString().trim()==='';
+const hasResignDate=e=>!!(e['Date Of Resignation']&&e['Date Of Resignation'].toString().trim()!=='');
+// Notice = resignation date is in the future (greater than today) → still counted as Active
+const isNotice=e=>{
+  if(!hasResignDate(e)) return false;
+  const d=parseDateStr(e['Date Of Resignation']);
+  return !!d && d>TODAY;
+};
+const isActive=e=>!hasResignDate(e)||isNotice(e);
+function noticeTag(e){
+  if(!isNotice(e)) return '';
+  const d=daysLeft(e);
+  return ` <span class="badge b-amber" style="margin-left:6px;" title="Last day: ${e['Date Of Resignation']}">⏳ Notice${d!==null?' · '+d+'d':''}</span>`;
+}
+function daysLeft(e){const d=parseDateStr(e['Date Of Resignation']);if(!d)return null;d.setHours(0,0,0,0);return Math.ceil((d-TODAY)/86400000);}
 
 function parseDateStr(s){
   if(!s) return null;
@@ -1601,6 +1658,7 @@ function applySortAndRender(table){
   if(table==='sales'){salesFiltered.sort(cmp);salesPage=1;renderSalesTable();}
   else if(table==='ho'){hoFiltered.sort(cmp);hoPage=1;renderHOTable();}
   else if(table==='resigned'){resignedFiltered.sort(cmp);resignedPage=1;renderResignedTable();}
+  else if(table==='notice'){noticeFiltered.sort(cmp);noticePage=1;renderNoticeTable();}
 }
 
 // ──────────────────────────────────────────────
@@ -1904,7 +1962,7 @@ function renderSalesTable(data){
     return `<tr onclick='openModal(${safeJson(e)})'>
       <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
       <td class="mono" style="color:var(--sales);font-size:12px;">${e['Emp Id']}</td>
-      <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+      <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span>${noticeTag(e)}</td>
       <td><span class="badge b-sky">${e['Short Designation']||e['Designation']||'—'}</span></td>
       <td>${e['HQ']||'—'}</td>
       <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
@@ -1996,7 +2054,7 @@ function renderHOTable(data){
     return `<tr onclick='openModal(${safeJson(e)})'>
       <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
       <td class="mono" style="color:var(--ho);font-size:12px;">${e['Emp Id']}</td>
-      <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+      <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span>${noticeTag(e)}</td>
       <td><span class="badge b-indigo">${e['Designation']||'—'}</span></td>
       <td>${e['Department']||'—'}</td>
       <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
@@ -2093,6 +2151,57 @@ function filterResignedTable(){
 }
 
 // ──────────────────────────────────────────────
+// NOTICE PERIOD TABLE
+// ──────────────────────────────────────────────
+function renderNoticeTable(data){
+  if(data!==undefined) noticeFiltered=data;
+  const sub=document.getElementById('notice-subtitle');
+  if(sub) sub.textContent=noticeFiltered.length+' of '+noticeEmps.length+' employees serving notice';
+  renderPaginatedTable('notice-tbody','notice-pagination',noticeFiltered,noticePage,(e,i,off)=>{
+    const d=daysLeft(e);
+    const cls=d!==null&&d<=7?'b-red':d!==null&&d<=15?'b-amber':'b-blue';
+    return `<tr onclick='openModal(${safeJson(e)})'>
+    <td class="mono" style="color:var(--muted);font-size:12px;">${off+i+1}</td>
+    <td class="mono" style="color:var(--accent3);font-size:12px;">${e['Emp Id']}</td>
+    <td style="min-width:150px;">${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
+    <td><span class="badge b-amber">${e['Short Designation']||e['Designation']||'—'}</span></td>
+    <td>${e['Department']||'—'}</td>
+    <td>${fmtDivs(e)}</td>
+    <td>${e['HQ']||'—'}</td>
+    <td style="color:var(--muted);font-size:12px;">${e['Date of Joining']||'—'}</td>
+    <td style="color:var(--accent3);font-size:12px;font-weight:600;">${e['Date Of Resignation']||'—'}</td>
+    <td><span class="badge ${cls}">${d!==null?d+' day'+(d===1?'':'s'):'—'}</span></td>
+  </tr>`;});
+}
+function filterNoticeTable(){
+  const q=(document.getElementById('notice-search').value||'').toLowerCase();
+  const dept=document.getElementById('notice-dept-filter').value;
+  const typeF=document.getElementById('notice-type-filter').value;
+  noticeFiltered=noticeEmps.filter(e=>
+    (!q||Object.values(e).some(v=>String(v).toLowerCase().includes(q)))&&
+    (!dept||e['Department']===dept)&&
+    (!typeF||(typeF==='sales'?isSales(e):!isSales(e))));
+  if(sortState.notice.col){applySortAndRender('notice');}
+  else{noticePage=1;renderNoticeTable();}
+}
+function clearNoticeFilters(){
+  document.getElementById('notice-search').value='';
+  document.getElementById('notice-dept-filter').value='';
+  document.getElementById('notice-type-filter').value='';
+  filterNoticeTable();
+}
+function exportNoticeXLSX(){
+  const data=noticeFiltered.length?noticeFiltered:noticeEmps;
+  if(!data.length){showToast('No data','error');return;}
+  const rows=data.map((e,i)=>({'#':i+1,'Emp ID':e['Emp Id'],'Name':e['Emp Name'],
+    'Designation':e['Short Designation']||e['Designation']||'','Department':e['Department']||'',
+    'Division':splitDivs(e).join(' | '),'HQ':e['HQ']||'','Date of Joining':e['Date of Joining']||'',
+    'Last Working Day':e['Date Of Resignation']||'','Days Left':daysLeft(e)}));
+  const wb=XLSX.utils.book_new();const ws=XLSX.utils.json_to_sheet(rows);styleWS(ws);
+  XLSX.utils.book_append_sheet(wb,ws,'Notice Period');downloadXLSX(wb,'Notice_Period_'+today());
+}
+
+// ──────────────────────────────────────────────
 // PAGINATION
 // ──────────────────────────────────────────────
 function renderPaginatedTable(tbodyId,paginId,data,page,rowFn){
@@ -2120,6 +2229,7 @@ function pgChange(tbodyId,pg){
   if(tbodyId==='sales-tbody'){salesPage=pg;renderSalesTable();}
   if(tbodyId==='ho-tbody'){hoPage=pg;renderHOTable();}
   if(tbodyId==='resigned-tbody'){resignedPage=pg;renderResignedTable();}
+  if(tbodyId==='notice-tbody'){noticePage=pg;renderNoticeTable();}
   if(tbodyId==='search-tbody'){searchPage=pg;renderSearchTable();}
 }
 
@@ -2647,7 +2757,7 @@ function runGlobalSearch(){
     (!div||hasDiv(e,div))&&
     (!hq||e['HQ']===hq)&&
     (!desig||(isSales(e)?e['Short Designation']:e['Designation'])===desig)&&
-    (!status||(status==='active'?isActive(e):!isActive(e)))&&
+    (!status||(status==='active'?isActive(e):status==='notice'?isNotice(e):!isActive(e)))&&
     (!type||(type==='sales'?isSales(e):!isSales(e))));
   searchPage=1;
   document.getElementById('search-result-count').textContent=_searchResultData.length+' result(s) found';
@@ -2662,7 +2772,7 @@ function renderSearchTable(){
       <td class="mono" style="color:var(--accent);font-size:12px;">${e['Emp Id']}</td>
       <td>${buildAvatar(e)} <span style="margin-left:8px;font-weight:600;">${e['Emp Name']}</span></td>
       <td>${sal?'<span class="badge b-sky">Sales</span>':'<span class="badge b-indigo">HO</span>'}</td>
-      <td><span class="badge ${act?'b-green':'b-red'}">${act?'Active':'Resigned'}</span></td>
+      <td><span class="badge ${isNotice(e)?'b-amber':act?'b-green':'b-red'}">${isNotice(e)?'Notice':act?'Active':'Resigned'}</span></td>
       <td><span class="badge b-gray">${(sal?e['Short Designation']:e['Designation'])||'—'}</span></td>
       <td>${e['Department']||'—'}</td>
       <td>${fmtDivs(e)}</td>
@@ -2753,7 +2863,7 @@ function openModal(emp){
   document.getElementById('modal-desig').textContent=(sal?emp['Short Designation']:emp['Designation']||'')+(emp['Department']?' · '+emp['Department']:'');
   document.getElementById('modal-status').innerHTML=
     `${sal?'<span class="badge b-sky">📈 Sales</span>':'<span class="badge b-indigo">🏢 Head Office</span>'}
-     ${act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red">👋 Resigned '+emp['Date Of Resignation']+'</span>'}
+     ${isNotice(emp)?'<span class="badge b-amber">⏳ Notice Period · Last day '+emp['Date Of Resignation']+'</span>':act?'<span class="badge b-green"><span class="pulse-dot" style="margin-right:4px;"></span>Active</span>':'<span class="badge b-red">👋 Resigned '+emp['Date Of Resignation']+'</span>'}
      ${emp['HQ']?`<span class="badge b-gray">📍 ${emp['HQ']}</span>`:''}
      ${splitDivs(emp).map(d=>`<span class="badge b-purple">🗂 ${d}</span>`).join('')}
      <button class="btn btn-primary" style="margin-left:auto;gap:5px;" onclick='sendMailToStaff(${safeJson(emp)})' title="Send email to this staff with managers in CC">
@@ -2860,6 +2970,7 @@ function copyFieldValue(btn,val){
 function populateFilters(){
   const depts=[...new Set(allEmployees.map(e=>e['Department']).filter(Boolean))].sort();
   populateSelect('resigned-dept-filter',depts);
+  populateSelect('notice-dept-filter',depts);
   populateSelect('new-dept-filter',depts);
   // Resigned year filter
   const years=[...new Set(resignedEmps.map(e=>extractYear(e['Date Of Resignation'])).filter(Boolean))].sort((a,b)=>b-a);
