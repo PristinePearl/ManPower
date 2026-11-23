@@ -487,7 +487,7 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
   <div id="load-error-msg"></div>
   <div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap;">
     <button class="btn btn-primary" style="font-size:12px;" onclick="loadData(true)">Retry</button>
-    <a class="btn btn-ghost" style="font-size:12px;text-decoration:none;" id="load-error-test" target="_blank" rel="noopener">Open sheet ↗</a>
+
     <button class="btn btn-ghost" style="font-size:12px;" onclick="document.getElementById('load-error').style.display='none'">Dismiss</button>
   </div>
 </div>
@@ -1030,16 +1030,19 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <div class="addr-print-card">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Label Preview (A4)</div>
         <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px;font-size:12px;font-weight:600;color:var(--text2);">
-          <label>Layout <select class="inp" id="ap-lay" onchange="apRenderBulkPreview()"><option value="8">8 per A4</option><option value="6">6 per A4</option></select></label>
-          <label>Copies <input class="inp" id="ap-cp" type="number" value="1" min="1" max="20" style="width:60px;" oninput="apRenderBulkPreview()"></label>
+          <label>Layout <select class="inp" id="ap-lay" onchange="apLayChange()"><option value="8">8 per A4</option><option value="6">6 per A4</option><option value="G">Glass With Care – 4 per A4 landscape</option></select></label>
+          <span id="ap-gopts" style="display:none;gap:8px;align-items:center;flex-wrap:wrap;">
+            <label>Date <input class="inp" id="ap-date" type="date" oninput="apRenderBulkPreview()"></label>
+          </span>
+          <label id="ap-cp-wrap">Copies <input class="inp" id="ap-cp" type="number" value="1" min="1" max="20" style="width:60px;" oninput="apRenderBulkPreview()"></label>
           <label>Start at # <input class="inp" id="ap-start" type="number" value="1" min="1" max="8" style="width:60px;" oninput="apRenderBulkPreview()"></label>
           <label>Text <select class="inp" id="ap-fz" onchange="apRenderBulkPreview()"><option value="0.85">Small</option><option value="1" selected>Normal</option><option value="1.15">Large</option></select></label>
-          <label>QR <select class="inp" id="ap-qt" onchange="apRenderBulkPreview()"><option value="from">Sender details</option><option value="none">No QR</option></select></label>
+          <label id="ap-qt-wrap">QR <select class="inp" id="ap-qt" onchange="apRenderBulkPreview()"><option value="from">Sender details</option><option value="none">No QR</option></select></label>
           <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" id="ap-cut" checked onchange="apRenderBulkPreview()"> Cut lines</label>
           <input class="inp" id="ap-note" placeholder="Extra line on every label (e.g. Ref: INV-1024)" style="flex:1;min-width:180px;" oninput="apRenderBulkPreview()">
         </div>
         <details style="margin-bottom:10px;font-size:12px;">
-          <summary style="cursor:pointer;font-weight:700;color:var(--accent);">✏️ Sender (FROM) details — used in QR</summary>
+          <summary style="cursor:pointer;font-weight:700;color:var(--accent);">✏️ Sender (FROM) details — used in QR &amp; Glass With Care</summary>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;">
             <input class="inp" id="ap-fn" placeholder="Name" style="grid-column:1/-1;" oninput="apFromChange()">
             <textarea class="inp" id="ap-fa" rows="3" placeholder="Address (one line per row; last line: CITY - PINCODE)" style="grid-column:1/-1;" oninput="apFromChange()"></textarea>
@@ -1275,7 +1278,6 @@ document.getElementById('nav-celeb-count').textContent=celebCount||'';
 function showLoadError(msg){
   const bar=document.getElementById('load-error'); if(!bar) return;
   document.getElementById('load-error-msg').textContent=msg;
-  document.getElementById('load-error-test').href='https://docs.google.com/spreadsheets/d/'+SHEET_SOURCE.id+'/edit?gid='+SHEET_SOURCE.gid;
   bar.style.display='block';
 }
 
@@ -1340,8 +1342,8 @@ async function loadData(force){
 function saveLocalCache(emps){try{localStorage.setItem('mp_cache_v1',JSON.stringify({t:Date.now(),employees:emps}));}catch(_){}}
 function loadLocalCache(){try{const c=JSON.parse(localStorage.getItem('mp_cache_v1')||'null');return c&&Array.isArray(c.employees)&&c.employees.length?c:null;}catch(_){return null;}}
 function fetchT(url,opts,ms){
-  const ctl=new AbortController();const t=setTimeout(()=>ctl.abort(),ms);
-  return fetch(url,Object.assign({signal:ctl.signal},opts)).finally(()=>clearTimeout(t));
+  // no AbortSignal (cannot be cloned in sandboxed/proxied frames) — timeout via race
+  return Promise.race([fetch(url,opts),new Promise((_,rej)=>setTimeout(()=>{const e=new Error('timeout');e.name='AbortError';rej(e);},ms))]);
 }
 // ── Google Sheet loader (direct CSV read) ──
 
@@ -4275,6 +4277,7 @@ function apRenderList(){
           <div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${e['Emp Name']||'—'}</div>
           <div style="font-size:10.5px;color:var(--muted);font-weight:600;">${e['HQ']||''} · ${(isSales(e)?e['Short Designation']:e['Designation'])||''}${e['Team Wise']?' · '+e['Team Wise']:''}${splitDivs(e).length?' · '+splitDivs(e).join(' | '):''}</div>
         </div>
+        ${sel&&apG('ap-lay')&&apG('ap-lay').value==='G'?`<label onclick="event.stopPropagation()" style="font-size:10px;font-weight:700;display:flex;align-items:center;gap:3px;">Boxes <input type="number" min="1" max="99" value="${apBoxN(e)}" style="width:46px;" class="inp" oninput="apSetBox('${String(e['Emp Id'])}',this.value)"></label>`:''}
         ${!hasAddr?'<span class="badge b-amber" style="font-size:9px;">No address</span>':''}
       </div>`;
     }).join('') || '<div style="color:var(--muted);font-size:13px;padding:20px;text-align:center;">No staff found</div>';
@@ -4369,8 +4372,19 @@ const AP_CSS=`.aplp{width:210mm;height:296.6mm;padding:5mm;display:grid;grid-tem
 .apqrw{width:27mm;flex:none;text-align:center}.apqr{width:100%;aspect-ratio:1}
 .apqr svg{width:100%;height:100%;display:block;shape-rendering:crispEdges}
 .apcap{font-size:6.5pt;line-height:1.1;font-weight:600;margin-top:.5mm}`;
-const AP_FROM={name:'PRISTINE PEARL PHARMA PVT LTD',addr:['SECOND FLOOR - 2B, DOOR NO: 129, THOTTASALAI EAST,','POWER HOUSE ROAD, PERUR VILLAGE,','COIMBATORE - 641002'],mobile:'',mail:''};
+const AP_GCSS=`.aplp.land{width:297mm;height:209.6mm;padding:4mm;font-family:Arial,Helvetica,sans-serif}
+.aplbl.gl{padding:4mm;color:#000;border-color:#000}
+.aplbl.gl .gh{border:2px solid #000;text-align:center;font-weight:800;letter-spacing:2px;font-size:1.2em;padding:1mm 0;margin-bottom:2mm}
+.aplbl.gl .apto{flex:1 1 auto;min-height:auto;overflow:visible}
+.aplbl.gl .gh,.aplbl.gl .gm,.aplbl.gl .frm{flex:none}
+.aplbl.gl .apt{line-height:1.2}.aplbl.gl .apn{margin:.3mm 0 .6mm}.aplbl.gl .apcs,.aplbl.gl .app,.aplbl.gl .apph{margin-top:.4mm}
+.aplbl.gl .gm{display:flex;justify-content:space-between;gap:4mm;border:1px solid #000;padding:1mm 2mm;margin-top:1.5mm;font-weight:700;font-size:1.05em}
+.aplbl.gl .frm{border-top:1px solid #000;margin-top:2mm;padding-top:1.5mm;font-size:.78em;line-height:1.3}
+.aplbl.gl .frm b{font-size:1.05em}
+.aplbl.gl .apcb{color:#000;background:#fff;border-color:#000;font-style:italic;font-weight:500;opacity:.8}`;
+const AP_FROM={name:'PRISTINE PEARL PHARMA PVT LTD',addr:['SECOND FLOOR - 2B, DOOR NO: 129, THOTTASALAI EAST,','POWER HOUSE ROAD, PERUR VILLAGE,','COIMBATORE - 641002'],mobile:'+91 9361136329',mail:'distribution@pristinepearl.com'};
 const AP_SET=['ap-lay','ap-cp','ap-start','ap-fz','ap-qt','ap-cut','ap-note'];
+const AP_ALLCSS=()=>AP_CSS+AP_GCSS;
 const apG=id=>document.getElementById(id);
 const apEsc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 let apInited=false, apPinCache={}; const apPinTried=new Set();
@@ -4378,14 +4392,47 @@ try{apPinCache=JSON.parse(localStorage.getItem('pinCache')||'{}')}catch(e){}
 
 function apInit(){
   if(apInited) return; apInited=true;
-  const st=document.createElement('style'); st.textContent=AP_CSS; document.head.appendChild(st);
+  const st=document.createElement('style'); st.textContent=AP_ALLCSS(); document.head.appendChild(st);
   try{
     const o=JSON.parse(localStorage.getItem('ap_lbl_set')||'{}');
     AP_SET.forEach(id=>{if(o[id]!==undefined){const el=apG(id); if(el.type==='checkbox') el.checked=o[id]; else el.value=o[id];}});
     if(o.from) Object.assign(AP_FROM,o.from);
   }catch(e){}
+  apG('ap-date').value=new Date().toISOString().slice(0,10);
+  apLayChange(true);
   apG('ap-fn').value=AP_FROM.name; apG('ap-fa').value=AP_FROM.addr.join('\n');
   apG('ap-fm').value=AP_FROM.mobile; apG('ap-fe').value=AP_FROM.mail;
+}
+function apLayChange(noRender){
+  const g=apG('ap-lay').value==='G';
+  apG('ap-gopts').style.display=g?'flex':'none';
+  apG('ap-cp-wrap').style.display=g?'none':'';
+  apG('ap-qt-wrap').style.display=g?'none':'';
+  apG('ap-start').max=g?4:8;
+  if(!noRender){apRenderList();apRenderBulkPreview();}
+}
+const apFmtDate=v=>{const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?`${m[3]}/${m[2]}/${m[1]}`:'__/__/____';};
+let apBoxes={};
+try{apBoxes=JSON.parse(localStorage.getItem('ap_boxes')||'{}')}catch(e){}
+const apBoxN=e=>Math.max(1,Math.min(99,+apBoxes[String(e['Emp Id'])]||1));
+function apSetBox(id,v,inp){
+  apBoxes[id]=Math.max(1,Math.min(99,+v||1));
+  try{localStorage.setItem('ap_boxes',JSON.stringify(apBoxes))}catch(e){}
+  apRenderBulkPreview();
+}
+function apGlassHTML(e,o,box,tot){
+  const pin=apPin(e), c=apPinCache[pin]||{}, up=s=>String(s||'').trim().toUpperCase();
+  const city=c.city||up(e['Current City'])||'—', st=c.state||up(e['Current State'])||'—';
+  const addr=up(e['Current Address']), ph=String(e['Current Phone']||'').trim(), F=AP_FROM;
+  const cs=(pin||city!=='—'||st!=='—')?`<div class="apcs">CITY : ${apEsc(city)} | STATE : ${apEsc(st)}</div>`:'';
+  return `<div class="aplbl gl"><div class="gh">GLASS WITH CARE</div><div class="apto"><div class="apt">
+    <div class="apk"><span>TO,</span><span class="apcb">${apEsc(apCourierMode)}</span></div>
+    <div class="apn">${apEsc(up(e['Emp Name'])||'—')}</div>
+    <div class="apa">${addr?apEsc(addr):'<span style="color:#aaa">No address</span>'}</div>${cs}
+    ${pin?`<div class="app">PIN : ${apEsc(pin)}</div>`:''}${ph?`<div class="apph">PH : ${apEsc(ph)}</div>`:''}
+    ${o.note?`<div class="apnote">${apEsc(o.note)}</div>`:''}</div></div>
+    <div class="gm"><span>${apFmtDate(o.date)}</span><span>Box : ${box} / ${tot}</span></div>
+    <div class="frm"><b>FROM,</b> <b>${apEsc(F.name)}</b><br>${F.addr.map(apEsc).join('<br>')}${F.mobile?`<br>Mob : ${apEsc(F.mobile)}`:''}${F.mail?` | ${apEsc(F.mail)}`:''}</div></div>`;
 }
 function apSave(){
   try{const o={}; AP_SET.forEach(id=>{const el=apG(id); o[id]=el.type==='checkbox'?el.checked:el.value;}); o.from=AP_FROM; localStorage.setItem('ap_lbl_set',JSON.stringify(o));}catch(e){}
@@ -4443,18 +4490,19 @@ function apLabelHTML(e,o,qr){
     ${o.note?`<div class="apnote">${apEsc(o.note)}</div>`:''}</div>${qr}</div></div>`;
 }
 function apOpts(){
-  return {n:apG('ap-lay').value==='6'?6:8, cp:Math.max(1,Math.min(20,+apG('ap-cp').value||1)), st:Math.max(1,+apG('ap-start').value||1)-1,
-    z:+apG('ap-fz').value||1, qr:apG('ap-qt').value!=='none', cut:apG('ap-cut').checked, note:apG('ap-note').value.trim()};
+  const g=apG('ap-lay').value==='G';
+  return {g, date:apG('ap-date').value, n:g?4:apG('ap-lay').value==='6'?6:8, cp:Math.max(1,Math.min(20,+apG('ap-cp').value||1)), st:Math.max(1,+apG('ap-start').value||1)-1,
+    z:+apG('ap-fz').value||1, qr:!g&&apG('ap-qt').value!=='none', cut:apG('ap-cut').checked, note:apG('ap-note').value.trim()};
 }
 function apSheets(emps,o){
-  const items=[]; emps.forEach(e=>{for(let k=0;k<o.cp;k++) items.push(e);});
+  const items=[]; if(o.g) emps.forEach(e=>{const t=apBoxN(e);for(let k=1;k<=t;k++) items.push({e,k,t});}); else emps.forEach(e=>{for(let k=0;k<o.cp;k++) items.push(e);});
   const st=Math.min(o.n-1,o.st); for(let k=0;k<st;k++) items.unshift(null);
-  const qr=o.qr?apQrBox():'', fs=(o.n===8?10.5:12.5)*o.z+'pt', empty='<div class="aplbl em"></div>';
+  const qr=o.qr?apQrBox():'', fs=(o.g?11.5:o.n===8?10.5:12.5)*o.z+'pt', empty='<div class="aplbl em"></div>';
   let html='';
   for(let s=0;s<items.length;s+=o.n){
-    const cells=items.slice(s,s+o.n).map(e=>e?apLabelHTML(e,o,qr):empty);
+    const cells=items.slice(s,s+o.n).map(e=>e?(o.g?apGlassHTML(e.e,o,e.k,e.t):apLabelHTML(e,o,qr)):empty);
     while(cells.length<o.n) cells.push(empty);
-    html+=`<div class="aplp${o.cut?'':' apnc'}" style="grid-template-rows:repeat(${o.n/2},1fr);--fs:${fs}">${cells.join('')}</div>`;
+    html+=`<div class="aplp${o.g?' land':''}${o.cut?'':' apnc'}" style="grid-template-rows:repeat(${o.n/2},1fr);--fs:${fs}">${cells.join('')}</div>`;
   }
   return {html,count:items.length-st,pages:Math.ceil(items.length/o.n)};
 }
@@ -4530,7 +4578,7 @@ async function apPrintBulk(emps){
   if(!win){showToast('Allow pop-ups to print labels','error');return;}
   await apEnsurePins(emps);
   const r=apSheets(emps,apOpts());
-  win.document.write(`<!DOCTYPE html><html><head><title>Address Labels — Bulk Print</title><style>@page{size:A4 portrait;margin:0}*{margin:0}body{background:#fff}${AP_CSS}</style></head><body>${r.html}<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script></body></html>`);
+  win.document.write(`<!DOCTYPE html><html><head><title>Address Labels — Bulk Print</title><style>@page{size:${apOpts().g?'A4 landscape':'A4 portrait'};margin:0}*{margin:0}body{background:#fff}${AP_ALLCSS()}</style></head><body>${r.html}<script>window.onload=function(){window.print();window.onafterprint=function(){window.close();}}<\/script></body></html>`);
   win.document.close();
 }
 
