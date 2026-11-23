@@ -7,6 +7,8 @@
 <title>ManPower — Pristine Pearl Pharma</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
@@ -1010,6 +1012,17 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
 
   <!-- BULK TAB -->
   <div id="ap-panel-bulk" style="display:none;">
+    <div class="addr-print-card" style="margin-bottom:18px;">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;">⬆ Bulk Upload → PDF</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
+        <button class="btn btn-ghost" style="font-size:12px;" onclick="apTemplateDownload()">⬇ Download template</button>
+        <label class="btn btn-primary" style="font-size:12px;cursor:pointer;">⬆ Upload filled template<input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="apUploadFile(this)"></label>
+        <button class="btn btn-ghost" id="ap-up-dl" style="font-size:12px;display:none;" onclick="apUpDownload()">⬇ Download PDF</button>
+        <button class="btn btn-ghost" id="ap-up-pr" style="font-size:12px;display:none;" onclick="apUpPrint()">🖨 Print PDF</button>
+        <span id="ap-up-msg" style="font-size:12px;font-weight:600;color:var(--text2);"></span>
+      </div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">Columns: Emp Id | Date (dd/mm/yyyy) | Box | Type — Type 1 = normal label (Box = no. of labels), Type 2 = Glass With Care (Box = no. of boxes, one label per box).</div>
+    </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
       <!-- Staff list -->
       <div class="addr-print-card">
@@ -4434,6 +4447,84 @@ function apGlassHTML(e,o,box,tot){
     <div class="gm"><span>${apFmtDate(o.date)}</span><span>Box : ${box} / ${tot}</span></div>
     <div class="frm"><b>FROM,</b> <b>${apEsc(F.name)}</b><br>${F.addr.map(apEsc).join('<br>')}${F.mobile?`<br>Mob : ${apEsc(F.mobile)}`:''}${F.mail?` | ${apEsc(F.mail)}`:''}</div></div>`;
 }
+/* ── Bulk upload → PDF ── */
+let apUpBlob=null;
+function apTemplateDownload(){
+  if(typeof XLSX==='undefined'){showToast('XLSX library not loaded','error');return;}
+  const t=new Date(), d=String(t.getDate()).padStart(2,'0')+'/'+String(t.getMonth()+1).padStart(2,'0')+'/'+t.getFullYear();
+  const sel=[...apBulkSel];
+  const rows=[['Emp Id','Date','Box','Type']];
+  (sel.length?sel:['']).forEach(id=>rows.push([id,d,1,2]));
+  const ws=XLSX.utils.aoa_to_sheet(rows); ws['!cols']=[{wch:14},{wch:14},{wch:8},{wch:8}];
+  const info=XLSX.utils.aoa_to_sheet([['Column','Meaning'],['Emp Id','Employee Id as in the ManPower sheet'],['Date','dd/mm/yyyy (blank = today)'],['Box','Type 2: number of boxes (one label per box, Box n / N). Type 1: number of labels'],['Type','1 = normal label, 2 = Glass With Care']]);
+  info['!cols']=[{wch:10},{wch:80}];
+  const wb=XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb,ws,'Labels'); XLSX.utils.book_append_sheet(wb,info,'Help');
+  XLSX.writeFile(wb,'Address_Print_Template.xlsx');
+}
+function apParseDate(v){
+  v=String(v||'').trim(); let m;
+  if((m=v.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/))) return `${m[1]}-${m[2].padStart(2,'0')}-${m[3].padStart(2,'0')}`;
+  if((m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/))){let y=+m[3]; if(y<100)y+=2000; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}
+  return new Date().toISOString().slice(0,10);
+}
+async function apUploadFile(inp){
+  const f=inp.files&&inp.files[0]; inp.value=''; if(!f) return;
+  const msg=apG('ap-up-msg'); apUpBlob=null; apG('ap-up-dl').style.display=apG('ap-up-pr').style.display='none';
+  try{
+    msg.textContent='Reading file…';
+    const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:false});
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const raw=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,dateNF:'yyyy-mm-dd'});
+    const key=(r,n)=>{const k=Object.keys(r).find(x=>x.toLowerCase().replace(/[^a-z]/g,'')===n);return k===undefined?'':r[k];};
+    const all=new Map(allEmployees.map(e=>[String(e['Emp Id']).trim(),e]));
+    const norm=[],glass=[],missing=[],bad=[];
+    raw.forEach((r,i)=>{
+      const id=String(key(r,'empid')).trim(); if(!id) return;
+      const e=all.get(id); if(!e){missing.push(id);return;}
+      const ty=String(key(r,'type')).trim(), n=Math.max(1,Math.min(99,parseInt(key(r,'box'))||1)), d=apParseDate(key(r,'date'));
+      if(ty==='1') for(let k=0;k<n;k++) norm.push(e);
+      else if(ty==='2') for(let k=1;k<=n;k++) glass.push({e,k,t:n,d});
+      else bad.push(id);
+    });
+    if(!norm.length&&!glass.length){msg.textContent='No valid rows found.'+(missing.length?' Unknown Emp Id: '+missing.join(', '):'');return;}
+    msg.textContent='Building PDF…';
+    await apEnsurePins([...norm,...glass.map(x=>x.e)]);
+    const base=apOpts(), pages=[];
+    if(norm.length){const o=Object.assign({},base,{g:false,n:base.n===6?6:8,cp:1,st:0,qr:apG('ap-qt').value!=='none'}); pages.push(...apPageEls(apSheets(norm,o).html));}
+    if(glass.length){const o=Object.assign({},base,{g:true,n:4,st:0,items:glass}); pages.push(...apPageEls(apSheets([],o).html));}
+    const host=document.createElement('div'); host.style.cssText='position:fixed;left:-10000px;top:0;'; document.body.appendChild(host);
+    pages.forEach(h=>host.insertAdjacentHTML('beforeend',h));
+    const els=[...host.querySelectorAll('.aplp')];
+    const {jsPDF}=window.jspdf; let pdf=null;
+    // recursive (not a loop) so no single loop spans the slow awaits
+    const addPage=async i=>{
+      if(i>=els.length) return;
+      msg.textContent=`Building PDF… page ${i+1}/${els.length}`;
+      const el=els[i], land=el.classList.contains('land');
+      const cv=await html2canvas(el,{scale:2.5,backgroundColor:'#fff',useCORS:true});
+      const img=cv.toDataURL('image/jpeg',.92);
+      if(!pdf) pdf=new jsPDF({orientation:land?'l':'p',unit:'mm',format:'a4'}); else pdf.addPage('a4',land?'l':'p');
+      pdf.addImage(img,'JPEG',0,0,land?297:210,land?210:297);
+      await new Promise(r=>setTimeout(r,0));
+      return addPage(i+1);
+    };
+    await addPage(0);
+    host.remove();
+    apUpBlob=pdf.output('blob');
+    apG('ap-up-dl').style.display=apG('ap-up-pr').style.display='';
+    msg.textContent=`✔ ${norm.length+glass.length} label(s) · ${els.length} page(s)`+(missing.length?` · Unknown Emp Id: ${missing.join(', ')}`:'')+(bad.length?` · Invalid Type (use 1 or 2): ${bad.join(', ')}`:'');
+  }catch(err){console.error(err); msg.textContent='Failed: '+(err.message||err);}
+}
+function apPageEls(html){return [html];}
+function apUpDownload(){
+  if(!apUpBlob) return; const a=document.createElement('a'); a.href=URL.createObjectURL(apUpBlob);
+  a.download='Address_Labels_'+new Date().toISOString().slice(0,10)+'.pdf'; document.body.appendChild(a); a.click(); a.remove();
+}
+function apUpPrint(){
+  if(!apUpBlob) return; const u=URL.createObjectURL(apUpBlob), w=window.open(u,'_blank');
+  if(!w){showToast('Allow pop-ups to print','error');return;}
+  setTimeout(()=>{try{w.print();}catch(e){}},1200);
+}
 function apSave(){
   try{const o={}; AP_SET.forEach(id=>{const el=apG(id); o[id]=el.type==='checkbox'?el.checked:el.value;}); o.from=AP_FROM; localStorage.setItem('ap_lbl_set',JSON.stringify(o));}catch(e){}
 }
@@ -4495,12 +4586,12 @@ function apOpts(){
     z:+apG('ap-fz').value||1, qr:!g&&apG('ap-qt').value!=='none', cut:apG('ap-cut').checked, note:apG('ap-note').value.trim()};
 }
 function apSheets(emps,o){
-  const items=[]; if(o.g) emps.forEach(e=>{const t=apBoxN(e);for(let k=1;k<=t;k++) items.push({e,k,t});}); else emps.forEach(e=>{for(let k=0;k<o.cp;k++) items.push(e);});
+  const items=[]; if(o.g&&o.items) items.push(...o.items); else if(o.g) emps.forEach(e=>{const t=apBoxN(e);for(let k=1;k<=t;k++) items.push({e,k,t});}); else emps.forEach(e=>{for(let k=0;k<o.cp;k++) items.push(e);});
   const st=Math.min(o.n-1,o.st); for(let k=0;k<st;k++) items.unshift(null);
   const qr=o.qr?apQrBox():'', fs=(o.g?11.5:o.n===8?10.5:12.5)*o.z+'pt', empty='<div class="aplbl em"></div>';
   let html='';
   for(let s=0;s<items.length;s+=o.n){
-    const cells=items.slice(s,s+o.n).map(e=>e?(o.g?apGlassHTML(e.e,o,e.k,e.t):apLabelHTML(e,o,qr)):empty);
+    const cells=items.slice(s,s+o.n).map(e=>e?(o.g?apGlassHTML(e.e,e.d?Object.assign({},o,{date:e.d}):o,e.k,e.t):apLabelHTML(e,o,qr)):empty);
     while(cells.length<o.n) cells.push(empty);
     html+=`<div class="aplp${o.g?' land':''}${o.cut?'':' apnc'}" style="grid-template-rows:repeat(${o.n/2},1fr);--fs:${fs}">${cells.join('')}</div>`;
   }
