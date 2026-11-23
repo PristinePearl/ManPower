@@ -1017,10 +1017,12 @@ main{flex:1;overflow:auto;padding:28px;min-width:0;}
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center;">
         <button class="btn btn-ghost" style="font-size:12px;" onclick="apTemplateDownload()">⬇ Download template</button>
         <label class="btn btn-primary" style="font-size:12px;cursor:pointer;">⬆ Upload filled template<input type="file" accept=".xlsx,.xls,.csv" style="display:none;" onchange="apUploadFile(this)"></label>
+        <button class="btn btn-primary" id="ap-up-gen" style="font-size:12px;display:none;" onclick="apUpBuild()">📄 Generate PDF</button>
         <button class="btn btn-ghost" id="ap-up-dl" style="font-size:12px;display:none;" onclick="apUpDownload()">⬇ Download PDF</button>
         <button class="btn btn-ghost" id="ap-up-pr" style="font-size:12px;display:none;" onclick="apUpPrint()">🖨 Print PDF</button>
         <span id="ap-up-msg" style="font-size:12px;font-weight:600;color:var(--text2);"></span>
       </div>
+      <div id="ap-up-review" style="margin-top:10px;"></div>
       <div style="font-size:11px;color:var(--muted);margin-top:6px;">Columns: Emp Id | Date (dd/mm/yyyy) | Box | Type — Type 1 = normal label (Box = no. of labels), Type 2 = Glass With Care (Box = no. of boxes, one label per box).</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
@@ -4292,6 +4294,7 @@ function apRenderList(){
         </div>
         ${sel&&apG('ap-lay')&&apG('ap-lay').value==='G'?`<label onclick="event.stopPropagation()" style="font-size:10px;font-weight:700;display:flex;align-items:center;gap:3px;">Boxes <input type="number" min="1" max="99" value="${apBoxN(e)}" style="width:46px;" class="inp" oninput="apSetBox('${String(e['Emp Id'])}',this.value)"></label>`:''}
         ${!hasAddr?'<span class="badge b-amber" style="font-size:9px;">No address</span>':''}
+        ${sel?`<button class="btn btn-ghost" title="Edit address for print" style="font-size:11px;padding:2px 6px;" onclick="event.stopPropagation();apEditOpen('${String(e['Emp Id'])}')">✏️${apOv[String(e['Emp Id'])]?'•':''}</button>`:''}
       </div>`;
     }).join('') || '<div style="color:var(--muted);font-size:13px;padding:20px;text-align:center;">No staff found</div>';
   }
@@ -4436,7 +4439,7 @@ function apSetBox(id,v,inp){
 function apGlassHTML(e,o,box,tot){
   const pin=apPin(e), c=apPinCache[pin]||{}, up=s=>String(s||'').trim().toUpperCase();
   const city=c.city||up(e['Current City'])||'—', st=c.state||up(e['Current State'])||'—';
-  const addr=up(e['Current Address']), ph=String(e['Current Phone']||'').trim(), F=AP_FROM;
+  const addr=up(apAddr(e)), ph=apPh(e), F=AP_FROM;
   const cs=(pin||city!=='—'||st!=='—')?`<div class="apcs">CITY : ${apEsc(city)} | STATE : ${apEsc(st)}</div>`:'';
   return `<div class="aplbl gl"><div class="gh">GLASS WITH CARE</div><div class="apto"><div class="apt">
     <div class="apk"><span>TO,</span><span class="apcb">${apEsc(apCourierMode)}</span></div>
@@ -4467,9 +4470,10 @@ function apParseDate(v){
   if((m=v.match(/^(\d{1,2})[-\/.](\d{1,2})[-\/.](\d{2,4})/))){let y=+m[3]; if(y<100)y+=2000; return `${y}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`;}
   return new Date().toISOString().slice(0,10);
 }
+let apUpRows=[];
 async function apUploadFile(inp){
   const f=inp.files&&inp.files[0]; inp.value=''; if(!f) return;
-  const msg=apG('ap-up-msg'); apUpBlob=null; apG('ap-up-dl').style.display=apG('ap-up-pr').style.display='none';
+  const msg=apG('ap-up-msg'); apUpBlob=null; ['ap-up-dl','ap-up-pr','ap-up-gen'].forEach(i=>apG(i).style.display='none');
   try{
     msg.textContent='Reading file…';
     const wb=XLSX.read(await f.arrayBuffer(),{type:'array',cellDates:false});
@@ -4477,16 +4481,54 @@ async function apUploadFile(inp){
     const raw=XLSX.utils.sheet_to_json(ws,{defval:'',raw:false,dateNF:'yyyy-mm-dd'});
     const key=(r,n)=>{const k=Object.keys(r).find(x=>x.toLowerCase().replace(/[^a-z]/g,'')===n);return k===undefined?'':r[k];};
     const all=new Map(allEmployees.map(e=>[String(e['Emp Id']).trim(),e]));
-    const norm=[],glass=[],missing=[],bad=[];
-    raw.forEach((r,i)=>{
+    apUpRows=[];
+    raw.forEach(r=>{
       const id=String(key(r,'empid')).trim(); if(!id) return;
-      const e=all.get(id); if(!e){missing.push(id);return;}
-      const ty=String(key(r,'type')).trim(), n=Math.max(1,Math.min(99,parseInt(key(r,'box'))||1)), d=apParseDate(key(r,'date'));
-      if(ty==='1') for(let k=0;k<n;k++) norm.push(e);
-      else if(ty==='2') for(let k=1;k<=n;k++) glass.push({e,k,t:n,d});
-      else bad.push(id);
+      apUpRows.push({id,e:all.get(id)||null,ty:String(key(r,'type')).trim(),n:Math.max(1,Math.min(99,parseInt(key(r,'box'))||1)),d:apParseDate(key(r,'date'))});
     });
-    if(!norm.length&&!glass.length){msg.textContent='No valid rows found.'+(missing.length?' Unknown Emp Id: '+missing.join(', '):'');return;}
+    msg.textContent='';
+    apUpReview();
+  }catch(err){console.error(err); msg.textContent='Failed: '+(err.message||err);}
+}
+/* validate rows → review table with issues */
+function apUpIssues(r){
+  const err=[],warn=[];
+  if(!r.e) err.push('Emp Id not found');
+  if(r.ty!=='1'&&r.ty!=='2') err.push('Type must be 1 or 2');
+  if(r.e){
+    if(!String(apAddr(r.e)).trim()) warn.push('No address');
+    if(!/^\d{6}$/.test(apPin(r.e))) warn.push('Pincode missing/invalid');
+    if(!apPh(r.e)) warn.push('No phone');
+  }
+  return {err,warn};
+}
+function apUpReview(){
+  const box=apG('ap-up-review'); if(!box) return;
+  if(!apUpRows.length){box.innerHTML='';return;}
+  let nN=0,nG=0,nErr=0,nWarn=0;
+  const trs=apUpRows.map((r,i)=>{
+    const {err,warn}=apUpIssues(r);
+    if(err.length) nErr++; else {if(r.ty==='1') nN+=r.n; else nG+=r.n; if(warn.length) nWarn++;}
+    const st=err.length?`<span style="color:#c92a2a;font-weight:700;">✖ ${err.join(', ')} (skipped)</span>`:warn.length?`<span style="color:#b36b00;font-weight:700;">⚠ ${warn.join(', ')}</span>`:'<span style="color:#2b8a3e;font-weight:700;">✔ OK</span>';
+    return `<tr><td>${i+1}</td><td>${apEsc(r.id)}</td><td>${apEsc(r.e?r.e['Emp Name']:'—')}</td><td>${apEsc(r.ty)==='2'?'Glass':apEsc(r.ty)==='1'?'Normal':'?'}</td><td>${r.n}</td><td>${apFmtDate(r.d)}</td><td>${st}</td><td>${r.e?`<button class="btn btn-ghost" style="font-size:11px;padding:1px 6px;" onclick="apEditOpen('${apEsc(r.id)}')">✏️${apOv[String(r.id)]?'•':''}</button>`:''}</td></tr>`;
+  }).join('');
+  const o=apOpts(), pg=Math.ceil(nN/(o.n===6?6:8))+Math.ceil(nG/4);
+  box.innerHTML=`<div style="font-size:12px;font-weight:700;margin-bottom:6px;">${nN+nG} label(s) → ${pg} page(s) · ${nErr} skipped · ${nWarn} with warnings</div>
+    <div style="max-height:260px;overflow:auto;border:1px solid var(--border);border-radius:8px;"><table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <thead><tr style="text-align:left;background:var(--bg2,#f3f3f3);"><th>#</th><th>Emp Id</th><th>Name</th><th>Type</th><th>Box</th><th>Date</th><th>Check</th><th></th></tr></thead><tbody>${trs}</tbody></table></div>`;
+  box.querySelectorAll('th,td').forEach(c=>c.style.padding='4px 8px');
+  apG('ap-up-gen').style.display=(nN+nG)?'':'none';
+  apG('ap-up-dl').style.display=apG('ap-up-pr').style.display='none'; apUpBlob=null;
+}
+async function apUpBuild(){
+  const msg=apG('ap-up-msg');
+  try{
+    const norm=[],glass=[];
+    apUpRows.forEach(r=>{
+      if(apUpIssues(r).err.length) return;
+      if(r.ty==='1') for(let k=0;k<r.n;k++) norm.push(r.e);
+      else for(let k=1;k<=r.n;k++) glass.push({e:r.e,k,t:r.n,d:r.d});
+    });
     msg.textContent='Building PDF…';
     await apEnsurePins([...norm,...glass.map(x=>x.e)]);
     const base=apOpts(), pages=[];
@@ -4496,7 +4538,6 @@ async function apUploadFile(inp){
     pages.forEach(h=>host.insertAdjacentHTML('beforeend',h));
     const els=[...host.querySelectorAll('.aplp')];
     const {jsPDF}=window.jspdf; let pdf=null;
-    // recursive (not a loop) so no single loop spans the slow awaits
     const addPage=async i=>{
       if(i>=els.length) return;
       msg.textContent=`Building PDF… page ${i+1}/${els.length}`;
@@ -4512,7 +4553,7 @@ async function apUploadFile(inp){
     host.remove();
     apUpBlob=pdf.output('blob');
     apG('ap-up-dl').style.display=apG('ap-up-pr').style.display='';
-    msg.textContent=`✔ ${norm.length+glass.length} label(s) · ${els.length} page(s)`+(missing.length?` · Unknown Emp Id: ${missing.join(', ')}`:'')+(bad.length?` · Invalid Type (use 1 or 2): ${bad.join(', ')}`:'');
+    msg.textContent=`✔ PDF ready · ${els.length} page(s)`;
   }catch(err){console.error(err); msg.textContent='Failed: '+(err.message||err);}
 }
 function apPageEls(html){return [html];}
@@ -4536,7 +4577,39 @@ function apFromChange(){
 }
 
 /* Pincode → District / State (India Post API), cached */
-const apPin=e=>String(e['Current Pincode']||'').replace(/\D/g,'');
+let apOv={}; try{apOv=JSON.parse(localStorage.getItem('ap_over')||'{}')}catch(e){}
+const apOvOf=e=>apOv[String(e['Emp Id'])]||{};
+const apAddr=e=>{const o=apOvOf(e);return o.addr!==undefined?o.addr:(e['Current Address']||'');};
+const apPh=e=>{const o=apOvOf(e);return String(o.ph!==undefined?o.ph:(e['Current Phone']||'')).trim();};
+const apPin=e=>{const o=apOvOf(e);return String(o.pin!==undefined?o.pin:(e['Current Pincode']||'')).replace(/\D/g,'');};
+/* Edit address / pincode / phone for printing only (sheet is not changed) */
+function apEditOpen(id){
+  id=String(id); const e=allEmployees.find(x=>String(x['Emp Id'])===id); if(!e) return;
+  const old=document.getElementById('ap-edit-ov'); if(old) old.remove();
+  const d=document.createElement('div'); d.id='ap-edit-ov';
+  d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:10001;display:flex;align-items:center;justify-content:center;';
+  d.innerHTML=`<div style="background:var(--card,#fff);color:var(--text,#111);border-radius:12px;padding:20px;width:min(460px,92vw);box-shadow:0 10px 40px rgba(0,0,0,.35);">
+    <div style="font-weight:800;margin-bottom:4px;">✏️ Edit label details — ${apEsc(e['Emp Name']||id)}</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Used only for printing. Sheet data is not changed.</div>
+    <textarea class="inp" id="ap-ed-a" rows="4" placeholder="Address" style="width:100%;margin-bottom:6px;">${apEsc(apAddr(e))}</textarea>
+    <div style="display:flex;gap:6px;margin-bottom:12px;"><input class="inp" id="ap-ed-p" placeholder="Pincode" maxlength="6" value="${apEsc(apPin(e))}" style="flex:1;"><input class="inp" id="ap-ed-h" placeholder="Phone" value="${apEsc(apPh(e))}" style="flex:1;"></div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <button class="btn btn-ghost" style="font-size:12px;" onclick="apEditReset('${id}')">Reset to sheet</button>
+      <button class="btn btn-ghost" style="font-size:12px;" onclick="document.getElementById('ap-edit-ov').remove()">Cancel</button>
+      <button class="btn btn-primary" style="font-size:12px;" onclick="apEditSave('${id}')">Save</button></div></div>`;
+  document.body.appendChild(d);
+}
+function apEditAfter(){
+  try{localStorage.setItem('ap_over',JSON.stringify(apOv))}catch(e){}
+  const o=document.getElementById('ap-edit-ov'); if(o) o.remove();
+  apRenderList(); apRenderBulkPreview(); apUpReview();
+  const all=allEmployees; apEnsurePins(all.filter(e=>apBulkSel.has(String(e['Emp Id'])))).then(c=>{if(c) apRenderBulkPreview();});
+}
+function apEditSave(id){
+  apOv[id]={addr:apG('ap-ed-a').value.trim(),pin:apG('ap-ed-p').value.trim(),ph:apG('ap-ed-h').value.trim()};
+  apEditAfter();
+}
+function apEditReset(id){delete apOv[id]; apEditAfter();}
 async function apLookupPin(p){
   try{
     const r=await fetch('https://api.postalpincode.in/pincode/'+p), j=await r.json(), po=j&&j[0]&&j[0].PostOffice;
@@ -4571,7 +4644,7 @@ function apQrBox(){
 function apLabelHTML(e,o,qr){
   const pin=apPin(e), c=apPinCache[pin]||{}, up=s=>String(s||'').trim().toUpperCase();
   const city=c.city||up(e['Current City'])||'—', st=c.state||up(e['Current State'])||'—';
-  const addr=up(e['Current Address']), ph=String(e['Current Phone']||'').trim();
+  const addr=up(apAddr(e)), ph=apPh(e);
   const cs=(pin||city!=='—'||st!=='—')?`<div class="apcs">CITY : ${apEsc(city)} | STATE : ${apEsc(st)}</div>`:'';
   return `<div class="aplbl"><div class="apto"><div class="apt">
     <div class="apk"><span>TO,</span><span class="apcb">${apEsc(apCourierMode)}</span></div>
